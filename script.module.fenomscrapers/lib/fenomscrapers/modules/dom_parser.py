@@ -12,7 +12,6 @@ from fenomscrapers.modules import py_tools
 DomMatch = namedtuple('DOMMatch', ['attrs', 'content'])
 re_type = type(re.compile(r''))
 
-
 		# ----- FUTURE -----
 # def parseDOM(html, name='', attrs=None, ret=False):
 	# try:
@@ -24,7 +23,6 @@ re_type = type(re.compile(r''))
 		# return results
 	# except:
 		# log_utils.error()
-
 
 def __get_dom_content(html, name, match):
 	try:
@@ -53,7 +51,6 @@ def __get_dom_content(html, name, match):
 	except:
 		log_utils.error()
 		return ''
-
 
 def __get_dom_elements(item, name, attrs):
 	try:
@@ -107,7 +104,6 @@ def __get_attribs(element):
 		log_utils.error()
 		return attribs
 
-
 def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
 	try:
 		if attrs is None: attrs = {}
@@ -123,7 +119,6 @@ def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
 
 		if not name: return ''
 		if not isinstance(attrs, dict): return ''
-
 		if req:
 			if not isinstance(req, list): req = [req]
 			req = set([key.lower() for key in req])

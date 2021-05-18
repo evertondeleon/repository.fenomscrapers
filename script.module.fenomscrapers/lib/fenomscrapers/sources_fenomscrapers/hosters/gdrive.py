@@ -10,12 +10,10 @@ try: #Py2
 	from urllib import unquote, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import unquote, quote_plus, unquote_plus
-
 from fenomscrapers.modules import control
 from fenomscrapers.modules import source_utils
 
 cloudflare_worker_url = control.setting('gdrive.cloudflare_url').strip()
-
 
 def getResults(searchTerm):
 	url = '{}/searchjson/{}'.format(cloudflare_worker_url, searchTerm)
@@ -24,22 +22,17 @@ def getResults(searchTerm):
 	results = requests.get(url).json()
 	return results
 
-
 def get_simple(title):
 	title = title.lower()
 	if "/" in title:
 		title = title.split("/")[-1]
-
 	title = unquote_plus(title)
 	title = title.replace('&', 'and').replace("'", '').replace('.', ' ')
 	title = re.sub(r'[^a-z0-9\s\.]+', '', title) # query keeps dashes if they exist in actual title. dash is removed in title check and links returned for comp
-
 	while "  " in title:
 		title = title.replace("  ", " ")
 	title = title.strip()
-	# log_utils.log('title = %s' % title)
 	return title
-
 
 def filteredResults(results, simpleQuery):
 	filtered = []
@@ -54,7 +47,6 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			query = tvshowtitle.replace('&', 'and')
@@ -64,7 +56,6 @@ class source:
 			source_utils.scraper_error('GDRIVE')
 			return
 
-
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
 			query = url + " S" + str(season).zfill(2) + "E" + str(episode).zfill(2)
@@ -73,7 +64,6 @@ class source:
 		except:
 			source_utils.scraper_error('GDRIVE')
 			return
-
 
 	def movie(self, imdb, title, aliases, year):
 		try:
@@ -85,7 +75,6 @@ class source:
 		except:
 			source_utils.scraper_error('GDRIVE')
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -100,14 +89,15 @@ class source:
 		except:
 			source_utils.scraper_error('GDRIVE')
 			return sources
-
 		for result in results:
 			try:
 				link = result["link"]
 				name = unquote(link.rsplit("/")[-1])
 				# name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title) # needs a decent rewrite to get this
+				release_title = name.lower().replace('&', 'and').replace("'", "")
+				release_title = re.sub(r'[^a-z0-9]+', '.', release_title)
 
-				quality, info = source_utils.get_release_quality(name, link)
+				quality, info = source_utils.get_release_quality(release_title, link)
 				try:
 					size = str(result["size_gb"]) + ' GB'
 					dsize, isize = source_utils._size(size)
@@ -122,7 +112,6 @@ class source:
 			except:
 				source_utils.scraper_error('GDRIVE')
 		return sources
-
 
 	def resolve(self, url):
 		return url

@@ -12,7 +12,6 @@ try: #Py2
 	from urllib import urlencode
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode
-
 from fenomscrapers.modules import control
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import source_utils
@@ -29,7 +28,6 @@ class source:
 		self.tfile_link = "/api/file/get?api_key=%s&t_files=1&id=%s"
 		self.login_link = "/api/login/login?login=%s&pwd=%s"
 		self.files = []
-
 
 	def get_api(self):
 		try:
@@ -50,7 +48,6 @@ class source:
 		except:
 			source_utils.scraper_error('FURK')
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -59,7 +56,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -67,7 +63,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -79,7 +74,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -161,7 +155,6 @@ class source:
 		except:
 			source_utils.scraper_error('FURK')
 
-
 	def resolve(self, url):
 		try:
 			api_key = self.get_api()
@@ -188,7 +181,6 @@ class source:
 		except:
 			source_utils.scraper_error('FURK')
 
-
 	def _manage_pack(self):
 		for i in self.files:
 			if self.content_type == 'movie':
@@ -201,14 +193,12 @@ class source:
 						else: pass
 		return url
 
-
 	def _seas_ep_query_list(self, season, episode):
 		return ['s%02de%02d' % (season, episode),
 				'%dx%02d' % (season, episode),
 				'%02dx%02d' % (season, episode),
 				'"season %d episode %d"' % (season, episode),
 				'"season %02d episode %02d"' % (season, episode)]
-
 
 	def _seas_ep_resolve_list(self, season, episode):
 		return ['s%02de%02d' % (season, episode),

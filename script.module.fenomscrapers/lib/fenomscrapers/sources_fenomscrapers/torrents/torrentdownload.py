@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -26,7 +25,6 @@ class source:
 		self.min_seeders = 1
 		self.pack_capable = True
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -35,7 +33,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -43,7 +40,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -55,7 +51,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -79,7 +74,6 @@ class source:
 			urls.append(url)
 			urls.append(url + '&p=2')
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
-
 			threads = []
 			for url in urls:
 				threads.append(workers.Thread(self.get_sources, url))
@@ -89,7 +83,6 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOAD')
 			return self.sources
-
 
 	def get_sources(self, url):
 		try:
@@ -102,7 +95,6 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOAD')
 			return
-
 		for post in posts:
 			try:
 				if '<th' in post: continue
@@ -123,7 +115,6 @@ class source:
 					if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 						ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 						if any(re.search(item, name.lower()) for item in ep_strings): continue
-
 					try:
 						seeders = int(items[2].replace(',', ''))
 						if self.min_seeders > seeders: continue
@@ -141,7 +132,6 @@ class source:
 														'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('TORRENTDOWNLOAD')
-
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -180,7 +170,6 @@ class source:
 			source_utils.scraper_error('TORRENTDOWNLOAD')
 			return self.sources
 
-
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
@@ -193,7 +182,6 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOAD')
 			return
-
 		for post in posts:
 			try:
 				if '<th' in post: continue
@@ -223,7 +211,6 @@ class source:
 					if source_utils.remove_lang(name_info): continue
 
 					url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-
 					try:
 						seeders = int(items[2].replace(',', ''))
 						if self.min_seeders > seeders: continue
@@ -243,7 +230,6 @@ class source:
 					self.sources.append(item)
 			except:
 				source_utils.scraper_error('TORRENTDOWNLOAD')
-
 
 	def resolve(self, url):
 		return url

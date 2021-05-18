@@ -11,7 +11,6 @@ try: #Py2
 	from urllib import urlencode
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -26,7 +25,6 @@ class source:
 		self.min_seeders = 0
 		self.pack_capable = False
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -34,7 +32,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -63,7 +60,6 @@ class source:
 		except:
 			source_utils.scraper_error('YTSMX')
 			return sources
-
 		for torrent in torrents:
 			try:
 				quality = torrent.get('quality')
@@ -74,7 +70,6 @@ class source:
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr)
 				if source_utils.remove_lang(name_info): continue
-
 				try:
 					seeders = torrent.get('seeds')
 					if self.min_seeders > seeders: continue
@@ -93,7 +88,6 @@ class source:
 			except:
 				source_utils.scraper_error('YTSMX')
 		return sources
-
 
 	def resolve(self, url):
 		return url

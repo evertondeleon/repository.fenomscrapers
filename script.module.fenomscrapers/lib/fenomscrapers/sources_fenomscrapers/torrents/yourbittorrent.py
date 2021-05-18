@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -26,7 +25,6 @@ class source:
 		self.min_seeders = 0  # to many items with no value but cached links
 		self.pack_capable = True
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -35,7 +33,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -43,7 +40,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -55,7 +51,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -91,7 +86,6 @@ class source:
 			source_utils.scraper_error('YOURBITTORRENT')
 			return self.sources
 
-
 	def get_sources(self, link):
 		try:
 			url = '%s%s' % (self.base_link, link)
@@ -112,7 +106,6 @@ class source:
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
-
 			try:
 				seeders = int(re.findall(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.DOTALL | re.I)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -133,7 +126,6 @@ class source:
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
-
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -179,7 +171,6 @@ class source:
 			source_utils.scraper_error('YOURBITTORRENT')
 			return self.sources
 
-
 	def get_pack_items(self, url):
 		try:
 			r = client.request(url, timeout='5')
@@ -191,7 +182,6 @@ class source:
 			return self.items
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
-
 
 	def get_pack_sources(self, url):
 		try:
@@ -222,7 +212,6 @@ class source:
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
-
 			try:
 				seeders = int(re.findall(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.DOTALL | re.I)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -243,7 +232,6 @@ class source:
 			self.sources.append(item)
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
-
 
 	def resolve(self, url):
 		return url

@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote, unquote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -27,7 +26,6 @@ class source:
 		self.min_seeders = 0
 		self.pack_capable = False
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -35,7 +33,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -47,7 +44,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -83,7 +79,6 @@ class source:
 		except:
 			source_utils.scraper_error('EZTV')
 			return sources
-
 		for row in rows:
 			try:
 				try:
@@ -100,7 +95,6 @@ class source:
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
-
 				try:
 					seeders = int(re.findall(r'<font\s*color\s*=\s*["\'].+?["\']>(\d+|\d+\,\d+)</font>', columns[5], re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -119,7 +113,6 @@ class source:
 			except:
 				source_utils.scraper_error('EZTV')
 		return sources
-
 
 	def resolve(self, url):
 		return url

@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote, unquote_plus
-
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -30,13 +29,11 @@ class source:
 		self.min_seeders = 0
 		self.pack_capable = True
 
-
 	@property
 	def base_link(self):
 		if not self._base_link:
 			self._base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
 		return self._base_link
-
 
 	def movie(self, imdb, title, aliases, year):
 		try:
@@ -46,7 +43,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -54,7 +50,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -66,7 +61,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -96,7 +90,6 @@ class source:
 			else:
 				url2 = url + '/2/'
 				urls.append(url2)
-
 			threads = []
 			for url in urls:
 				threads.append(workers.Thread(self.get_sources, url))
@@ -106,7 +99,6 @@ class source:
 		except:
 			source_utils.scraper_error('KICKASS2')
 			return self.sources
-
 
 	def get_sources(self, url):
 		# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
@@ -118,7 +110,6 @@ class source:
 		except:
 			source_utils.scraper_error('KICKASS2')
 			return
-
 		for post in posts:
 			try:
 				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
@@ -137,7 +128,6 @@ class source:
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
-
 				try:
 					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']green\s*center["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -150,12 +140,10 @@ class source:
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
-
 				self.sources.append({'provider': 'kickass2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('KICKASS2')
-
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -194,7 +182,6 @@ class source:
 			source_utils.scraper_error('KICKASS2')
 			return self.sources
 
-
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % link, __name__, log_utils.LOGDEBUG)
 		try:
@@ -205,7 +192,6 @@ class source:
 		except:
 			source_utils.scraper_error('KICKASS2')
 			return
-
 		for post in posts:
 			try:
 				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
@@ -231,7 +217,6 @@ class source:
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
-
 				try:
 					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']green\s*center["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -244,14 +229,12 @@ class source:
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
-
 				item = {'provider': 'kickass2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
 				self.sources.append(item)
 			except:
 				source_utils.scraper_error('KICKASS2')
-
 
 	def __get_base_url(self, fallback):
 		for domain in self.domains:
@@ -264,7 +247,6 @@ class source:
 			except:
 				source_utils.scraper_error('KICKASS2')
 		return fallback
-
 
 	def resolve(self, url):
 		return url

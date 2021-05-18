@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, unquote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import source_utils
@@ -27,7 +26,6 @@ class source:
 		self.min_seeders = 0
 		self.pack_capable = True
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -36,7 +34,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -44,7 +41,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -56,7 +52,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -85,7 +80,6 @@ class source:
 		except:
 			source_utils.scraper_error('MAGNETDL')
 			return sources
-
 		try:
 			next_page = [i for i in results if 'Next Page' in i]
 			if not next_page: raise Exception()
@@ -113,7 +107,6 @@ class source:
 				elif not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
-
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 's'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -132,7 +125,6 @@ class source:
 			except:
 				source_utils.scraper_error('MAGNETDL')
 		return sources
-
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -171,7 +163,6 @@ class source:
 			source_utils.scraper_error('MAGNETDL')
 			return self.sources
 
-
 	def get_sources_packs(self, url):
 		# log_utils.log('url = %s' % str(url), __name__, log_utils.LOGDEBUG)
 		try:
@@ -183,7 +174,6 @@ class source:
 		except:
 			source_utils.scraper_error('MAGNETDL')
 			return
-
 		try:
 			next_page = [i for i in results if 'Next Page' in i]
 			if not next_page: raise Exception()
@@ -220,7 +210,6 @@ class source:
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
-
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 's'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -240,7 +229,6 @@ class source:
 				self.sources.append(item)
 			except:
 				source_utils.scraper_error('MAGNETDL')
-
 
 	def resolve(self, url):
 		return url

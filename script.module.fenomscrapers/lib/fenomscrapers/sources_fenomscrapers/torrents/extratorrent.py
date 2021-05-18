@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
@@ -28,7 +27,6 @@ class source:
 		self.min_seeders = 1
 		self.pack_capable = True
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -38,7 +36,6 @@ class source:
 			source_utils.scraper_error('EXTRATORRENT')
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -47,7 +44,6 @@ class source:
 		except:
 			source_utils.scraper_error('EXTRATORRENT')
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -60,7 +56,6 @@ class source:
 		except:
 			source_utils.scraper_error('EXTRATORRENT')
 			return
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -95,7 +90,6 @@ class source:
 				list += client.parseDOM(r, 'tr', attrs={'class': 'tlz'})
 				for item in list:
 					links.append(item)
-
 			threads = []
 			for link in links:
 				threads.append(workers.Thread(self.get_sources, link))
@@ -105,7 +99,6 @@ class source:
 		except:
 			source_utils.scraper_error('EXTRATORRENT')
 			return self.sources
-
 
 	def get_sources(self, link):
 		try:
@@ -124,7 +117,6 @@ class source:
 			if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 				ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
-
 			try:
 				seeders = int(client.parseDOM(link, 'td', attrs={'class': 'sy'})[0].replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -142,7 +134,6 @@ class source:
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('EXTRATORRENT')
-
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -182,7 +173,6 @@ class source:
 			source_utils.scraper_error('EXTRATORRENT')
 			return self.sources
 
-
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link), log_utils.LOGDEBUG)
 		try:
@@ -193,7 +183,6 @@ class source:
 		except:
 			source_utils.scraper_error('EXTRATORRENT')
 			return
-
 		for post in posts:
 			try:
 				post = re.sub(r'\n', '', post)
@@ -222,7 +211,6 @@ class source:
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
-
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'sy'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -242,7 +230,6 @@ class source:
 				self.sources.append(item)
 			except:
 				source_utils.scraper_error('EXTRATORRENT')
-
 
 	def resolve(self, url):
 		return url

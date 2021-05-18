@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -25,7 +24,6 @@ class source:
 		self.show_link = '/index.php?show=%s'
 		self.pack_capable = False
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -34,7 +32,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -42,7 +39,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -54,7 +50,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -84,7 +79,6 @@ class source:
 		except:
 			source_utils.scraper_error('TOPNOW')
 			return sources
-
 		for i in r:
 			try:
 				if 'magnet:' not in i: continue
@@ -118,7 +112,6 @@ class source:
 			except:
 				source_utils.scraper_error('TOPNOW')
 		return sources
-
 
 	def resolve(self, url):
 		return url

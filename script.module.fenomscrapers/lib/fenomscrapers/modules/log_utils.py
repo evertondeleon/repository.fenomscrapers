@@ -5,7 +5,6 @@
 
 from datetime import datetime
 import inspect
-from string import printable
 import unicodedata
 import xbmc
 from fenomscrapers.modules import control
@@ -42,7 +41,7 @@ def log(msg, caller=None, level=LOGNOTICE):
 			if isinstance(msg, py_tools.binary_type):
 				msg = '%s (ENCODED by log_utils.log())' % (py_tools.ensure_str(msg, errors='replace'))
 		else:
-			if not isprintable(msg): # if not all(c in printable for c in msg): # isprintable() not available in py2
+			if not is_printable(msg): # if not all(c in printable for c in msg): # isprintable() not available in py2
 				msg = normalize(msg)
 			if isinstance(msg, py_tools.binary_type):
 				msg = '%s (ENCODED by log_utils.log())' % (py_tools.ensure_text(msg))
@@ -72,7 +71,6 @@ def log(msg, caller=None, level=LOGNOTICE):
 		traceback.print_exc()
 		xbmc.log('[ script.module.fenomonscrapers ] log_utils.log() Logging Failure: %s' % (e), LOGERROR)
 
-
 def error(message=None, exception=True):
 	try:
 		import sys
@@ -98,12 +96,10 @@ def error(message=None, exception=True):
 	except Exception as e:
 		xbmc.log('[ script.module.fenomonscrapers ] log_utils.error() Logging Failure: %s' % (e), LOGERROR)
 
-
-def isprintable(s, codec='utf8'):
+def is_printable(s, codec='utf8'):
 	try: s.decode(codec)
 	except UnicodeDecodeError: return False
 	else: return True
-
 
 def normalize(title):
 	try:
@@ -111,12 +107,3 @@ def normalize(title):
 	except:
 		error()
 		return title
-
-
-def strip_non_ascii_and_unprintable(text):
-	try:
-		result = ''.join(char for char in text if char in printable)
-		return result.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
-	except:
-		error()
-		return text

@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -26,7 +25,6 @@ class source:
 		self.min_seeders = 1
 		self.pack_capable = True
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -35,7 +33,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -43,7 +40,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -55,7 +51,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -79,7 +74,6 @@ class source:
 			urls.append(url)
 			# urls.append(url + '?p=2')
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
-
 			threads = []
 			for url in urls:
 				threads.append(workers.Thread(self.get_sources, url))
@@ -90,7 +84,6 @@ class source:
 			source_utils.scraper_error('IDOPE')
 			return self.sources
 
-
 	def get_sources(self, url):
 		try:
 			r = client.request(url, timeout='5')
@@ -100,7 +93,6 @@ class source:
 		except:
 			source_utils.scraper_error('IDOPE')
 			return
-
 		for row in rows:
 			try:
 				url = client.parseDOM(row, 'a', attrs={'title': 'Download Torrent Magnet'}, ret='href')[0]
@@ -115,7 +107,6 @@ class source:
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
-
 				try:
 					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']seeds\s*is-hidden-sm-mobile["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.S | re.I)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -134,7 +125,6 @@ class source:
 													'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('IDOPE')
-
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -173,7 +163,6 @@ class source:
 			source_utils.scraper_error('IDOPE')
 			return self.sources
 
-
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
@@ -184,7 +173,6 @@ class source:
 		except:
 			source_utils.scraper_error('IDOPE')
 			return
-
 		for row in rows:
 			try:
 				url = client.parseDOM(row, 'a', attrs={'title': 'Download Torrent Magnet'}, ret='href')[0]
@@ -208,7 +196,6 @@ class source:
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
-
 				try:
 					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']seeds\s*is-hidden-sm-mobile["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.S | re.I)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -216,7 +203,6 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					# size = re.findall(r'<td class="is-hidden-touch">(.+? (?:GB|MB))<', row)[0]
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
@@ -229,7 +215,6 @@ class source:
 				self.sources.append(item)
 			except:
 				source_utils.scraper_error('IDOPE')
-
 
 	def resolve(self, url):
 		return url

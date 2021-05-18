@@ -2,7 +2,6 @@
 
 import os.path
 import pkgutil
-
 from fenomscrapers.modules import log_utils
 try:
 	import xbmcaddon
@@ -36,14 +35,12 @@ def sources(specified_folders=None):
 	except:
 		return []
 
-
 def enabledCheck(module_name):
 	if __addon__ is not None:
 		if __addon__.getSetting('provider.' + module_name) == 'true':
 			return True
 		else: return False
 	return True
-
 
 # def pack_sources():
 	# try:
@@ -57,12 +54,10 @@ def enabledCheck(module_name):
 		# pass
 	# return pack_sources
 
-
 def pack_sources():
 	return ['bitlord', 'bt4g', 'btdb', 'btscene', 'extratorrent', 'idope', 'kickass2', 'limetorrents', 'magnetdl', 'piratebay',
-				'skytorrents', 'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy', 'torrentparadise',
-				'torrenttm', 'torrentz2', 'yourbittorrent', 'zooqle']
-
+				'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy', 'torrentparadise',
+				'torrentz2', 'yourbittorrent', 'zooqle']
 
 def getScraperFolder(scraper_source):
 	sourceSubFolders = [x[1] for x in os.walk(os.path.dirname(__file__))][0]

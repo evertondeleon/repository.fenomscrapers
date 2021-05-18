@@ -10,8 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-# from fenomscrapers.modules import cfscrape
-# from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -26,7 +24,6 @@ class source:
 		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
 		self.min_seeders = 0 # to many items with no value but cached links
 		self.pack_capable = False
-
 
 	def movie(self, imdb, title, aliases, year):
 		try:
@@ -59,7 +56,6 @@ class source:
 		sources = []
 		if not url: return sources
 		try:
-			# scraper = cfscrape.create_scraper()
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -79,7 +75,6 @@ class source:
 
 			headers = {'User-Agent': client.agent()}
 			r = client.request(url, headers=headers, timeout='5')
-			# r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
 
 			if not r: return sources
 			rows = client.parseDOM(r, 'tr', attrs={'class': 't-row'})
@@ -87,7 +82,6 @@ class source:
 		except:
 			source_utils.scraper_error('GLODLS')
 			return sources
-
 		for row in rows:
 			try:
 				ref = client.parseDOM(row, 'a', ret='href')
@@ -104,7 +98,6 @@ class source:
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
-
 				try:
 					seeders = int(re.findall(r'<td.*?<font color\s*=\s*["\'].+?["\']><b>([0-9]+|[0-9]+,[0-9]+)</b>', row)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -123,7 +116,6 @@ class source:
 			except:
 				source_utils.scraper_error('GLODLS')
 		return sources
-
 
 	def resolve(self, url):
 		return url

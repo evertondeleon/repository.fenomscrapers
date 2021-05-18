@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from sys import argv
-try:
+try: #Py2
 	from urlparse import parse_qsl
-except:
+except ImportError: #Py3
 	from urllib.parse import parse_qsl
-
 from fenomscrapers import sources_fenomscrapers
 from fenomscrapers.modules import control
 
@@ -15,29 +14,23 @@ mode = params.get('mode')
 query = params.get('query')
 name = params.get('name')
 
-
 if action is None:
 	xbmc.log('Hello from FenomScrapers', 2)
 	control.openSettings('0.0', 'script.module.fenomscrapers')
 
-
 if action == "FenomScrapersSettings":
 	control.openSettings('0.0', 'script.module.fenomscrapers')
 
-
 elif mode == "FenomScrapersSettings":
 	control.openSettings('0.0', 'script.module.fenomscrapers')
-
 
 elif action == 'ShowChangelog':
 	from fenomscrapers.modules import changelog
 	changelog.get()
 
-
 elif action == 'ShowHelp':
 	from fenomscrapers.help import help
 	help.get(name)
-
 
 elif action == "Defaults":
 	sourceList = []
@@ -47,14 +40,12 @@ elif action == "Defaults":
 		value = control.getSettingDefault(source_setting)
 		control.setSetting(source_setting, value)
 
-
 elif action == "toggleAll":
 	sourceList = []
 	sourceList = sources_fenomscrapers.all_providers
 	for i in sourceList:
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
-
 
 elif action == "toggleAllHosters":
 	sourceList = []
@@ -63,14 +54,12 @@ elif action == "toggleAllHosters":
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
 
-
 elif action == "toggleAllTorrent":
 	sourceList = []
 	sourceList = sources_fenomscrapers.torrent_providers
 	for i in sourceList:
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
-
 
 elif action == "toggleAllPackTorrent":
 	control.execute('RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllTorrent&amp;setting=false)')
@@ -81,7 +70,6 @@ elif action == "toggleAllPackTorrent":
 	for i in sourceList:
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
-
 
 elif action == 'openMyAccount':
 	from myaccounts import openMASettings
@@ -95,12 +83,14 @@ elif action == 'openMyAccount':
 	if params.get('opensettings') == 'true':
 		control.openSettings(query, 'script.module.fenomscrapers')
 
-
 elif action == 'syncMyAccount':
 	control.syncMyAccounts()
 	if params.get('opensettings') == 'true':
 		control.openSettings(query, 'script.module.fenomscrapers')
 
-
 elif action == 'cleanSettings':
 	control.clean_settings()
+
+elif action == 'undesirablesSelect':
+	from fenomscrapers.modules import source_utils
+	source_utils.undesirablesSelect()

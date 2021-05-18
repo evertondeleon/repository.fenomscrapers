@@ -11,7 +11,6 @@ try: #Py2
 	from urlparse import urljoin
 except ImportError: #Py3
 	from urllib.parse import urljoin
-
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import control
@@ -35,7 +34,6 @@ class source:
 			'Authorization': self._get_auth(),
 			'User-Agent': 'Placenta for Kodi'}
 
-
 	def _get_auth(self):
 		try:
 			# Python 2
@@ -47,7 +45,6 @@ class source:
 			user_info = user_info.encode('utf-8')
 			auth = 'Basic ' + base64.b64encode(user_info).decode('utf-8')
 		return auth
-
 
 	def movie(self, imdb, title, aliases, year): # seems Ororo does not provide Movies
 		try:
@@ -62,7 +59,6 @@ class source:
 			source_utils.scraper_error('ORORO')
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			if (self.user == '' or self.password == ''): return
@@ -75,7 +71,6 @@ class source:
 		except:
 			source_utils.scraper_error('ORORO')
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -94,7 +89,6 @@ class source:
 			source_utils.scraper_error('ORORO')
 			return
 
-
 	def ororo_moviecache(self, user):
 		try:
 			url = urljoin(self.base_link, self.moviesearch_link)
@@ -107,7 +101,6 @@ class source:
 			source_utils.scraper_error('ORORO')
 			return
 
-
 	def ororo_tvcache(self, user):
 		try:
 			url = urljoin(self.base_link, self.tvsearch_link)
@@ -119,7 +112,6 @@ class source:
 		except:
 			source_utils.scraper_error('ORORO')
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -141,7 +133,6 @@ class source:
 		except:
 			source_utils.scraper_error('ORORO')
 			return sources
-
 
 	def resolve(self, url):
 		return url

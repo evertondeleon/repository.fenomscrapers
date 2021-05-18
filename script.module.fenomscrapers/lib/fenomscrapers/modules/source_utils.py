@@ -11,11 +11,9 @@ try: #Py2
 	from urlparse import urlparse
 except ImportError: #Py3
 	from urllib.parse import urlparse, unquote_plus
-
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import control
 from fenomscrapers.modules import log_utils
-
 
 RES_4K = ['.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd'] # some idiots use "uhd.1080p" in their uploads, "uhd" now removed
 RES_1080 = ['1080p', '1080i', 'hd1080', '1080hd']
@@ -24,7 +22,7 @@ RES_SD = ['576p', '576i', 'sd576', '576sd', 'x576', '480p', '480i', 'sd480', '48
 SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
 CAM = ['camrip', 'cam.rip', 'tsrip', '.ts.rip.', 'dvdcam', 'dvd.cam', 'dvdts', 'dvd.ts.', '.cam', 'telecine', 'telesync', 'tele.sync']
 HDCAM = ['hdcam', '.hd.cam', 'hdts', '.hd.ts', '.hdtc', '.hd.tc', '.hctc', '.hc.tc']
-VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', 'tab', 'htab', 'topandbottom', 'top.and.bottom']
+VIDEO_3D = ['.3d.', '.sbs.', '.hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', '.tab.', '.htab.', 'topandbottom', 'top.and.bottom']
 CODEC_H265 = ['hevc', 'h265', 'h.265', 'x265', 'x.265']
 
 LANG = ['arabic', 'bgaudio', 'castellano', 'chinese', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
@@ -35,12 +33,12 @@ DUBBED = ['dublado', 'dubbed', 'pldub']
 SUBS = ['subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs']
 ADDS = ['1xbet', 'betwin']
 
-UNDESIREABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'baibako', 'bonus.disc',
-			  'courage.bambey', '.cbr', '.cbz', 'coldfilm', 'dilnix', 'dlrip', 'dutchreleaseteam', 'e.book.collection', 'empire.minutemen', 'eniahd',
-			  '.exe', 'extras.only', 'gears.media', 'gearsmedia', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'idea.film', 'ideafilm',
-			  'jaskier', 'kb.1080p', 'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm',
-			  'megapeer', 'minutemen.empire', 'omskbird', 'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'exkinoray', 'sample',
-			  'soundtrack', 'subtitle.only', 'teaser', 'trailer', 'tumbler.studio', 'tvshows', 'vostfr', 'webdlrip', 'webhdrip', 'wish666']
+UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'amedia', 'baibako', 'bigsinema', 'bonus.disc', 'courage.bambey',
+				'.cbr', '.cbz', 'coldfilm', 'dilnix', 'dutchreleaseteam', 'e.book.collection', 'empire.minutemen', 'eniahd', '.exe', 'exkinoray', 'extras.only',
+				'gears.media', 'gearsmedia', 'gostfilm', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'hurtom', 'idea.film', 'ideafilm', 'jaskier', 'kapatejl6', 'kb.1080p',
+				'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm', 'megapeer', 'minutemen.empire', 'omskbird',
+				'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'sample', 'soundtrack', 'subtitle.only', 'sunshinestudio', 'teaser', 'trailer', 'tumbler.studio',
+				'tvshows', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666']
 
 season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
 			'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three',
@@ -67,6 +65,29 @@ season_ordinal2_dict = {'1': '1st', '2': '2nd', '3': '3rd', '4': '4th', '5': '5t
 			'11': '11th', '12': '12th', '13': '13th', '14': '14th', '15': '15th', '16': '16th', '17': '17th', '18': '18th', '19': '19th',
 			'20': '20th', '21': '21st', '22': '22nd', '23': '23rd', '24': '24th', '25': '25th'}
 
+def get_undesirables():
+	try:
+		chosen = control.setting('undesirables.choice')
+		if not chosen: chosen = UNDESIRABLES
+		else: chosen = chosen.replace(' ', '').split(',')
+		user_defined = control.setting('undesirables.user_defined')
+		if not user_defined: user_defined = []
+		else: user_defined = user_defined.replace(' ', '').split(',')
+		chosen.extend(user_defined)
+		undesirables = list(set(chosen))
+	except:
+		log_utils.error()
+		undesirables = UNDESIRABLES
+	return undesirables
+
+def undesirablesSelect():
+	chosen = control.setting('undesirables.choice').replace(' ', '').split(',')
+	try: preselect = [UNDESIRABLES.index(i) for i in chosen]
+	except: preselect = [UNDESIRABLES.index(i) for i in UNDESIRABLES]
+	choices = control.multiselectDialog(UNDESIRABLES, preselect=preselect)
+	if not choices: return
+	choices = [UNDESIRABLES[i] for i in choices]
+	control.setSetting('undesirables.choice', ','.join(choices))
 
 def get_qual(term):
 	if any(i in term for i in RES_4K): return '4K'
@@ -76,7 +97,6 @@ def get_qual(term):
 	elif any(i in term for i in SCR): return 'SCR'
 	elif any(i in term for i in CAM): return 'CAM'
 	elif any(i in term for i in HDCAM): return 'CAM'
-
 
 def get_release_quality(release_info, release_link=None):
 	try:
@@ -88,8 +108,6 @@ def get_release_quality(release_info, release_link=None):
 		if not quality:
 			if release_link:
 				release_link = release_link.lower()
-				# try: release_link = release_link.encode('utf-8')
-				# except: pass
 				quality = get_qual(release_link)
 				if not quality: quality = 'SD'
 			else: quality = 'SD'
@@ -97,7 +115,6 @@ def get_release_quality(release_info, release_link=None):
 	except:
 		log_utils.error()
 		return 'SD', []
-
 
 def aliases_to_array(aliases, filter=None):
 	try:
@@ -108,7 +125,6 @@ def aliases_to_array(aliases, filter=None):
 	except:
 		log_utils.error()
 		return []
-
 
 def check_title(title, aliases, release_title, hdlr, year, years=None):
 	try: aliases = aliases_to_array(jsloads(aliases))
@@ -147,14 +163,13 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 		log_utils.error()
 		return match
 
-
 def remove_lang(release_info):
 	if not release_info: return False
 	try:
 		if any(value in release_info for value in DUBBED): return True
 		if any(value in release_info for value in SUBS): return True
 		if control.setting('filter.undesirables') == 'true':
-			if any(value in release_info for value in UNDESIREABLES): return True
+			if any(value in release_info for value in get_undesirables()): return True
 			# if any(value in release_info for value in ADDS): return True
 		if control.setting('filter.foreign.single.audio') == 'true':
 			if any(value in release_info for value in LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
@@ -165,6 +180,12 @@ def remove_lang(release_info):
 		log_utils.error()
 		return False
 
+def single_checkPack(release_title, query):
+	# log_utils.log('release_title=%s' % release_title.lower())
+	range_pattern = r'%s%s' % (query.lower(), '[-]\d{2}([-,.[({]|$)')
+	if bool(re.search(range_pattern, release_title.lower())):
+		return True
+	else: return False
 
 def filter_season_pack(show_title, aliases, year, season, release_title):
 	try: aliases = aliases_to_array(jsloads(aliases))
@@ -236,7 +257,6 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 	except:
 		log_utils.error()
 		return True
-
 
 def filter_show_pack(show_title, aliases, imdb, year, season, release_title, total_seasons):
 	try: aliases = aliases_to_array(jsloads(aliases))
@@ -478,15 +498,8 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 		# return True, total_seasons
 		log_utils.error()
 
-
 def info_from_name(release_title, title, year, hdlr=None, episode_title=None, season=None, pack=None):
-	# log_utils.log('release_title = %s' % release_title, __name__, log_utils.LOGDEBUG)
 	try:
-		# try: release_title = release_title.encode('utf-8') 
-		# except: pass
-		# try: release_title = str(release_title)
-		# except: pass
-
 		release_title = release_title.lower().replace('&', 'and').replace("'", "")
 		release_title = re.sub(r'[^a-z0-9]+', '.', release_title)
 		title = title.lower().replace('&', 'and').replace("'", "")
@@ -512,7 +525,6 @@ def info_from_name(release_title, title, year, hdlr=None, episode_title=None, se
 		log_utils.error()
 		return release_title
 
-
 def release_title_format(release_title):
 	try:
 		release_title = release_title.lower().replace("'", "").lstrip('.').rstrip('.')
@@ -521,7 +533,6 @@ def release_title_format(release_title):
 	except:
 		log_utils.error()
 		return release_title
-
 
 def clean_name(release_title):
 	try:
@@ -564,7 +575,6 @@ def clean_name(release_title):
 		log_utils.error()
 		return release_title
 
-
 def strip_non_ascii_and_unprintable(text):
 	try:
 		result = ''.join(char for char in text if char in printable)
@@ -588,7 +598,6 @@ def _size(siz):
 		log_utils.error()
 		return 0, ''
 
-
 def convert_size(size_bytes, to='GB'):
 	try:
 		import math
@@ -604,12 +613,10 @@ def convert_size(size_bytes, to='GB'):
 		log_utils.error()
 		return 0, ''
 
-
 def scraper_error(provider):
 	import traceback
 	failure = traceback.format_exc()
 	log_utils.log(provider.upper() + ' - Exception: \n' + str(failure), caller='scraper_error', level=log_utils.LOGERROR)
-
 
 def is_host_valid(url, domains):
 	try:
@@ -625,7 +632,6 @@ def is_host_valid(url, domains):
 	except:
 		log_utils.error()
 		return False, ''
-
 
 def __top_domain(url):
 	try:

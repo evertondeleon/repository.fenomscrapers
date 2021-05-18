@@ -1,3 +1,9 @@
+[B][COLOR red]Update - v1.3.8 - May 05, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Torrent.tm site appears dead so scraper is removed.[/I]
+[COLOR yellow]--[/COLOR][I] Added new Undesirables customization list where you can now
+    enable or disable individual groups.  You can also add
+    your own specific group you may dislike.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed gdrive scraper not setting Info for 3D links.[/I]
 
 [B][COLOR red]Update - v1.3.7 - April 13, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Updated cfscrape(aka cloudscraper) to v1.2.58.  Note Venomous

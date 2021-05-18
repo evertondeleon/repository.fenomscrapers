@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
-
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
@@ -25,7 +24,6 @@ class source:
 		self.base_link = 'http://scene-rls.net'
 		self.search_link = '/?s=%s'
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -34,7 +32,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -42,7 +39,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -54,7 +50,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -83,7 +78,6 @@ class source:
 		except:
 			source_utils.scraper_error('SCENERLS')
 			return sources
-
 		items = []
 		for post in posts:
 			try:
@@ -96,7 +90,6 @@ class source:
 			except:
 				source_utils.scraper_error('SCENERLS')
 				return sources
-
 		for item in items:
 			try:
 				name = item[0]
@@ -104,7 +97,6 @@ class source:
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
-
 				# check year for reboot/remake show issues if year is available-crap shoot
 				# if 'tvshowtitle' in data:
 					# if re.search(r'([1-3][0-9]{3})', name):
@@ -130,7 +122,6 @@ class source:
 			except:
 				source_utils.scraper_error('SCENERLS')
 		return sources
-
 
 	def resolve(self, url):
 		return url

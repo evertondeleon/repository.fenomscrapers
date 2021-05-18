@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -26,7 +25,6 @@ class source:
 		self.min_seeders = 0
 		self.pack_capable = False
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -35,7 +33,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -43,7 +40,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -55,7 +51,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -91,13 +86,11 @@ class source:
 			source_utils.scraper_error('ISOHUNT2')
 			return self.sources
 
-
 	def get_sources(self, row):
 		row = re.sub(r'\n', '', row)
 		row = re.sub(r'\t', '', row)
 		data = re.compile(r'<a\s*href\s*=\s*["\'](/torrent_details/.+?)["\']><span>(.+?)</span>.*?<td\s*class\s*=\s*["\']size-row["\']>(.+?)</td><td\s*class\s*=\s*["\']sn["\']>([0-9]+)</td>').findall(row)
 		if not data: return
-
 		for items in data:
 			try:
 				# item[1] does not contain full info like the &dn= portion of magnet
@@ -119,7 +112,6 @@ class source:
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
-
 				try:
 					seeders = int(items[3].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -137,7 +129,6 @@ class source:
 													'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('ISOHUNT2')
-
 
 	def resolve(self, url):
 		return url

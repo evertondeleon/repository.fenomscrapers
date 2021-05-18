@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -26,7 +25,6 @@ class source:
 		self.min_seeders = 0
 		self.pack_capable = False
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -35,7 +33,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -43,7 +40,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -55,7 +51,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -80,7 +75,6 @@ class source:
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
 			rows = client.parseDOM(r, 'div', attrs={'id': 'profile1'})
-
 			threads = []
 			for row in rows:
 				threads.append(workers.Thread(self.get_sources, row))
@@ -90,7 +84,6 @@ class source:
 		except:
 			source_utils.scraper_error('MAGNET4YOU')
 			return self.sources
-
 
 	def get_sources(self, row):
 		try:
@@ -108,7 +101,6 @@ class source:
 			if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
-
 			try:
 				seeders = int(re.findall(r'<span\s*style\s*=\s*["\']color:#008000["\']><strong>\s*([0-9]+)\s*</strong>', row, re.DOTALL)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -126,7 +118,6 @@ class source:
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('MAGNET4YOU')
-
 
 	def resolve(self, url):
 		return url

@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -26,7 +25,6 @@ class source:
 		self.min_seeders = 0
 		self.pack_capable = True
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -35,7 +33,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -43,7 +40,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -55,7 +51,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -91,7 +86,6 @@ class source:
 			source_utils.scraper_error('TORRENTFUNK')
 			return self.sources
 
-
 	def get_sources(self, link):
 		try:
 			try: url = link[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
@@ -121,7 +115,6 @@ class source:
 			hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
-
 			try:
 				seeders = int(re.findall(r'Swarm.*?>(?!<)([0-9]+)</', link, re.DOTALL | re.I)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -139,7 +132,6 @@ class source:
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('TORRENTFUNK')
-
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -185,7 +177,6 @@ class source:
 			source_utils.scraper_error('TORRENTFUNK')
 			return self.sources
 
-
 	def get_pack_items(self, url):
 		# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 		try:
@@ -196,7 +187,6 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTFUNK')
 			return
-
 		for link in links:
 			try:
 				try: url = link[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
@@ -233,7 +223,6 @@ class source:
 			except:
 				source_utils.scraper_error('TORRENTFUNK')
 
-
 	def get_pack_sources(self, items):
 		try:
 			link = client.request(items[2], timeout='5')
@@ -241,7 +230,6 @@ class source:
 			hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, items[0])
 			if url in str(self.sources): return
-
 			try:
 				seeders = int(re.findall(r'Swarm.*?>(?!<)([0-9]+)</', link, re.DOTALL | re.I)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -261,7 +249,6 @@ class source:
 			self.sources.append(item)
 		except:
 			source_utils.scraper_error('TORRENTFUNK')
-
 
 	def resolve(self, url):
 		return url

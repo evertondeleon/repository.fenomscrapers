@@ -12,7 +12,6 @@ try: #Py2
 	from urlparse import parse_qs
 except ImportError: #Py3
 	from urllib.parse import urlencode, quote, parse_qs
-
 from fenomscrapers.modules import control
 from fenomscrapers.modules import source_utils
 
@@ -29,7 +28,6 @@ class source:
 		self.base_link = 'https://members.easynews.com'
 		self.search_link = '/2.0/search/solr-search/advanced'
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -38,7 +36,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -46,7 +43,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -58,7 +54,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -89,7 +84,6 @@ class source:
 		except:
 			source_utils.scraper_error('EASYNEWS')
 			return sources
-
 		for item in files:
 			try:
 				post_hash, post_title, ext, duration = item['0'], item['10'], item['11'], item['14']
@@ -133,10 +127,8 @@ class source:
 				source_utils.scraper_error('EASYNEWS')
 		return sources
 
-
 	def resolve(self, url):
 		return url
-
 
 	def _get_auth(self):
 		auth = None
@@ -152,7 +144,6 @@ class source:
 			auth = 'Basic ' + b64encode(user_info).decode('utf-8')
 		return auth
 
-
 	def _query(self, data):
 		if 'tvshowtitle' not in data:
 			title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', data.get('title'))
@@ -165,7 +156,6 @@ class source:
 			episode = int(data.get('episode'))
 			query = '%s S%02dE%02d' % (title, season, episode)
 		return query
-
 
 	def _translate_search(self, query):
 		params = SEARCH_PARAMS

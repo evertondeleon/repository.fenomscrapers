@@ -27,12 +27,12 @@ limetorrents (priority=3, uses cfscrape)
 magnet4you (priority=4)
 magnetdl (priority=3
 nyaa (priority=5, anime)
-skytorrents (priority=3)
+skytorrents (priority=3)  v2 challenge and now removed
 topnow (priority=5)
 torrentdownload (priority=3)
 torrentgalaxy (priority=4, uses cfscrape)
 torrentquest (removed, mirror of magnetdl)
-torrenttm (priority=3, new as of 2-17-21)
+torrenttm (priority=3, new as of 2-17-21) dead site as of 4-18-21 and now removed
 torrentz2 (priority=4)
 zooqle (priority=5)
 

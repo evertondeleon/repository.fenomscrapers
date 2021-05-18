@@ -12,7 +12,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
-
 from fenomscrapers.modules import control
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -25,7 +24,6 @@ class source:
 		self.base_link = 'https://filepursuit.p.rapidapi.com' # 'https://rapidapi.com/azharxes/api/filepursuit' to obtain key
 		self.search_link = '/?type=video&q=%s'
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -35,7 +33,6 @@ class source:
 			source_utils.scraper_error('FILEPURSUIT')
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -44,7 +41,6 @@ class source:
 		except:
 			source_utils.scraper_error('FILEPURSUIT')
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -57,7 +53,6 @@ class source:
 		except:
 			source_utils.scraper_error('FILEPURSUIT')
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -91,7 +86,6 @@ class source:
 		except:
 			source_utils.scraper_error('FILEPURSUIT')
 			return sources
-
 		for item in results:
 			try:
 				url = item['file_link']
@@ -121,7 +115,6 @@ class source:
 			except:
 				source_utils.scraper_error('FILEPURSUIT')
 		return sources
-
 
 	def resolve(self, url):
 		return url

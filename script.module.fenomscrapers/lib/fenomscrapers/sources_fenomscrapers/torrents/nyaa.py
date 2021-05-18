@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -26,7 +25,6 @@ class source:
 		self.min_seeders = 1
 		self.pack_capable = False
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -35,7 +33,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -43,7 +40,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -55,7 +51,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -117,7 +112,6 @@ class source:
 						if hdlr2 in name:
 							t = name.split(hdlr2)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 						# if cleantitle.get(t) != cleantitle.get(title): continue # Anime title matching is a bitch!
-
 						try:
 							seeders = int(link[2][0])
 							if self.min_seeders > seeders: continue
@@ -137,7 +131,6 @@ class source:
 				source_utils.scraper_error('NYAA')
 				return sources
 		return sources
-
 
 	def resolve(self, url):
 		return url

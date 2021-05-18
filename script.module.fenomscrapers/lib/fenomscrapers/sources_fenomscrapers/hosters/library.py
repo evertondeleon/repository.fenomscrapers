@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode
-
 from fenomscrapers.modules import control
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import py_tools
@@ -23,7 +22,6 @@ class source:
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = []
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			return urlencode({'imdb': imdb, 'title': title,'year': year})
@@ -31,14 +29,12 @@ class source:
 			source_utils.scraper_error('LIBRARY')
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			return urlencode({'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'year': year})
 		except:
 			source_utils.scraper_error('LIBRARY')
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -50,7 +46,6 @@ class source:
 		except:
 			source_utils.scraper_error('LIBRARY')
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -102,7 +97,6 @@ class source:
 				r = jsloads(r)['result']['episodedetails']
 
 			url = py_tools.ensure_text(r['file'], errors='replace')
-
 			try:
 				quality = int(r['streamdetails']['video'][0]['width'])
 			except:
@@ -123,14 +117,12 @@ class source:
 			except:
 				source_utils.scraper_error('LIBRARY')
 				dsize = 0
-
 			try:
 				c = r['streamdetails']['video'][0]['codec']
 				if c == 'avc1': c = 'h264'
 				info.append(c)
 			except:
 				source_utils.scraper_error('LIBRARY')
-
 			try:
 				ac = r['streamdetails']['audio'][0]['codec']
 				if ac == 'dca': ac = 'dts'
@@ -138,7 +130,6 @@ class source:
 				info.append(ac)
 			except:
 				source_utils.scraper_error('LIBRARY')
-
 			try:
 				ach = r['streamdetails']['audio'][0]['channels']
 				if ach == 1: ach = 'mono'
@@ -158,7 +149,6 @@ class source:
 		except:
 			source_utils.scraper_error('LIBRARY')
 			return sources
-
 
 	def resolve(self, url):
 		return url

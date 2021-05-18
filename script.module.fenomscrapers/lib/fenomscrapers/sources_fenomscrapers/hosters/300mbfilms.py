@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
@@ -24,7 +23,6 @@ class source:
 		self.base_link = 'https://www.300mbfilms.io'
 		self.search_link = '/?s=%s'
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -34,7 +32,6 @@ class source:
 			source_utils.scraper_error('300MBFILMS')
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -43,7 +40,6 @@ class source:
 		except:
 			source_utils.scraper_error('300MBFILMS')
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -56,7 +52,6 @@ class source:
 		except:
 			source_utils.scraper_error('300MBFILMS')
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -80,7 +75,6 @@ class source:
 			r = client.request(url)
 			if not r: return sources
 			posts = client.parseDOM(r, 'h2')
-
 			urls = []
 			for item in posts:
 				if not item.startswith('<a href'): continue
@@ -119,7 +113,6 @@ class source:
 			source_utils.scraper_error('300MBFILMS')
 			return sources
 
-
 	def links(self, url):
 		urls = []
 		try:
@@ -151,7 +144,6 @@ class source:
 				return urls
 		except:
 			source_utils.scraper_error('300MBFILMS')
-
 
 	def resolve(self, url):
 		return url

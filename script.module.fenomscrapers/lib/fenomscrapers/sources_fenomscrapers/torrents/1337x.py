@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote, unquote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -27,7 +26,6 @@ class source:
 		self.min_seeders = 1
 		self.pack_capable = False
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -36,7 +34,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -44,7 +41,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -56,7 +52,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -100,7 +95,6 @@ class source:
 			source_utils.scraper_error('1337X')
 			return self.sources
 
-
 	def get_items(self, url):
 		try:
 			headers = {'User-Agent': client.agent()}
@@ -111,7 +105,6 @@ class source:
 		except:
 			source_utils.scraper_error('1337X')
 			return
-
 		for post in posts:
 			try:
 				data = client.parseDOM(post, 'a', ret='href')[1]
@@ -127,21 +120,17 @@ class source:
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
-
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'coll-2 seeds'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
-
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 				except: isize = '0' ; dsize = 0
-
 				self.items.append((name, name_info, link, isize, dsize, seeders))
 			except:
 				source_utils.scraper_error('1337X')
-
 
 	def get_sources(self, item):
 		try:
@@ -159,7 +148,6 @@ class source:
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})
 		except:
 			source_utils.scraper_error('1337X')
-
 
 	def resolve(self, url):
 		return url

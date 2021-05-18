@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
@@ -33,7 +32,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -41,7 +39,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -53,7 +50,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -80,7 +76,6 @@ class source:
 		except:
 			source_utils.scraper_error('MYVIDEOLINK')
 			return sources
-
 		items = []
 		for post in posts:
 			try:
@@ -156,7 +151,6 @@ class source:
 			except:
 				source_utils.scraper_error('MYVIDEOLINK')
 		return sources
-
 
 	def resolve(self, url):
 		return url

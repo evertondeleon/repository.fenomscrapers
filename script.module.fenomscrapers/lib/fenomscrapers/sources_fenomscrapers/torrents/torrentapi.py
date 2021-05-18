@@ -12,7 +12,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import source_utils
@@ -31,7 +30,6 @@ class source:
 		self.min_seeders = 0
 		self.pack_capable = True
 
-
 	def _get_token(self):
 		try:
 			token = self.scraper.get(self.token).content
@@ -39,7 +37,6 @@ class source:
 			return token
 		except:
 			source_utils.scraper_error('TORRENTAPI')
-
 
 	def movie(self, imdb, title, aliases, year):
 		try:
@@ -49,7 +46,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -57,7 +53,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -69,7 +64,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -103,7 +97,6 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
-
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
@@ -118,7 +111,6 @@ class source:
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
-
 				try:
 					seeders = int(file["seeders"])
 					if self.min_seeders > seeders: continue
@@ -136,7 +128,6 @@ class source:
 			except:
 				source_utils.scraper_error('TORRENTAPI')
 		return sources
-
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		sources = []
@@ -167,7 +158,6 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
-
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
@@ -182,7 +172,6 @@ class source:
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
-
 				try:
 					seeders = int(file["seeders"])
 					if self.min_seeders > seeders: continue
@@ -200,7 +189,6 @@ class source:
 			except:
 				source_utils.scraper_error('TORRENTAPI')
 		return sources
-
 
 	def resolve(self, url):
 		return url

@@ -11,7 +11,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus
 except: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
-
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
@@ -32,7 +31,6 @@ class source:
 		self.scraper = cfscrape.create_scraper()
 		self.headers = {'User-Agent': client.agent()}
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -41,7 +39,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -49,7 +46,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -61,7 +57,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def search(self, title, year):
 		try:
@@ -80,7 +75,6 @@ class source:
 		except:
 			source_utils.scraper_error('RAPIDMOVIEZ')
 			return None
-
 
 	def sources(self, url, hostDict):
 		self.sources = []
@@ -138,7 +132,6 @@ class source:
 			source_utils.scraper_error('RAPIDMOVIEZ')
 			return self.sources
 
-
 	def get_sources(self, name, url):
 		try:
 			# r = self.scraper.get(url, headers=self.headers).content
@@ -176,7 +169,6 @@ class source:
 													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('RAPIDMOVIEZ')
-
 
 	def resolve(self, url):
 		return url

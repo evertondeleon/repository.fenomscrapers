@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode, urljoin
-
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
@@ -26,7 +25,6 @@ class source:
 		self.base_old = 'http://old3.proxybb.com'
 		self.search_link = 'http://search.proxybb.com/?s=%s' #may use in future but adds a request to do so.
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -36,7 +34,6 @@ class source:
 			source_utils.scraper_error('RLSBB')
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -45,7 +42,6 @@ class source:
 		except:
 			source_utils.scraper_error('RLSBB')
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -58,7 +54,6 @@ class source:
 		except:
 			source_utils.scraper_error('RLSBB')
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -97,7 +92,6 @@ class source:
 					query = re.sub(r'\s', '-', query)
 					query = query + "-S" + season
 					url = urljoin(self.base_link, query)
-					# log_utils.log('Season url = %s' % url, log_utils.LOGDEBUG)
 					# r = scraper.get(url).content
 					r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
 					isSeasonQuery = True
@@ -124,8 +118,6 @@ class source:
 						end = (post_titles[index + 1].replace('[', '\\[').replace('(', '\\(').replace(')', '\\)').replace('+', '\\+')).replace(' \\ ', ' \\\\ ') if index + 1 < len(post_titles) else ''
 						try: container = re.findall(r'(?:%s)([\S\s]+)(?:%s)' % (start, end), post, re.I)[0] #parse all data between release_titles in multi post(content) group
 						except:
-							# log_utils.log('start = %s' % start, log_utils.LOGDEBUG)
-							# log_utils.log('end = %s' % end, log_utils.LOGDEBUG)
 							source_utils.scraper_error('RLSBB')
 							continue
 						try: size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', container)[0].replace(',', '.')
@@ -153,8 +145,6 @@ class source:
 
 						name = client.replaceHTMLCodes(name)
 						name = source_utils.strip_non_ascii_and_unprintable(name)
-						# if not source_utils.check_title(title, aliases, name, hdlr, year): continue # name above parses matching title from comments so not needed
-						# if source_utils.remove_lang(name_info): continue # not seen lang BS yet needing this.
 						name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 
 						url = py_tools.ensure_text(client.replaceHTMLCodes(str(i)), errors='replace')
@@ -181,7 +171,6 @@ class source:
 			except:
 				source_utils.scraper_error('RLSBB')
 		return sources
-
 
 	def resolve(self, url):
 		return url

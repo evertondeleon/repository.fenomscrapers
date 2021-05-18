@@ -11,7 +11,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -29,7 +28,6 @@ class source:
 		self.min_seeders = 0
 		self.pack_capable = True
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -38,7 +36,6 @@ class source:
 		except:
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -46,7 +43,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -58,7 +54,6 @@ class source:
 			return url
 		except:
 			return
-
 
 	def sources(self, url, hostDict):
 		sources = []
@@ -104,7 +99,6 @@ class source:
 		except:
 			source_utils.scraper_error('BITLORD')
 			return sources
-
 		for file in files.get('content'):
 			try:
 				name = source_utils.clean_name(file.get('name'))
@@ -121,7 +115,6 @@ class source:
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
-
 				try:
 					seeders = file.get('seeds')
 					if self.min_seeders > seeders: continue
@@ -141,7 +134,6 @@ class source:
 			except:
 				source_utils.scraper_error('BITLORD')
 		return sources
-
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -181,7 +173,6 @@ class source:
 			source_utils.scraper_error('BITLORD')
 			return self.sources
 
-
 	def get_sources_packs(self, link, url):
 		try:
 			self.headers.update({'Referer': link})
@@ -204,7 +195,6 @@ class source:
 		except:
 			source_utils.scraper_error('BITLORD')
 			return
-
 		for file in files.get('content'):
 			try:
 				name = source_utils.clean_name(file.get('name'))
@@ -231,7 +221,6 @@ class source:
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
-
 				try:
 					seeders = file.get('seeds')
 					if self.min_seeders > seeders: continue
@@ -253,7 +242,6 @@ class source:
 			except:
 				source_utils.scraper_error('BITLORD')
 
-
 	def _get_token_and_cookies(self):
 		headers = None
 		try:
@@ -268,7 +256,6 @@ class source:
 		except:
 			source_utils.scraper_error('BITLORD')
 			return headers
-
 
 	def resolve(self, url):
 		return url

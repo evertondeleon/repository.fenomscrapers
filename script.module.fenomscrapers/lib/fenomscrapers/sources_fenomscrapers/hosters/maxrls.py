@@ -10,7 +10,6 @@ try: #Py2
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
-
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
@@ -26,7 +25,6 @@ class source:
 		self.base_link = 'http://max-rls.com'
 		self.search_link = '/?s=%s&submit=Find'
 
-
 	def movie(self, imdb, title, aliases, year):
 		try:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
@@ -36,7 +34,6 @@ class source:
 			source_utils.scraper_error('MAXRLS')
 			return
 
-
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
@@ -45,7 +42,6 @@ class source:
 		except:
 			source_utils.scraper_error('MAXRLS')
 			return
-
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
@@ -59,13 +55,11 @@ class source:
 			source_utils.scraper_error('MAXRLS')
 			return
 
-
 	def sources(self, url, hostDict):
 		sources = []
 		if not url: return sources
 		try:
 			scraper = cfscrape.create_scraper(delay=5)
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -90,7 +84,6 @@ class source:
 		except:
 			source_utils.scraper_error('MAXRLS')
 			return sources
-
 		for post in posts:
 			try:
 				post_title = client.parseDOM(post, "h2", attrs={"class": "postTitle"})
@@ -109,7 +102,6 @@ class source:
 					if source_utils.remove_lang(name_info): continue
 
 					links = client.parseDOM(i, "a", ret="href")
-
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', i, re.DOTALL)
 
 					for link in links:
@@ -131,7 +123,6 @@ class source:
 			except:
 				source_utils.scraper_error('MAXRLS')
 		return sources
-
 
 	def resolve(self, url):
 		return url

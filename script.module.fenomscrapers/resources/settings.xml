@@ -11,6 +11,9 @@
 		<setting label="32009" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowChangelog)" />
 		<setting id="checkAddonUpdates" type="bool" label="32010" default="false" />
 		<setting label="32001" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=updates)" />
+		<!-- Hidden -->
+        <setting id="undesirables.choice" type="text" default="" visible="false" />
+        <!-- <setting id="folder5.tv_shows_directory" type="text" default="None" visible="false" /> -->
 	</category>
 
 	<!-- Debrid Sources-1 -->
@@ -51,6 +54,8 @@
 		<setting label="32002" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=packScrapers)" />
 		<setting type="sep" />
 		<setting id="filter.undesirables" type="bool" label="32016" default="true" />
+        <setting id="undesirables.browse" type="action" label="Manage Default Undesirables" default="[B]Browse[/B]" action="RunPlugin(plugin://script.module.fenomscrapers/?action=undesirablesSelect)" subsetting="true" enable="eq(-1,true)" />
+        <setting id="undesirables.user_defined" label="Define Extra Undesirables (Comma Separated)" type="text" default="" subsetting="true" enable="eq(-2,true)" />
 		<setting label="32003" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=undesirablesFilter)" />
 		<setting id="filter.foreign.single.audio" type="bool" label="32017" default="true" />
 		<setting type="sep" />
@@ -81,7 +86,6 @@
 		<setting id="provider.torrentfunk" type="bool" label="32124" default="false" />
 		<setting id="provider.torrentgalaxy" type="bool" label="32125" default="false" />
 		<setting id="provider.torrentparadise" type="bool" label="32135" default="true" />
-		<setting id="provider.torrenttm" type="bool" label="32134" default="true" />
 		<setting id="provider.torrentz2" type="bool" label="32130" default="false" />
 		<setting id="provider.yourbittorrent" type="bool" label="32126" default="false" />
 		<setting id="provider.ytsmx" type="bool" label="32127" default="false" />
