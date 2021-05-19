@@ -20,8 +20,9 @@ RES_1080 = ['1080p', '1080i', 'hd1080', '1080hd']
 RES_720 = ['720p', '720i', 'hd720', '720hd']
 RES_SD = ['576p', '576i', 'sd576', '576sd', 'x576', '480p', '480i', 'sd480', '480sd']
 SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
-CAM = ['camrip', 'cam.rip', 'tsrip', '.ts.rip.', 'dvdcam', 'dvd.cam', 'dvdts', 'dvd.ts.', '.cam', 'telecine', 'telesync', 'tele.sync']
-HDCAM = ['hdcam', '.hd.cam', 'hdts', '.hd.ts', '.hdtc', '.hd.tc', '.hctc', '.hc.tc']
+CAM = ['camrip', 'cam.rip', 'tsrip', '.ts.rip.', 'dvdcam', 'dvd.cam', 'dvdts', 'dvd.ts.', '.cam.', 'telecine', 'telesync', 'tele.sync', 
+			'hdcam', '.hd.cam', 'hdts', '.hd.ts', '.hdtc', '.hd.tc', '.hctc', '.hc.tc', '1xbet', 'betwin']
+
 VIDEO_3D = ['.3d.', '.sbs.', '.hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', '.tab.', '.htab.', 'topandbottom', 'top.and.bottom']
 CODEC_H265 = ['hevc', 'h265', 'h.265', 'x265', 'x.265']
 
@@ -31,14 +32,13 @@ ABV_LANG = ['.zh.', '.zho.', '.chi.', '.chs.', '.nl.', '.nld.', '.dut,', '.fi.',
 						'.ja.', '.jpn.', '.ko.', '.kor.', '.pl.', '.pol.', '.pt.', '.por.', '.ru.', '.rus.', '.es.', '.spa.', '.sv.', '.swe.', '.tr.', '.tur.', '.uk.', '.ukr.', '.vi.', '.vie.']
 DUBBED = ['dublado', 'dubbed', 'pldub']
 SUBS = ['subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs']
-ADDS = ['1xbet', 'betwin']
 
 UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'amedia', 'baibako', 'bigsinema', 'bonus.disc', 'courage.bambey',
 				'.cbr', '.cbz', 'coldfilm', 'dilnix', 'dutchreleaseteam', 'e.book.collection', 'empire.minutemen', 'eniahd', '.exe', 'exkinoray', 'extras.only',
 				'gears.media', 'gearsmedia', 'gostfilm', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'hurtom', 'idea.film', 'ideafilm', 'jaskier', 'kapatejl6', 'kb.1080p',
 				'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm', 'megapeer', 'minutemen.empire', 'omskbird',
 				'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'sample', 'soundtrack', 'subtitle.only', 'sunshinestudio', 'teaser', 'trailer', 'tumbler.studio',
-				'tvshows', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666']
+				'.ost.', 'tvshows', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666']
 
 season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
 			'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three',
@@ -90,13 +90,12 @@ def undesirablesSelect():
 	control.setSetting('undesirables.choice', ','.join(choices))
 
 def get_qual(term):
-	if any(i in term for i in RES_4K): return '4K'
+	if any(i in term for i in SCR): return 'SCR'
+	elif any(i in term for i in CAM): return 'CAM'
+	elif any(i in term for i in RES_4K): return '4K'
 	elif any(i in term for i in RES_1080): return '1080p'
 	elif any(i in term for i in RES_720): return '720p'
-	elif any(i in term for i in RES_SD): return 'SD'
-	elif any(i in term for i in SCR): return 'SCR'
-	elif any(i in term for i in CAM): return 'CAM'
-	elif any(i in term for i in HDCAM): return 'CAM'
+	else: return 'SD'
 
 def get_release_quality(release_info, release_link=None):
 	try:
@@ -170,7 +169,6 @@ def remove_lang(release_info):
 		if any(value in release_info for value in SUBS): return True
 		if control.setting('filter.undesirables') == 'true':
 			if any(value in release_info for value in get_undesirables()): return True
-			# if any(value in release_info for value in ADDS): return True
 		if control.setting('filter.foreign.single.audio') == 'true':
 			if any(value in release_info for value in LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
 			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
@@ -181,7 +179,6 @@ def remove_lang(release_info):
 		return False
 
 def single_checkPack(release_title, query):
-	# log_utils.log('release_title=%s' % release_title.lower())
 	range_pattern = r'%s%s' % (query.lower(), '[-]\d{2}([-,.[({]|$)')
 	if bool(re.search(range_pattern, release_title.lower())):
 		return True

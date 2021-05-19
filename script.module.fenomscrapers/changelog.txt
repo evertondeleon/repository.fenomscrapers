@@ -1,4 +1,9 @@
-[B][COLOR red]Update - v1.3.8 - May 05, 2021[/COLOR][/B]
+[B][COLOR red]Update - v1.3.9 - May 19, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Improved CAM detection of source links where 1080p and 720p
+    may also be present in release_link.[/I]
+[COLOR yellow]--[/COLOR][I] "1xbet" and "betwin" have been added to CAM detection.[/I]
+
+[B][COLOR red]Update - v1.3.8 - May 18, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Torrent.tm site appears dead so scraper is removed.[/I]
 [COLOR yellow]--[/COLOR][I] Added new Undesirables customization list where you can now
     enable or disable individual groups.  You can also add
