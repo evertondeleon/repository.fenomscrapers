@@ -75,7 +75,7 @@ elif action == 'openMyAccount':
 	from myaccounts import openMASettings
 	openMASettings('0.0')
 	control.sleep(500)
-	while control.condVisibility('Window.IsVisible(addonsettings)') or control.window.getProperty('myaccounts.active') == 'true':
+	while control.condVisibility('Window.IsVisible(addonsettings)') or control.homeWindow.getProperty('myaccounts.active') == 'true':
 		control.sleep(500)
 	control.sleep(100)
 	control.syncMyAccounts()

@@ -1,12 +1,11 @@
 # -*- coding: UTF-8 -*-
 
-import os.path
-
+import os
 from . import hosters
 from . import torrents
 
 scraper_source = os.path.dirname(__file__)
-__all__ = [x[1] for x in os.walk(os.path.dirname(__file__))][0]
+__all__ = [x[1] for x in os.walk(scraper_source)][0]
 
 ##--hosters--##
 hoster_source = hosters.sourcePath

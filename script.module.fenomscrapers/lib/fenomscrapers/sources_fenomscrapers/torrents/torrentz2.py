@@ -118,7 +118,6 @@ class source:
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
-					source_utils.scraper_error('TORRENTZ2')
 					dsize = 0
 				info = ' | '.join(info)
 

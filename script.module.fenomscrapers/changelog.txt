@@ -1,3 +1,9 @@
+[B][COLOR red]Update - v1.4.0 - May 20, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed issue with custom Undesirables input not converted to .lower().[/I]
+[COLOR yellow]--[/COLOR][I] Undesirables list is now a windows property for speed of access.[/I]
+[COLOR yellow]--[/COLOR][I] All settings are now converted to using window properties for speed.
+    Kodi's .getSetting() is extremely slow.[/I]
+
 [B][COLOR red]Update - v1.3.9 - May 19, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Improved CAM detection of source links where 1080p and 720p
     may also be present in release_link.[/I]

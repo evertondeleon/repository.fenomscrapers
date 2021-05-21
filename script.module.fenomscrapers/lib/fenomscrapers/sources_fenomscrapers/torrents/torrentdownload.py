@@ -73,7 +73,7 @@ class source:
 			url = urljoin(self.base_link, url)
 			urls.append(url)
 			urls.append(url + '&p=2')
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls, __name__, log_utils.LOGDEBUG)
 			threads = []
 			for url in urls:
 				threads.append(workers.Thread(self.get_sources, url))

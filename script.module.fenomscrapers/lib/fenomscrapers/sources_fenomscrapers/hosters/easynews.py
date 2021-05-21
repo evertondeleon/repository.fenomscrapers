@@ -61,6 +61,7 @@ class source:
 		auth = self._get_auth()
 		if not auth: return sources
 		try:
+			title_chk = control.setting('easynews.title.chk') == 'true'
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -104,8 +105,7 @@ class source:
 					name_chk = re.sub(r'^tvp[.-]', '', name_chk, 1, re.I)
 				name_chk = re.sub(r'disney[.-]gallery[.-]star[.-]wars[.-]', '', name_chk, 0, re.I)
 				name_chk = re.sub(r'marvels[.-]', '', name_chk, 0, re.I)
-
-				if control.setting('easynews.title.chk') == 'true':
+				if title_chk:
 					if not source_utils.check_title(title, aliases, name_chk, hdlr, year, years): continue
 
 				name_info = source_utils.info_from_name(name_chk, title, year, hdlr, episode_title)

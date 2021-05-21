@@ -5,7 +5,43 @@
 
 import xbmc
 from fenomscrapers.modules import control
+window = control.homeWindow
 LOGNOTICE = xbmc.LOGNOTICE if control.getKodiVersion() < 19 else xbmc.LOGINFO # (2 in 18, deprecated in 19 use LOGINFO(1))
+
+
+class CheckSettingsFile:
+	def run(self):
+		try:
+			xbmc.log('[ script.module.fenomscrapers ]  CheckSettingsFile Service Starting...', LOGNOTICE)
+			window.clearProperty('fenomscrapers_settings')
+			profile_dir = control.dataPath
+			if not control.existsPath(profile_dir):
+				success = control.makeDirs(profile_dir)
+				if success: xbmc.log('%s : created successfully' % profile_dir, LOGNOTICE)
+			else: xbmc.log('%s : already exists' % profile_dir, LOGNOTICE)
+			settings_xml = control.joinPath(profile_dir, 'settings.xml')
+			if not control.existsPath(settings_xml):
+				control.setSetting('module.provider', 'Fenomscrapers')
+				xbmc.log('%s : created successfully' % settings_xml, LOGNOTICE)
+			else: xbmc.log('%s : already exists' % settings_xml, LOGNOTICE)
+			return xbmc.log('[ script.module.fenomscrapers ]  Finished CheckSettingsFile Service', LOGNOTICE)
+		except:
+			import traceback
+			traceback.print_exc()
+
+
+class SettingsMonitor(control.monitor_class):
+	def __init__ (self):
+		control.monitor_class.__init__(self)
+		control.setUndesirables()
+		xbmc.log('[ script.module.fenomscrapers ]  Settings Monitor Service Starting...', LOGNOTICE)
+
+	def onSettingsChanged(self):
+		# Kodi callback when the addon settings are changed
+		window.clearProperty('fenomscrapers_settings')
+		control.sleep(50)
+		refreshed = control.make_settings_dict()
+		control.setUndesirables()
 
 
 class AddonCheckUpdate:
@@ -51,12 +87,14 @@ class SyncMyAccounts:
 def main():
 	while not control.monitor.abortRequested():
 		xbmc.log('[ script.module.fenomscrapers ]  Service Started', LOGNOTICE)
+		CheckSettingsFile().run()
 		SyncMyAccounts().run()
 		if control.setting('checkAddonUpdates') == 'true':
 			AddonCheckUpdate().run()
 		if control.isVersionUpdate():
 			control.clean_settings()
 			xbmc.log('[ script.module.fenomscrapers ]  Settings file cleaned complete', LOGNOTICE)
+		SettingsMonitor().waitForAbort()
 		xbmc.log('[ script.module.fenomscrapers ]  Service Stopped', LOGNOTICE)
 		break
 

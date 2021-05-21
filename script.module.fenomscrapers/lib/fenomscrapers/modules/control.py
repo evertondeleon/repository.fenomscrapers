@@ -3,6 +3,7 @@
 	Fenomscrapers Module
 """
 
+from json import dumps as jsdumps, loads as jsloads
 import os.path
 import xbmc
 import xbmcaddon
@@ -20,27 +21,81 @@ getLangString = addonObject.getLocalizedString
 condVisibility = xbmc.getCondVisibility
 execute = xbmc.executebuiltin
 jsonrpc = xbmc.executeJSONRPC
+monitor_class = xbmc.Monitor
 monitor = xbmc.Monitor()
 transPath = xbmc.translatePath if getKodiVersion() < 19 else xbmcvfs.translatePath
 joinPath = os.path.join
 
 dialog = xbmcgui.Dialog()
-window = xbmcgui.Window(10000)
+homeWindow = xbmcgui.Window(10000)
 
 existsPath = xbmcvfs.exists
 openFile = xbmcvfs.File
 makeFile = xbmcvfs.mkdir
+makeDirs = xbmcvfs.mkdirs
 
 SETTINGS_PATH = transPath(joinPath(addonInfo('path'), 'resources', 'settings.xml'))
 try: dataPath = transPath(addonInfo('profile')).decode('utf-8')
 except: dataPath = transPath(addonInfo('profile'))
 cacheFile = joinPath(dataPath, 'cache.db')
+settingsFile = joinPath(dataPath, 'settings.xml')
 
-def setting(id):
-	return xbmcaddon.Addon('script.module.fenomscrapers').getSetting(id)
+
+def setting(id, fallback=None):
+	try: settings_dict = jsloads(homeWindow.getProperty('fenomscrapers_settings'))
+	except: settings_dict = make_settings_dict()
+	if settings_dict is None: settings_dict = settings_fallback(id)
+	value = settings_dict.get(id, '')
+	if fallback is None: return value
+	if value == '': return fallback
+	return value
+
+def settings_fallback(id):
+	return {id: addonObject.getSetting(id)}
 
 def setSetting(id, value):
-	return xbmcaddon.Addon('script.module.fenomscrapers').setSetting(id, value)
+	return addonObject.setSetting(id, value)
+
+def make_settings_dict(): # service runs upon a setting change
+	try:
+		root = ET.parse(settingsFile).getroot()
+		settings_dict = {}
+		for item in root:
+			dict_item = {}
+			setting_id = item.get('id')
+			if getKodiVersion() >= 18: setting_value = item.text
+			else: setting_value = item.get('value')
+			if setting_value is None: setting_value = ''
+			dict_item = {setting_id: setting_value}
+			settings_dict.update(dict_item)
+		homeWindow.setProperty('fenomscrapers_settings', jsdumps(settings_dict))
+		return settings_dict
+	except:
+		return None
+
+def setUndesirables():
+	try:
+		from fenomscrapers.modules.source_utils import UNDESIRABLES
+		filter_undesirables = setting('filter.undesirables')
+		if filter_undesirables == 'true':
+			try:
+				undesirables = ''
+				default = setting('undesirables.choice')
+				if default: undesirables += default
+				else: undesirables += ','.join(UNDESIRABLES)
+				user = setting('undesirables.user_defined')
+				if user: undesirables += '%s%s' % (',', user)
+				undesirables = undesirables.lower()
+			except:
+				from fenomscrapers.modules import log_utils
+				undesirables = ','.join(UNDESIRABLES)
+				log_utils.error('Error: Undesirables Window Properties: ')
+			homeWindow.setProperty('fenom.undesirables', undesirables)
+		homeWindow.setProperty('fenom.filter.undesirables', filter_undesirables)
+		homeWindow.setProperty('fenom.filter.foreign.single.audio', setting('filter.foreign.single.audio'))
+	except:
+		from fenomscrapers.modules import log_utils
+		log_utils.error()
 
 def lang(language_id):
 	text = getLangString(language_id)
@@ -57,7 +112,7 @@ def multiselectDialog(list, preselect=[], heading=addonInfo('name')):
 	return dialog.multiselect(heading, list, preselect=preselect)
 
 def isVersionUpdate():
-	versionFile = os.path.join(dataPath, 'installed.version')
+	versionFile = joinPath(dataPath, 'installed.version')
 	try:
 		if not xbmcvfs.exists(versionFile):
 			f = open(versionFile, 'w')
@@ -111,13 +166,13 @@ def clean_settings():
 		addon_name = addon.getAddonInfo('name')
 		addon_dir = transPath(addon.getAddonInfo('path'))
 		profile_dir = transPath(addon.getAddonInfo('profile'))
-		active_settings_xml = os.path.join(addon_dir, 'resources', 'settings.xml')
+		active_settings_xml = joinPath(addon_dir, 'resources', 'settings.xml')
 		root = ET.parse(active_settings_xml).getroot()
 		for item in root.findall(r'./category/setting'):
 			setting_id = item.get('id')
 			if setting_id:
 				active_settings.append(setting_id)
-		settings_xml = os.path.join(profile_dir, 'settings.xml')
+		settings_xml = joinPath(profile_dir, 'settings.xml')
 		root = ET.parse(settings_xml).getroot()
 		for item in root:
 			dict_item = {}

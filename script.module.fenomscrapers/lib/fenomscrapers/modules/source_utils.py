@@ -6,11 +6,6 @@
 from json import loads as jsloads
 import re
 from string import printable
-try: #Py2
-	from urllib import unquote_plus
-	from urlparse import urlparse
-except ImportError: #Py3
-	from urllib.parse import urlparse, unquote_plus
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import control
 from fenomscrapers.modules import log_utils
@@ -20,8 +15,8 @@ RES_1080 = ['1080p', '1080i', 'hd1080', '1080hd']
 RES_720 = ['720p', '720i', 'hd720', '720hd']
 RES_SD = ['576p', '576i', 'sd576', '576sd', 'x576', '480p', '480i', 'sd480', '480sd']
 SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
-CAM = ['camrip', 'cam.rip', 'tsrip', '.ts.rip.', 'dvdcam', 'dvd.cam', 'dvdts', 'dvd.ts.', '.cam.', 'telecine', 'telesync', 'tele.sync', 
-			'hdcam', '.hd.cam', 'hdts', '.hd.ts', '.hdtc', '.hd.tc', '.hctc', '.hc.tc', '1xbet', 'betwin']
+CAM = ['1xbet', 'betwin', '.cam.', 'camrip', 'cam.rip', 'dvdcam', 'dvd.cam', 'dvdts', 'hdcam', '.hd.cam', '.hctc', '.hc.tc', '.hdtc',
+			'.hd.tc',  'hdts', '.hd.ts', '.ts.', '.tc.', 'tsrip', 'telecine', 'telesync', 'tele.sync']
 
 VIDEO_3D = ['.3d.', '.sbs.', '.hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', '.tab.', '.htab.', 'topandbottom', 'top.and.bottom']
 CODEC_H265 = ['hevc', 'h265', 'h.265', 'x265', 'x.265']
@@ -38,7 +33,7 @@ UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'am
 				'gears.media', 'gearsmedia', 'gostfilm', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'hurtom', 'idea.film', 'ideafilm', 'jaskier', 'kapatejl6', 'kb.1080p',
 				'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm', 'megapeer', 'minutemen.empire', 'omskbird',
 				'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'sample', 'soundtrack', 'subtitle.only', 'sunshinestudio', 'teaser', 'trailer', 'tumbler.studio',
-				'.ost.', 'tvshows', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666']
+				'.ost.', 'tvshows', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666',]
 
 season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
 			'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three',
@@ -66,18 +61,8 @@ season_ordinal2_dict = {'1': '1st', '2': '2nd', '3': '3rd', '4': '4th', '5': '5t
 			'20': '20th', '21': '21st', '22': '22nd', '23': '23rd', '24': '24th', '25': '25th'}
 
 def get_undesirables():
-	try:
-		chosen = control.setting('undesirables.choice')
-		if not chosen: chosen = UNDESIRABLES
-		else: chosen = chosen.replace(' ', '').split(',')
-		user_defined = control.setting('undesirables.user_defined')
-		if not user_defined: user_defined = []
-		else: user_defined = user_defined.replace(' ', '').split(',')
-		chosen.extend(user_defined)
-		undesirables = list(set(chosen))
-	except:
-		log_utils.error()
-		undesirables = UNDESIRABLES
+	undesirables = control.homeWindow.getProperty('fenom.undesirables')
+	undesirables = list(set(undesirables.replace(' ', '').split(',')))
 	return undesirables
 
 def undesirablesSelect():
@@ -167,9 +152,10 @@ def remove_lang(release_info):
 	try:
 		if any(value in release_info for value in DUBBED): return True
 		if any(value in release_info for value in SUBS): return True
-		if control.setting('filter.undesirables') == 'true':
-			if any(value in release_info for value in get_undesirables()): return True
-		if control.setting('filter.foreign.single.audio') == 'true':
+		if control.homeWindow.getProperty('fenom.filter.undesirables') == 'true':
+			undesirables = get_undesirables()
+			if any(value in release_info for value in undesirables): return True
+		if control.homeWindow.getProperty('fenom.filter.foreign.single.audio') == 'true':
 			if any(value in release_info for value in LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
 			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
 		if release_info.endswith('.srt.') and not any(value in release_info for value in ['with.srt', '.avi', '.mkv', '.mp4']): return True
@@ -537,12 +523,12 @@ def clean_name(release_title):
 							'[.www.tamilrockers.com.]', 'tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.ws', 'www.tamilrockers.pl',
 							'[.www.torrenting.com.]', 'www.torrenting.com', 'www.torrenting.org', 'www-torrenting-com', 'www-torrenting-org',
 							'[katmoviehd.eu]', '[katmoviehd.to]', '[katmoviehd.tv]', '+katmoviehd.pw+', 'katmoviehd-pw',
-							'[.www.torrent9.uno.]', '[www.torrent9.ph.]', 'www.torrent9.nz', '[.torrent9.tv.]', '[.torrent9.cz.]', '[ torrent9.cz ]',
+							'[.www.torrent9.uno.]', '[www.torrent9.ph.]', 'www.torrent9.nz', '[.torrent9.tv.]', '[.torrent9.cz.]', '[ torrent9.cz ]', 'torrent9-cz-.-',
 							'[agusiq.torrents.pl]', '[agusiq-torrents.pl]', 'agusiq-torrents-pl',
 							'[.oxtorrent.com.]', '[oxtorrent-com]', 'oxtorrent-com',
 							'[movcr.com]', 'www.movcr.tv', 'movcr-com', 'www.movcr.to',
 							'[ex-torrenty.org]', '[xtorrenty.org]', 'xtorrenty.org',
-							'[acesse.]', '[acesse-hd-elite-me]',
+							'[acesse.]', '[acesse-hd-elite-me]', '[acesse.hd-elite.me].',
 							'[torrentcouch.net]', '[torrentcouch-net]',
 							'[.www.cpasbien.cm.]', '[.www.cpasbien.pw.]',
 							'[auratorrent.pl].nastoletni.wilkoak', '[auratorrent.pl]',
@@ -550,23 +536,22 @@ def clean_name(release_title):
 							'[www.scenetime.com]', 'www.scenetime.com',
 							'[kst.vn]', 'kst-vn',
 							'[itfriend]', '[itf]',
+							'(imax)', '.imax.',
 							'www.2movierulz.ac', 'www.2movierulz.ms',
 							'www.3movierulz.com', 'www.3movierulz.tv',
-							'[zooqle.com]', '[horriblesubs]', '[gktorrent.com]', '[.www.omgtorrent.com.]', '[3d.hentai]', '[dark.media]', '[devil-torrents.pl]',
-							'[filetracker.pl]', 'www.bludv.tv', 'ramin.djawadi', '[prof]', '[reup]', '[.www.speed.cd.]', '[-bde4.com]',
-							'[ah]', '[ul]', '+13.+', 'taht.oyunlar', 'crazy4tv.com', '[tv]', '[noobsubs]', '[.freecourseweb.com.]',
-							'best-torrents-net', '[.www.torrentday.com.]', '1-3-3-8.com', 'ssrmovies.club', 'www.tamilmv.bid']
-		unwanted2 = ['().-.', '()--', '[..].', '[..]', '.[.].', '[.].','[.]-', '[]', '[.', '.]', ' ]-', '].', '{..}.', '{..}', '.{.}.', '{.}.', '{.}-', '{}', '{.', '.}', ' }-', '}.', '+-+-', '.-.', '-.-', '.-', '-.', '--', '-', '...', '..', '.', '4..', '4.', '4].']
-
+							'[zooqle.com]', '[horriblesubs]', '[gktorrent.com]', '[.www.omgtorrent.com.]', '[3d.hentai]', '[dark.media]', '[devil-torrents.pl]', 'mkvcinemas.live',
+							'[filetracker.pl]', 'www.bludv.tv', 'ramin.djawadi', '[prof]', '[reup]', '[.www.speed.cd.]', '[-bde4.com]', 'extramovies.casa',
+							'[ah]', '[ul]', '+13.+', 'taht.oyunlar', 'crazy4tv.com', '[tv]', '[noobsubs]', '[.freecourseweb.com.]', 'karibu', '989pa.com', '[aletorrenty.pl]',
+							'best-torrents-net', '[.www.torrentday.com.]', '1-3-3-8.com', 'ssrmovies.club', 'www.tamilmv.bid', 'www.1tamilmv.org', '[h3h2.com]']
 		if release_title.lower().startswith('rifftrax'): return release_title # removed by "undesirables" anyway so exit
 		release_title = strip_non_ascii_and_unprintable(release_title).lstrip('/ ').replace(' ', '.')
+		# log_utils.log('release_title: ' + str(release_title))
 		for i in unwanted:
 			if release_title.lower().startswith(i):
 				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else r'%s' % i
 				release_title = re.sub(r'^%s' % pattern, '', release_title, 1, re.I)
-		for i in unwanted2:
-			release_title = release_title.lstrip(i)
-		# log_utils.log('final release_title: ' + str(release_title), log_utils.LOGDEBUG)
+		release_title = release_title.lstrip(' 4.-[](){}')
+		# log_utils.log('final release_title: ' + str(release_title))
 		return release_title
 	except:
 		log_utils.error()
@@ -631,6 +616,10 @@ def is_host_valid(url, domains):
 		return False, ''
 
 def __top_domain(url):
+	try: #Py2
+		from urlparse import urlparse
+	except ImportError: #Py3
+		from urllib.parse import urlparse
 	try:
 		elements = urlparse(url)
 		domain = elements.netloc or elements.path
