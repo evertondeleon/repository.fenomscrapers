@@ -7,15 +7,15 @@ from datetime import datetime
 import inspect
 import unicodedata
 import xbmc
-from fenomscrapers.modules import control
+from fenomscrapers.modules.control import getKodiVersion, transPath, setting as getSetting, lang, joinPath, existsPath
 from fenomscrapers.modules import py_tools
 
 LOGDEBUG = xbmc.LOGDEBUG #0
 LOGINFO = xbmc.LOGINFO #1
-LOGNOTICE = xbmc.LOGNOTICE if control.getKodiVersion() < 19 else xbmc.LOGINFO #(2 in 18, deprecated in 19 use LOGINFO(1))
+LOGNOTICE = xbmc.LOGNOTICE if getKodiVersion() < 19 else xbmc.LOGINFO #(2 in 18, deprecated in 19 use LOGINFO(1))
 LOGWARNING = xbmc.LOGWARNING #(3 in 18, 2 in 19)
 LOGERROR = xbmc.LOGERROR #(4 in 18, 3 in 19)
-LOGSEVERE = xbmc.LOGSEVERE if control.getKodiVersion() < 19 else xbmc.LOGFATAL #(5 in 18, deprecated in 19 use LOGFATAL(4))
+LOGSEVERE = xbmc.LOGSEVERE if getKodiVersion() < 19 else xbmc.LOGFATAL #(5 in 18, deprecated in 19 use LOGFATAL(4))
 LOGFATAL = xbmc.LOGFATAL #(6 in 18, 4 in 19)
 LOGNONE = xbmc.LOGNONE #(7 in 18, 5 in 19)
 if py_tools.isPY2:
@@ -24,15 +24,15 @@ if py_tools.isPY2:
 else:
 	debug_list = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL']
 DEBUGPREFIX = '[COLOR red][ FENOMSCRAPERS %s ][/COLOR]'
-LOGPATH = control.transPath('special://logpath/')
+LOGPATH = transPath('special://logpath/')
 
 
 def log(msg, caller=None, level=LOGNOTICE):
-	debug_enabled = control.setting('debug.enabled') == 'true'
+	debug_enabled = getSetting('debug.enabled') == 'true'
 	if not debug_enabled: return
-	debug_location = control.setting('debug.location')
+	debug_location = getSetting('debug.location')
 
-	if isinstance(msg, int): msg = control.lang(msg) # for strings.po translations
+	if isinstance(msg, int): msg = lang(msg) # for strings.po translations
 
 	try:
 		if py_tools.isPY3:
@@ -56,8 +56,8 @@ def log(msg, caller=None, level=LOGNOTICE):
 			msg = 'From func name: %s.%s() Line # :%s\n                       msg : %s' % (caller[0], caller[1], caller[2], msg)
 
 		if debug_location == '1':
-			log_file = control.joinPath(LOGPATH, 'fenomscrapers.log')
-			if not control.existsPath(log_file):
+			log_file = joinPath(LOGPATH, 'fenomscrapers.log')
+			if not existsPath(log_file):
 				f = open(log_file, 'w')
 				f.close()
 			with open(log_file, 'a', encoding='utf-8') as f: #with auto cleans up and closes

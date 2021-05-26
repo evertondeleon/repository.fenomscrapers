@@ -106,6 +106,7 @@ class source:
 				url = py_tools.ensure_text(client.replaceHTMLCodes(item[0]), errors='replace')
 				valid, host = source_utils.is_host_valid(url, hostDict)
 				if not valid: continue
+
 				sources.append({'provider': '300mbfilms', 'source': host, 'name': item[1], 'name_info': item[2], 'quality': item[3], 'language': 'en', 'url': url,
 											'info': item[4], 'direct': False, 'debridonly': True, 'size': item[5]})
 			return sources

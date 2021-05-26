@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-26-2021)
+# modified by Venom for Fenomscrapers (updated 5-21-2021)
 """
 	Fenomscrapers Project
 """
 
 from json import loads as jsloads
 import re
-import time
+from time import sleep
 try: #Py2
 	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote_plus
@@ -89,7 +89,7 @@ class source:
 			else:
 				search_link = self.msearch.format(self.key, data['imdb'])
 
-			time.sleep(2.1)
+			sleep(2.1)
 			# rjson = client.request(search_link, error=True, timeout='5')
 			rjson = self.scraper.get(search_link).content
 			if not rjson or 'torrent_results' not in str(rjson): return sources
@@ -148,9 +148,8 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 			search_link = self.tvshowsearch.format(self.key, data['imdb'], 'S%s' % self.season_xx)
-			# log_utils.log('search_link = %s' % str(search_link), log_utils.LOGDEBUG)
-
-			time.sleep(2.1)
+			# log_utils.log('search_link = %s' % str(search_link))
+			sleep(2.1)
 			# rjson = client.request(search_link, error=True, timeout='5')
 			rjson = self.scraper.get(search_link).content
 			if not rjson or 'torrent_results' not in str(rjson): return sources

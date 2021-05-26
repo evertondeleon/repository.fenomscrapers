@@ -6,7 +6,6 @@
 
 import re
 from collections import namedtuple
-from fenomscrapers.modules import log_utils
 from fenomscrapers.modules import py_tools
 
 DomMatch = namedtuple('DOMMatch', ['attrs', 'content'])
@@ -22,6 +21,7 @@ re_type = type(re.compile(r''))
 		# else: results = [result.content for result in results]
 		# return results
 	# except:
+		# from fenomscrapers.modules import log_utils
 		# log_utils.error()
 
 def __get_dom_content(html, name, match):
@@ -49,6 +49,7 @@ def __get_dom_content(html, name, match):
 		else: result = ''
 		return result
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return ''
 
@@ -86,6 +87,7 @@ def __get_dom_elements(item, name, attrs):
 			this_list = last_list
 		return this_list
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return this_list
 
@@ -101,6 +103,7 @@ def __get_attribs(element):
 			attribs[match['key'].lower().strip()] = value
 		return attribs
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return attribs
 
@@ -137,5 +140,6 @@ def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
 			all_results += results
 		return all_results
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return ''

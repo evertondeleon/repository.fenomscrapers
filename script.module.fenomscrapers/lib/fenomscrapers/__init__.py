@@ -2,10 +2,9 @@
 
 import os
 from pkgutil import walk_packages
-from fenomscrapers.modules import control
-from fenomscrapers.modules import log_utils
+from fenomscrapers.modules.control import setting as getSetting
 
-debug = control.setting('debug.enabled') == 'true'
+debug = getSetting('debug.enabled') == 'true'
 
 def sources(specified_folders=None):
 	try:
@@ -24,9 +23,12 @@ def sources(specified_folders=None):
 						module = loader.find_module(module_name).load_module(module_name)
 						sourceDict.append((module_name, module.source()))
 					except Exception as e:
-						if debug: log_utils.log('Error: Loading module: "%s": %s' % (module_name, e), level=log_utils.LOGWARNING)
+						if debug:
+							from fenomscrapers.modules import log_utils
+							log_utils.log('Error: Loading module: "%s": %s' % (module_name, e), level=log_utils.LOGWARNING)
 		return sourceDict
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return []
 
@@ -35,18 +37,19 @@ def getScraperFolder():
 		sourceSubFolders = [x[1] for x in os.walk(os.path.dirname(__file__))][0]
 		return [i for i in sourceSubFolders if 'fenomscrapers' in i.lower()][0]
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return 'sources_fenomscrapers'
 
 def enabledCheck(module_name):
 	try:
-		if control.setting('provider.' + module_name) == 'true': return True
+		if getSetting('provider.' + module_name) == 'true': return True
 		else: return False
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return True
 
 def pack_sources():
-	return ['bitlord', 'bt4g', 'btdb', 'btscene', 'extratorrent', 'idope', 'kickass2', 'limetorrents', 'magnetdl', 'piratebay',
-				'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy', 'torrentparadise',
-				'torrentz2', 'yourbittorrent', 'zooqle']
+	return ['7torrents', 'bitlord', 'bt4g', 'btdb', 'btscene', 'extratorrent', 'idope', 'kickass2', 'limetorrents', 'magnetdl', 'piratebay', 'solidtorrents',
+				'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy', 'torrentparadise', 'torrentz2', 'yourbittorrent', 'zooqle']

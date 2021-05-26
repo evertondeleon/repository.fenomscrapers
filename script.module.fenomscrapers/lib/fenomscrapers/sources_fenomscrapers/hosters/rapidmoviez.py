@@ -140,6 +140,7 @@ class source:
 			if name.startswith('['): name = name.split(']')[1]
 			name = name.strip().replace(' ', '.')
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
+			if source_utils.remove_lang(name_info): return self.sources
 
 			l = dom_parser.parse_dom(r, 'pre', {'class': 'links'})
 			if l == []: return

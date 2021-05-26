@@ -5,7 +5,6 @@
 
 import re
 import unicodedata
-from fenomscrapers.modules import log_utils
 from fenomscrapers.modules import py_tools
 
 
@@ -20,6 +19,7 @@ def get(title):
 		title = re.sub(r'\n|([\[({].+?[})\]])|([:;–\-"\',!_.?~$@])|\s', '', title) # stop trying to remove alpha characters "vs" or "v", they're part of a title
 		return title
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return title
 
@@ -36,6 +36,7 @@ def get_simple(title):
 		title = re.sub(r'<.*?>', '', title) # removes tags
 		return title
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return title
 
@@ -54,6 +55,7 @@ def geturl(title):
 		title = title.replace('/', '-').replace(' ', '-').replace('--', '-').replace('–', '-').replace('!', '')
 		return title
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return title
 
@@ -63,5 +65,6 @@ def normalize(title):
 		title = ''.join(c for c in unicodedata.normalize('NFKD', py_tools.ensure_text(py_tools.ensure_str(title))) if unicodedata.category(c) != 'Mn')
 		return str(title)
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return title

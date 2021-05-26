@@ -10,7 +10,6 @@ from time import time
 try: from sqlite3 import dbapi2 as db
 except ImportError: from pysqlite2 import dbapi2 as db
 from fenomscrapers.modules import control
-from fenomscrapers.modules import log_utils
 
 
 def get(function, duration, *args):
@@ -42,6 +41,7 @@ def get(function, duration, *args):
 			cache_insert(key, fresh_result)
 			return literal_eval(fresh_result)
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return None
 
@@ -59,6 +59,7 @@ def cache_get(key):
 		results = dbcur.execute('''SELECT * FROM cache WHERE key=?''', (key,)).fetchone()
 		return results
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return None
 	finally:
@@ -75,6 +76,7 @@ def cache_insert(key, value):
 			dbcur.execute('''INSERT INTO cache Values (?, ?, ?)''', (key, value, now))
 		dbcur.connection.commit()
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 	finally:
 		dbcur.close() ; dbcon.close()

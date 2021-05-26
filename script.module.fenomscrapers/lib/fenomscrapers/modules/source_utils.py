@@ -7,8 +7,8 @@ from json import loads as jsloads
 import re
 from string import printable
 from fenomscrapers.modules import cleantitle
-from fenomscrapers.modules import control
-from fenomscrapers.modules import log_utils
+from fenomscrapers.modules.control import homeWindow, setting as getSetting, setSetting, multiselectDialog
+
 
 RES_4K = ['.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd'] # some idiots use "uhd.1080p" in their uploads, "uhd" now removed
 RES_1080 = ['1080p', '1080i', 'hd1080', '1080hd']
@@ -31,9 +31,9 @@ SUBS = ['subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs']
 UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'amedia', 'baibako', 'bigsinema', 'bonus.disc', 'courage.bambey',
 				'.cbr', '.cbz', 'coldfilm', 'dilnix', 'dutchreleaseteam', 'e.book.collection', 'empire.minutemen', 'eniahd', '.exe', 'exkinoray', 'extras.only',
 				'gears.media', 'gearsmedia', 'gostfilm', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'hurtom', 'idea.film', 'ideafilm', 'jaskier', 'kapatejl6', 'kb.1080p',
-				'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm', 'megapeer', 'minutemen.empire', 'omskbird',
-				'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'sample', 'soundtrack', 'subtitle.only', 'sunshinestudio', 'teaser', 'trailer', 'tumbler.studio',
-				'.ost.', 'tvshows', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666',]
+				'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm', 'megapeer', 'minutemen.empire', 'newstudio',
+				'omskbird', '.ost.', 'paravozik', 'profix.media', 'rifftrax', 'sample', 'soundtrack', 'subtitle.only', 'sunshinestudio', 'teaser', 'trailer', 'tumbler.studio',
+				'tvshows', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666']
 
 season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
 			'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three',
@@ -61,18 +61,18 @@ season_ordinal2_dict = {'1': '1st', '2': '2nd', '3': '3rd', '4': '4th', '5': '5t
 			'20': '20th', '21': '21st', '22': '22nd', '23': '23rd', '24': '24th', '25': '25th'}
 
 def get_undesirables():
-	undesirables = control.homeWindow.getProperty('fenom.undesirables')
+	undesirables = homeWindow.getProperty('fenom.undesirables')
 	undesirables = list(set(undesirables.replace(' ', '').split(',')))
 	return undesirables
 
 def undesirablesSelect():
-	chosen = control.setting('undesirables.choice').replace(' ', '').split(',')
+	chosen = getSetting('undesirables.choice').replace(' ', '').split(',')
 	try: preselect = [UNDESIRABLES.index(i) for i in chosen]
 	except: preselect = [UNDESIRABLES.index(i) for i in UNDESIRABLES]
-	choices = control.multiselectDialog(UNDESIRABLES, preselect=preselect)
+	choices = multiselectDialog(UNDESIRABLES, preselect=preselect)
 	if not choices: return
 	choices = [UNDESIRABLES[i] for i in choices]
-	control.setSetting('undesirables.choice', ','.join(choices))
+	setSetting('undesirables.choice', ','.join(choices))
 
 def get_qual(term):
 	if any(i in term for i in SCR): return 'SCR'
@@ -97,6 +97,7 @@ def get_release_quality(release_info, release_link=None):
 			else: quality = 'SD'
 		return quality, info
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return 'SD', []
 
@@ -107,6 +108,7 @@ def aliases_to_array(aliases, filter=None):
 		if isinstance(filter, str): filter = [filter]
 		return [x.get('title') for x in aliases if not filter or x.get('country') in filter]
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return []
 
@@ -124,6 +126,7 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 				if alias in title_list: continue
 				title_list.append(alias)
 			except:
+				from fenomscrapers.modules import log_utils
 				log_utils.error()
 	try:
 		match = True
@@ -144,6 +147,7 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 			if h not in release_title: match = False
 		return match
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return match
 
@@ -152,15 +156,16 @@ def remove_lang(release_info):
 	try:
 		if any(value in release_info for value in DUBBED): return True
 		if any(value in release_info for value in SUBS): return True
-		if control.homeWindow.getProperty('fenom.filter.undesirables') == 'true':
+		if homeWindow.getProperty('fenom.filter.undesirables') == 'true':
 			undesirables = get_undesirables()
 			if any(value in release_info for value in undesirables): return True
-		if control.homeWindow.getProperty('fenom.filter.foreign.single.audio') == 'true':
+		if homeWindow.getProperty('fenom.filter.foreign.single.audio') == 'true':
 			if any(value in release_info for value in LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
 			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
 		if release_info.endswith('.srt.') and not any(value in release_info for value in ['with.srt', '.avi', '.mkv', '.mp4']): return True
 		return False
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return False
 
@@ -182,6 +187,7 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 				if alias in title_list: continue
 				title_list.append(alias)
 			except:
+				from fenomscrapers.modules import log_utils
 				log_utils.error()
 	try:
 		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
@@ -238,6 +244,7 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 			return True
 		return False
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return True
 
@@ -253,6 +260,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 				if alias in title_list: continue
 				title_list.append(alias)
 			except:
+				from fenomscrapers.modules import log_utils
 				log_utils.error()
 	try:
 		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
@@ -478,8 +486,9 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 		return True, total_seasons
 	except:
-		# return True, total_seasons
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
+		# return True, total_seasons
 
 def info_from_name(release_title, title, year, hdlr=None, episode_title=None, season=None, pack=None):
 	try:
@@ -505,6 +514,7 @@ def info_from_name(release_title, title, year, hdlr=None, episode_title=None, se
 		name_info = '.%s.' % name_info
 		return name_info
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return release_title
 
@@ -514,6 +524,7 @@ def release_title_format(release_title):
 		fmt = '.%s.' % re.sub(r'[^a-z0-9-~]+', '.', release_title).replace('.-.', '-').replace('-.', '-').replace('.-', '-').replace('--', '-')
 		return fmt
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return release_title
 
@@ -545,15 +556,14 @@ def clean_name(release_title):
 							'best-torrents-net', '[.www.torrentday.com.]', '1-3-3-8.com', 'ssrmovies.club', 'www.tamilmv.bid', 'www.1tamilmv.org', '[h3h2.com]']
 		if release_title.lower().startswith('rifftrax'): return release_title # removed by "undesirables" anyway so exit
 		release_title = strip_non_ascii_and_unprintable(release_title).lstrip('/ ').replace(' ', '.')
-		# log_utils.log('release_title: ' + str(release_title))
 		for i in unwanted:
 			if release_title.lower().startswith(i):
 				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else r'%s' % i
 				release_title = re.sub(r'^%s' % pattern, '', release_title, 1, re.I)
 		release_title = release_title.lstrip(' 4.-[](){}')
-		# log_utils.log('final release_title: ' + str(release_title))
 		return release_title
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return release_title
 
@@ -562,6 +572,7 @@ def strip_non_ascii_and_unprintable(text):
 		result = ''.join(char for char in text if char in printable)
 		return result.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return text
 
@@ -569,7 +580,6 @@ def _size(siz):
 	try:
 		if siz in ['0', 0, '', None]: return 0, ''
 		div = 1 if siz.lower().endswith(('gb', 'gib')) else 1024
-		# log_utils.log('siz = %s' % siz, log_utils.LOGDEBUG)
 		# if ',' in siz and siz.lower().endswith(('mb', 'mib')): siz = size.replace(',', '')
 		# elif ',' in siz and siz.lower().endswith(('gb', 'gib')): siz = size.replace(',', '.')
 		# float_size = float(re.sub(r'[^0-9|/.|/,]', '', siz.replace(',', '.'))) / div
@@ -577,6 +587,7 @@ def _size(siz):
 		str_size = '%.2f GB' % float_size
 		return float_size, str_size
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return 0, ''
 
@@ -592,11 +603,13 @@ def convert_size(size_bytes, to='GB'):
 		str_size = "%s %s" % (float_size, to)
 		return float_size, str_size
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return 0, ''
 
 def scraper_error(provider):
 	import traceback
+	from fenomscrapers.modules import log_utils
 	failure = traceback.format_exc()
 	log_utils.log(provider.upper() + ' - Exception: \n' + str(failure), caller='scraper_error', level=log_utils.LOGERROR)
 
@@ -612,6 +625,7 @@ def is_host_valid(url, domains):
 		if hosts and any([h for h in ['akamaized', 'ocloud'] if h in host]): host = 'CDN'
 		return any(hosts), host
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return False, ''
 
@@ -630,4 +644,5 @@ def __top_domain(url):
 		domain = domain.lower()
 		return domain
 	except:
+		from fenomscrapers.modules import log_utils
 		log_utils.error()

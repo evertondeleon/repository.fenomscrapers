@@ -1,4 +1,4 @@
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.4.0" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.4.1" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="script.module.requests" />
 		<import addon="script.module.myaccounts" version="1.0.0" />
@@ -24,11 +24,9 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.4.0 - May 20, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Fixed issue with custom Undesirables input not converted to .lower().[/I]
-[COLOR yellow]--[/COLOR][I] Undesirables list is now a windows property for speed of access.[/I]
-[COLOR yellow]--[/COLOR][I] All settings are now converted to using window properties for speed.
-    Kodi's .getSetting() is extremely slow.[/I]
+[B][COLOR red]Update - v1.4.1 - May 26, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] 7torrents scraper is back and no longer behind Cloudflare, for now.[/I]
+[COLOR yellow]--[/COLOR][I] btdig scraper removed, reCaptcha.[/I]
 		</news>
 	</extension>
 </addon>
