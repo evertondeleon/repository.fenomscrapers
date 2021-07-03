@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated url 1-28-2021)
+# created by Venom for Fenomscrapers (updated url 7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -92,10 +92,10 @@ class source:
 		for row in rows:
 			try:
 				if 'magnet:' not in row: continue
-				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
+				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -107,14 +107,15 @@ class source:
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 				try:
-					# seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Seeds'})[0])
-					seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Last Updated'})[0]) #keep an eye on this, looks like they gaffed their col's (seeders and size)
+					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) #keep an eye on this, looks like they gaffed their col's (seeders and size)
 					if self.min_seeders > seeders: continue
-				except: seeders = 0
+				except:
+					source_utils.scraper_error('TORRENTZ2')
+					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' '))[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' ')).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -179,10 +180,10 @@ class source:
 		for row in rows:
 			try:
 				if 'magnet:' not in row: continue
-				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
+				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -203,14 +204,13 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 				try:
-					# seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Seeds'})[0])
-					seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Last Updated'})[0]) #keep an eye on this, looks like they gaffed their col's (seeders and size)
+					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) #keep an eye on this, looks like they gaffed their col's (seeders and size)
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' '))[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' ')).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

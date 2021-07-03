@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (2-9-2021)
+# created by Venom for Fenomscrapers (7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -70,7 +70,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 
 			r = client.request(url, timeout='5')
 			if not r or 'did not match any documents' in r: return sources
@@ -102,8 +102,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0] #lot of combo S01E01-E08 so parse episode item for size instead, it's closer
-					# size = re.findall(r'<b class\s*=\s*["\']cpill .+?-pill["\']>(.+?)</b>', post, re.I)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0) #lot of combo S01E01-E08 so parse episode item for size instead, it's closer
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -142,6 +141,7 @@ class source:
 						self.search_link % quote_plus(query + ' Season'),
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
+
 			for url in queries:
 				link = urljoin(self.base_link, url)
 				threads.append(workers.Thread(self.get_sources_packs, link))
@@ -153,7 +153,7 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % str(link))
 		r = client.request(link, timeout='5')
 		if not r or 'did not match any documents' in r: return
 		r = r.replace('&nbsp;', ' ')
@@ -191,7 +191,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'<b class\s*=\s*["\']cpill .+?-pill["\']>(.+?)</b>', post, re.I)[0] #pack size calc will re-evalute this
+					size = re.search(r'<b\s*class\s*=\s*["\']cpill.+?-pill["\']>(.+?)</b>', post, re.I).group(1)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

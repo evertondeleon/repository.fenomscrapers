@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 2-19-2021)
+# created by Venom for Fenomscrapers (updated 7-03-2021)
 """
 	Fenomscrapers Project
 """
@@ -73,7 +73,7 @@ class source:
 			url = urljoin(self.base_link, url)
 			urls.append(url)
 			# urls.append(url + '?p=2')
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls)
 			threads = []
 			for url in urls:
 				threads.append(workers.Thread(self.get_sources, url))
@@ -97,7 +97,8 @@ class source:
 			try:
 				url = client.parseDOM(row, 'a', attrs={'title': 'Download Torrent Magnet'}, ret='href')[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
@@ -108,14 +109,13 @@ class source:
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 				try:
-					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']seeds\s*is-hidden-sm-mobile["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.S | re.I)[0].replace(',', ''))
+					seeders = int(re.search(r'<td\s*class\s*=\s*["\']seeds\s*is-hidden-sm-mobile["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					# size = re.findall(r'<td class="is-hidden-touch">(.+? (?:GB|MB))<', row)[0]
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -164,7 +164,7 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % str(link))
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
@@ -177,7 +177,7 @@ class source:
 			try:
 				url = client.parseDOM(row, 'a', attrs={'title': 'Download Torrent Magnet'}, ret='href')[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
 				if not self.search_series:
@@ -197,13 +197,13 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 				try:
-					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']seeds\s*is-hidden-sm-mobile["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.S | re.I)[0].replace(',', ''))
+					seeders = int(re.search(r'<td\s*class\s*=\s*["\']seeds\s*is-hidden-sm-mobile["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

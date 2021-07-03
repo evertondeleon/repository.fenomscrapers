@@ -446,8 +446,8 @@ msgid "EZTV (shows only)"
 msgstr "EZTV (alleen series)"
 
 msgctxt "#32108"
-msgid "GLODLS"
-msgstr "GLODLS"
+msgid "GLODLS (Pack capable)"
+msgstr "GLODLS  (Pack geschikt)"
 
 msgctxt "#32109"
 msgid "IDOPE (Pack capable)"
@@ -558,8 +558,8 @@ msgid "TORRENTPARADISE (Pack capable)"
 msgstr "TORRENTPARADISE (Pack geschikt)"
 
 msgctxt "#32136"
-msgid ""
-msgstr ""
+msgid "TORRENTPROJECT2 (Pack capable)"
+msgstr "TORRENTPPROJECT2 (Pack geschikt)"
 
 msgctxt "#32137"
 msgid ""

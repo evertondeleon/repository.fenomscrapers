@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-26-2021)
+# modified by Venom for Fenomscrapers (updated 7-03-2021)
 """
 	Fenomscrapers Project
 """
@@ -77,7 +77,7 @@ class source:
 				urls.append(self.moviesearch % (quote(query)))
 			url2 = ''.join(urls).replace('/1/', '/2/')
 			urls.append(url2)
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls)
 
 			threads = []
 			for url in urls:
@@ -100,17 +100,17 @@ class source:
 			headers = {'User-Agent': client.agent()}
 			r = client.request(url, headers=headers, timeout='10')
 			if not r or '<tbody' not in r: return
-			posts = client.parseDOM(r, 'tbody')[0]
-			posts = client.parseDOM(posts, 'tr')
+			table = client.parseDOM(r, 'tbody')[0]
+			rows = client.parseDOM(table, 'tr')
 		except:
 			source_utils.scraper_error('1337X')
 			return
-		for post in posts:
+		for row in rows:
 			try:
-				data = client.parseDOM(post, 'a', ret='href')[1]
+				data = client.parseDOM(row, 'a', ret='href')[1]
 				link = urljoin(self.base_link, data)
 
-				name = client.parseDOM(post, 'a')[1]
+				name = client.parseDOM(row, 'a')[1]
 				name = source_utils.clean_name(unquote_plus(name))
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
 					continue
@@ -121,11 +121,11 @@ class source:
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 				try:
-					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'coll-2 seeds'})[0].replace(',', ''))
+					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'coll-2 seeds'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 				except: isize = '0' ; dsize = 0
 				self.items.append((name, name_info, link, isize, dsize, seeders))
@@ -143,7 +143,8 @@ class source:
 			url = [i for i in data if 'magnet:' in i][0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
-			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+			hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+
 			self.sources.append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1],
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})
 		except:

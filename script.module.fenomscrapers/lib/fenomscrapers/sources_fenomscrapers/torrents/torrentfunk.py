@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-28-2021)
+# created by Venom for Fenomscrapers (updated 7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -70,7 +70,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
@@ -107,22 +107,21 @@ class source:
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
-			if not url.startswith('http'): 
-				link = urljoin(self.base_link, url)
-
+			if not url.startswith('http'): link = urljoin(self.base_link, url)
 			link = client.request(link, timeout='5')
 			if link is None: 	return
-			hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
+
+			hash = re.search(r'Infohash.*?>(?!<)(.+?)</', link, re.I).group(1)
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
 			try:
-				seeders = int(re.findall(r'Swarm.*?>(?!<)([0-9]+)</', link, re.DOTALL | re.I)[0].replace(',', ''))
+				seeders = int(re.search(r'Swarm.*?>(?!<)([0-9]+)</', link, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
 			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
+				size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(0)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0
@@ -178,7 +177,7 @@ class source:
 			return self.sources
 
 	def get_pack_items(self, url):
-		# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+		# log_utils.log('url = %s' % url)
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
@@ -227,17 +226,18 @@ class source:
 		try:
 			link = client.request(items[2], timeout='5')
 			if link is None: 	return
-			hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
+			hash = re.search(r'Infohash.*?>(?!<)(.+?)</', link, re.I).group(1)
+
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, items[0])
 			if url in str(self.sources): return
 			try:
-				seeders = int(re.findall(r'Swarm.*?>(?!<)([0-9]+)</', link, re.DOTALL | re.I)[0].replace(',', ''))
+				seeders = int(re.search(r'Swarm.*?>(?!<)([0-9]+)</', link, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
 			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(items[1], url)
 			try:
-				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
+				size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(0)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0

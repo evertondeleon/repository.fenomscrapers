@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 05-26-2021)
+# created by Venom for Fenomscrapers (updated 07-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -20,7 +20,6 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 # 7torr.com is a mirror of btscene
- # 7torrents.cc mirror ?
 		self.domain = ['7torrents.cc']
 		self.base_link = 'https://www.7torrents.cc'
 		self.search_link = '/search?query=%s&sort=seeders'
@@ -99,10 +98,10 @@ class source:
 		for row in rows:
 			try:
 				if 'magnet' not in row: continue
-				url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
+				url = re.search(r'href\s*=\s*["\'](magnet:.+?)["\']', row, re.I).group(1)
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -114,13 +113,13 @@ class source:
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 				try:
-					seeders = int(re.findall(r'Seeders.*?["\']>([0-9]+|[0-9]+,[0-9]+)</strong>', row, re.DOTALL | re.I)[0].replace(',', ''))
+					seeders = int(re.search(r'Seeders.*?["\']>([0-9]+|[0-9]+,[0-9]+)</strong>', row, re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -130,6 +129,7 @@ class source:
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('7torrents')
+
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -181,10 +181,10 @@ class source:
 		for row in rows:
 			try:
 				if 'magnet' not in row: continue
-				url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
+				url = re.search(r'href\s*=\s*["\'](magnet:.+?)["\']', row, re.I).group(1)
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -205,13 +205,13 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 				try:
-					seeders = int(re.findall(r'Seeders.*?["\']>([0-9]+|[0-9]+,[0-9]+)</strong>', row, re.DOTALL | re.I)[0].replace(',', ''))
+					seeders = int(re.search(r'Seeders.*?["\']>([0-9]+|[0-9]+,[0-9]+)</strong>', row, re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

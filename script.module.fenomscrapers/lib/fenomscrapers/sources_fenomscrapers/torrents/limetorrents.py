@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-26-2021)
+# modified by Venom for Fenomscrapers (updated 7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -93,7 +93,7 @@ class source:
 			return self.sources
 
 	def get_sources(self, link):
-		# log_utils.log('link = %s' % link, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % link)
 		try:
 			headers = {'User-Agent': client.agent()}
 			r = py_tools.ensure_str(self.scraper.get(link, headers=headers).content, errors='replace')
@@ -109,10 +109,10 @@ class source:
 				data = client.parseDOM(row, 'a', ret='href')[0]
 				if '/search/' in data: continue
 				data = re.sub(r'\s', '', data).strip()
-				hash = re.compile(r'/torrent/(.+?).torrent', re.I).findall(data)[0]
-				name = re.findall(r'title\s*=\s*(.+?)$', data, re.DOTALL | re.I)[0]
-				name = source_utils.clean_name(name)
+				hash = re.search(r'/torrent/(.+?).torrent', data, re.I).group(1)
 
+				name = re.search(r'title\s*=\s*(.+?)$', data, re.I).group(1)
+				name = source_utils.clean_name(name)
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -129,7 +129,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -179,7 +179,7 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % str(link))
 		try:
 			headers = {'User-Agent': client.agent()}
 			r = py_tools.ensure_str(self.scraper.get(link, headers=headers).content, errors='replace')
@@ -195,11 +195,11 @@ class source:
 				data = client.parseDOM(row, 'a', ret='href')[0]
 				if '/search/' in data: continue
 				data = re.sub(r'\s', '', data).strip()
-				hash = re.compile(r'/torrent/(.+?).torrent', re.I).findall(data)[0]
-				name = re.findall(r'title\s*=\s*(.+?)$', data, re.DOTALL | re.I)[0]
+				hash = re.search(r'/torrent/(.+?).torrent', data, re.I).group(1)
+
+				name = re.search(r'title\s*=\s*(.+?)$', data, re.I).group(1)
 				name = source_utils.clean_name(name)
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-
 				if not self.search_series:
 					if not self.bypass_filter:
 						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
@@ -223,7 +223,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

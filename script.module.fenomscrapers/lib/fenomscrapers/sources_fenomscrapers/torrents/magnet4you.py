@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-28-2021)
+# created by Venom for Fenomscrapers (updated 7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -70,7 +70,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
@@ -88,10 +88,11 @@ class source:
 	def get_sources(self, row):
 		try:
 			if 'magnet:' not in row: return
-			url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
+			url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			if url in str(self.sources): return
-			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+			hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
@@ -102,13 +103,13 @@ class source:
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 			try:
-				seeders = int(re.findall(r'<span\s*style\s*=\s*["\']color:#008000["\']><strong>\s*([0-9]+)\s*</strong>', row, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.search(r'<span\s*style\s*=\s*["\']color:#008000["\']><strong>\s*([0-9]+)\s*</strong>', row, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
 			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
+				size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0

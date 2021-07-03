@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 2-19-2021)
+# created by Venom for Fenomscrapers (updated 7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -73,7 +73,7 @@ class source:
 			url = urljoin(self.base_link, url)
 			urls.append(url)
 			urls.append(url + '&p=2')
-			# log_utils.log('urls = %s' % urls, __name__, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls)
 			threads = []
 			for url in urls:
 				threads.append(workers.Thread(self.get_sources, url))
@@ -122,7 +122,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
-						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[1])[0]
+						size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[1]).group(0)
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except: dsize = 0
@@ -171,7 +171,7 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % str(link))
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
@@ -218,7 +218,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
-						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[1])[0]
+						size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[1]).group(0)
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except: dsize = 0

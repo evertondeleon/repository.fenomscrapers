@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-28-2021)
+# created by Venom for Fenomscrapers (updated 7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -91,8 +91,7 @@ class source:
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on topnow &tr= before &dn=
 				url = url.split('&tr=')[0].replace(' ', '.')
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				release_name = url.split('&dn=')[1]
 				release_name = source_utils.clean_name(release_name)
 				name_info = source_utils.info_from_name(release_name, title, year, hdlr, episode_title)
@@ -101,7 +100,7 @@ class source:
 				seeders = 0 # seeders not available on topnow
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', i)[-1] # file size is no longer available on topnow's new site
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', i).group(0) # file size is no longer available on topnow's new site
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

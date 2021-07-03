@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-26-2021)
+# modified by Venom for Fenomscrapers (updated 7-03-2021)
 """
 	Fenomscrapers Project
 """
@@ -101,7 +101,7 @@ class source:
 			return self.sources
 
 	def get_sources(self, url):
-		# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
+		# log_utils.log('url = %s' % url)
 		try:
 			headers = {'User-Agent': client.agent()}
 			r = client.request(url, headers=headers, timeout='5')
@@ -117,7 +117,7 @@ class source:
 
 				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				if url in str(self.sources): continue
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = unquote_plus(url.split('&dn=')[1])
 				name = source_utils.clean_name(name)
 
@@ -129,13 +129,13 @@ class source:
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 				try:
-					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']green\s*center["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.search(r'<td\s*class\s*=\s*["\']green\s*center["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -197,7 +197,7 @@ class source:
 				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
 				link = ref.split('url=')[1]
 				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = unquote_plus(url.split('&dn=')[1])
 				name = source_utils.clean_name(name)
 
@@ -218,13 +218,13 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 				try:
-					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']green\s*center["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.search(r'<td\s*class\s*=\s*["\']green\s*center["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -241,7 +241,7 @@ class source:
 			try:
 				url = 'https://%s' % domain
 				result = client.request(url, limit=1, timeout='5')
-				try: result = re.findall('r<title>(.+?)</title>', result, re.DOTALL)[0]
+				try: result = re.search('r<title>(.+?)</title>', result, re.I).group(1)
 				except: result = None
 				if result and 'Kickass' in result: return url
 			except:

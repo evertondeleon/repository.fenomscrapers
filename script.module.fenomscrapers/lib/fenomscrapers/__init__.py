@@ -51,5 +51,7 @@ def enabledCheck(module_name):
 		return True
 
 def pack_sources():
-	return ['7torrents', 'bitlord', 'bt4g', 'btdb', 'btscene', 'extratorrent', 'idope', 'kickass2', 'limetorrents', 'magnetdl', 'piratebay', 'solidtorrents',
-				'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy', 'torrentparadise', 'torrentz2', 'yourbittorrent', 'zooqle']
+	return ['7torrents', 'bitlord', 'bt4g', 'btscene', 'extratorrent', 'glodls', 'idope', 'kickass2', 'limetorrents', 'magnetdl', 'piratebay', 'solidtorrents',
+				'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy', 'torrentparadise', 'torrentproject2', 'torrentz2', 'yourbittorrent', 'zooqle']
+# btdb removed 7-3-21
+# glodls added 7-3-21

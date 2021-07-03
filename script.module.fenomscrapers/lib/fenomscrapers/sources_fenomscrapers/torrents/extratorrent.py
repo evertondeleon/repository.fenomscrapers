@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 2-26-2021)
+# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -21,7 +21,7 @@ class source:
 	def __init__(self):
 		self.priority = 4
 		self.language = ['en']
-		self.domains = ['extratorrent.si', 'extratorrents.it']
+		self.domains = ['extratorrent.si']
 		self.base_link = 'https://extratorrent.si'
 		self.search_link = '/search/?new=1&search=%s&s_cat=4'
 		self.min_seeders = 1
@@ -80,7 +80,7 @@ class source:
 			urls.append(url)
 			# urls.append('%s%s' % (url, '&page=2')) # next page is not working atm
 			# urls.append('%s%s' % (url, '&page=3'))
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls)
 
 			links = []
 			for x in urls:
@@ -102,11 +102,12 @@ class source:
 
 	def get_sources(self, link):
 		try:
-			url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', link, re.DOTALL | re.I)[0]
+			url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', link, re.I).group(1)
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources): return
-			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+			hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
 
@@ -118,13 +119,13 @@ class source:
 				ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 			try:
-				seeders = int(client.parseDOM(link, 'td', attrs={'class': 'sy'})[0].replace(',', ''))
+				seeders = int(client.parseDOM(link, 'td', attrs={'class': 'sn'})[0].replace(',', ''))
 				if self.min_seeders > seeders: return
 			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
+				size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(0)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0
@@ -187,11 +188,11 @@ class source:
 			try:
 				post = re.sub(r'\n', '', post)
 				post = re.sub(r'\t', '', post)
-				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', post, re.DOTALL | re.I)[0]
+				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', post, re.I).group(1)
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				if url in str(self.sources): continue
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
 
@@ -212,13 +213,13 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 				try:
-					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'sy'})[0].replace(',', ''))
+					seeders = int(client.parseDOM(link, 'td', attrs={'class': 'sn'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

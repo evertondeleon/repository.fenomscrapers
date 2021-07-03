@@ -86,7 +86,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name_info, item[0])
 					try:
-						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', item)[0]
+						size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', item).group(0)
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
@@ -137,7 +137,8 @@ class source:
 					link = client.request(r1)
 				if '<strong>Single' not in link: continue
 
-				link = re.findall(r'<strong>Single(.+?)</tr', link, re.DOTALL | re.I)[0]
+				# link = re.findall(r'<strong>Single(.+?)</tr', link, re.DOTALL | re.I)[0]
+				link = re.search(r'<strong>Single(.+?)</tr', link, re.I).group(1)
 				link = client.parseDOM(link, 'a', ret='href')
 				link = [(i.split('=')[-1]) for i in link]
 				for i in link:

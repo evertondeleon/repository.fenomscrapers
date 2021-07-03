@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 2-9-2021)
+# created by Venom for Fenomscrapers (updated 7-03-2021)
 """
 	Fenomscrapers Project
 """
@@ -70,7 +70,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 
 			result = client.request(url, timeout='5')
 			if not result or '<tbody' not in result: return
@@ -100,9 +100,9 @@ class source:
 				link = unquote_plus(client.parseDOM(link, 'a', attrs={'title': 'Download Magnet link'}, ret='href')[0])
 				if not link: continue
 
-				url = re.compile(r'(magnet:.*)').findall(link)[0].replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				url = re.search(r'(magnet:.*)', link).group(1).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(unquote_plus(url)) # many links dbl quoted so we must unquote again
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = unquote_plus(url.split('&dn=')[1])
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
@@ -119,7 +119,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[2])[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[2]).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

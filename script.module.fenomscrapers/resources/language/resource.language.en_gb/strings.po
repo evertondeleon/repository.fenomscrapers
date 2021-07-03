@@ -3,6 +3,7 @@
 # Addon id: script.module.fenomscrapers
 # Addon Provider: Mr-Kodi
 # Translator English: Mr-Kodi
+# Translator English:
 msgid ""
 msgstr ""
 
@@ -445,7 +446,7 @@ msgid "EZTV (shows only)"
 msgstr ""
 
 msgctxt "#32108"
-msgid "GLODLS"
+msgid "GLODLS (Pack capable)"
 msgstr ""
 
 msgctxt "#32109"
@@ -557,7 +558,7 @@ msgid "TORRENTPARADISE (Pack capable)"
 msgstr ""
 
 msgctxt "#32136"
-msgid ""
+msgid "TORRENTPROJECT2 (Pack capable)"
 msgstr ""
 
 msgctxt "#32137"

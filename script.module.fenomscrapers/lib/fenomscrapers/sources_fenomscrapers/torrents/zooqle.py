@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-28-2021)
+# modified by Venom for Fenomscrapers (updated 7-03-2021)
 """
 	Fenomscrapers Project
 """
@@ -74,7 +74,7 @@ class source:
 			url = urljoin(self.base_link, url) + str(category) + '&v=t&s=sz&sd=d'
 			urls.append(url)
 			urls.append(url.replace('pg=1', 'pg=2'))
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls)
 			threads = []
 			for url in urls:
 				threads.append(workers.Thread(self.get_sources, url))
@@ -103,14 +103,14 @@ class source:
 			try:
 				try:
 					if 'magnet:' not in row: continue
-					url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
+					url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(self.sources): continue
 				except: continue
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				try:
-					name = re.findall(r'<a class\s*=\s*["\'].+?>(.+?)</a>', row, re.DOTALL | re.I)[0]
+					name = re.search(r'<a\s*class\s*=\s*["\'].+?>(.+?)</a>', row, re.I).group(1)
 					name = client.cleanHTML(name)
 					name = unquote_plus(name)
 					name = source_utils.clean_name(name)
@@ -130,13 +130,13 @@ class source:
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 				try:
-					seeders = int(re.findall(r'["\']Seeders:\s*([0-9]+|[0-9]+,[0-9]+)\s*\|', row, re.DOTALL | re.I)[0].replace(',', ''))
+					seeders = int(re.search(r'["\']Seeders:\s*([0-9]+|[0-9]+,[0-9]+)\s*\|', row, re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[-1]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -187,7 +187,7 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % str(link))
 		try:
 			# For some reason Zooqle returns 404 even though the response has a body.
 			# This is probably a bug on Zooqle's server and the error should just be ignored.
@@ -205,14 +205,14 @@ class source:
 			try:
 				try:
 					if 'magnet:' not in row: continue
-					url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
+					url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(self.sources): continue
 				except: continue
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				try:
-					name = re.findall(r'<a class\s*=\s*["\'].+?>(.+?)</a>', row, re.DOTALL | re.I)[0]
+					name = re.search(r'<a class\s*=\s*["\'].+?>(.+?)</a>', row, re.I).group(1)
 					name = client.cleanHTML(name)
 					name = unquote_plus(name)
 					name = source_utils.clean_name(name)
@@ -241,13 +241,13 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 				try:
-					seeders = int(re.findall(r'["\']Seeders:\s*([0-9]+|[0-9]+,[0-9]+)\s*\|', row, re.DOTALL | re.I)[0].replace(',', ''))
+					seeders = int(re.search(r'["\']Seeders:\s*([0-9]+|[0-9]+,[0-9]+)\s*\|', row, re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[-1]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

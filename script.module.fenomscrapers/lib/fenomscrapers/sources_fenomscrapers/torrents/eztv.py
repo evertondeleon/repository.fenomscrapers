@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-28-2021)
+# modified by Venom for Fenomscrapers (updated 7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -63,7 +63,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.]+', '', query)
 			url = self.search_link % (quote_plus(query).replace('+', '-'))
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 			html = client.request(url, timeout='5')
 			try:
 				tables = client.parseDOM(html, 'table', attrs={'class': 'forum_header_border'})
@@ -89,21 +89,20 @@ class source:
 				url = str(client.replaceHTMLCodes(link[0]).split('&tr')[0])
 				try: url = unquote(url).decode('utf8')
 				except: pass
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = link[1].split(' [eztv]')[0].split(' Torrent:')[0]
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 				try:
-					seeders = int(re.findall(r'<font\s*color\s*=\s*["\'].+?["\']>(\d+|\d+\,\d+)</font>', columns[5], re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.search(r'<font\s*color\s*=\s*["\'].+?["\']>(\d+|\d+\,\d+)</font>', columns[5], re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', columns[3])[-1]
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[3])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)

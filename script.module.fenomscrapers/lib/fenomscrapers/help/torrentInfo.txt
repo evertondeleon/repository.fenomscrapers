@@ -45,6 +45,7 @@ moviemagnet (uses api to fetch their ID, movies only, uses cfscrape,
     site down as of 12/1/220-scraper removed)
 torlock(priority=7)
 torrentfunk(priority=7)
+torrentproject2(priority=6) new as of 7-02-21
 yourbittorrent(priority=9)
 
 The following scrapers sit behind CloudFlare and 

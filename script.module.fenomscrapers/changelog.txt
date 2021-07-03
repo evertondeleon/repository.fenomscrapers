@@ -1,3 +1,12 @@
+[B][COLOR red]Update - v1.4.2 - July 03, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] btdb scraper removed.  Domain no longer exists.[/I]
+[COLOR yellow]--[/COLOR][I] Added new "torrentproject2" scraper.[/I]
+[COLOR yellow]--[/COLOR][I] glodls scraper is now pack capable.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed extratorrent scraper stopped returning seeder count.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed torrentz2 scraper stopped returning seeder count.[/I]
+[COLOR yellow]--[/COLOR][I] 7torrents scraper default has been changed to off.  Server timeout
+    frequently occurs.[/I]
+
 [B][COLOR red]Update - v1.4.1 - May 26, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] 7torrents scraper is back and no longer behind Cloudflare, for now.[/I]
 [COLOR yellow]--[/COLOR][I] btdig scraper removed, reCaptcha.[/I]

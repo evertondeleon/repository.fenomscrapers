@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 5-21-2021)
+# modified by Venom for Fenomscrapers (updated 7-03-2021)
 """
 	Fenomscrapers Project
 """
@@ -100,7 +100,7 @@ class source:
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = unquote_plus(file["title"])
 				name = source_utils.clean_name(name)
 
@@ -160,7 +160,7 @@ class source:
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = unquote_plus(file["title"])
 				name = source_utils.clean_name(name)
 

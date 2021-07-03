@@ -82,7 +82,7 @@ class source:
 		for post in posts:
 			try:
 				content = client.parseDOM(post, "div", attrs={"class": "postContent"})
-				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', content[0])[0]
+				size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', content[0]).group(0)
 				u = client.parseDOM(content, "h2")
 				u = client.parseDOM(u, 'a', ret='href')
 				u = [(i.strip('/').split('/')[-1], i, size) for i in u]

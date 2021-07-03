@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-19-2021)
+# modified by Venom for Fenomscrapers (updated 7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -70,7 +70,7 @@ class source:
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = urljoin(self.base_link, self.search_link.format(query[0].lower(), cleantitle.geturl(query)))
-			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 
 			r = client.request(url, timeout='5')
 			if not r or '<tbody' not in r: return sources
@@ -96,7 +96,7 @@ class source:
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(sources): continue
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = source_utils.clean_name(unquote_plus(name))
 
@@ -114,7 +114,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -164,7 +164,7 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, url):
-		# log_utils.log('url = %s' % str(url), __name__, log_utils.LOGDEBUG)
+		# log_utils.log('url = %s' % str(url))
 		try:
 			r = client.request(url, timeout='5')
 			if not r or '<tbody' not in r: return
@@ -190,7 +190,7 @@ class source:
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(self.sources): continue
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = source_utils.clean_name(unquote_plus(name))
 
@@ -217,7 +217,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

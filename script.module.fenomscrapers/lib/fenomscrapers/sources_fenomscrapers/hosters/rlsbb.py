@@ -120,7 +120,7 @@ class source:
 						except:
 							source_utils.scraper_error('RLSBB')
 							continue
-						try: size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', container)[0].replace(',', '.')
+						try: size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', container).group(0).replace(',', '.')
 						except: size = '0'
 						container = client.parseDOM(container, 'a', ret='href')
 						items.append((name, size, container))
@@ -128,7 +128,7 @@ class source:
 				elif len(post_titles) == 1:
 					name = post_titles[0]
 					container = client.parseDOM(post, 'a', ret='href') #parse all links in a single post(content) group
-					try: size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0].replace(',', '.')
+					try: size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0).replace(',', '.')
 					except: size = '0'
 					items.append((name, size, container))
 				else: continue
@@ -157,7 +157,7 @@ class source:
 						quality, info = source_utils.get_release_quality(name, url)
 						try:
 							if size == '0':
-								try: size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', name)[0].replace(',', '.')
+								try: size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', name).group(0).replace(',', '.')
 								except: raise Exception()
 							dsize, isize = source_utils._size(size)
 							info.insert(0, isize)

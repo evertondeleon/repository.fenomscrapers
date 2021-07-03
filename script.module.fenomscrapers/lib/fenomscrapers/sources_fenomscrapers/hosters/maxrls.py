@@ -102,7 +102,7 @@ class source:
 					if source_utils.remove_lang(name_info): continue
 
 					links = client.parseDOM(i, "a", ret="href")
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', i, re.DOTALL)
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', i).group(0)
 
 					for link in links:
 						url = link
@@ -112,7 +112,7 @@ class source:
 
 						quality, info = source_utils.get_release_quality(name_info, url)
 						try:
-							dsize, isize = source_utils._size(size[0])
+							dsize, isize = source_utils._size(size)
 							info.insert(0, isize)
 						except:
 							dsize = 0

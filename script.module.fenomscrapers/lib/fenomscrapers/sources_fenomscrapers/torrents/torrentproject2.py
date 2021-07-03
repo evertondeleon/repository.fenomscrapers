@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 7-02-2021)
+# created by Venom for Fenomscrapers (7-02-2021)
 """
 	Fenomscrapers Project
 """
@@ -17,13 +17,12 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 9
+		self.priority = 6
 		self.language = ['en']
-		self.domain = ['yourbittorrent2.com', 'yourbittorrent.com']
-		self.base_link = 'https://yourbittorrent2.com'
-		# self.search_link = '?q=%s&page=1&v=&c=&sort=size&o=desc'
-		self.search_link = '?q=%s'
-		self.min_seeders = 0  # to many items with no value but cached links
+		self.domains = ['torrentproject2.com']
+		self.base_link = 'https://torrentproject2.com'
+		self.search_link = '/?t=%s&orderby=seeders'
+		self.min_seeders = 1
 		self.pack_capable = True
 
 	def movie(self, imdb, title, aliases, year):
@@ -72,10 +71,11 @@ class source:
 
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url).replace('+', '-')
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
-			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
+			links = re.findall(r'<a\s*href\s*=\s*["\'](.+?torrent.html)["\']', r, re.I)
 			threads = []
 			for link in links:
 				threads.append(workers.Thread(self.get_sources, link))
@@ -83,18 +83,18 @@ class source:
 			[i.join() for i in threads]
 			return self.sources
 		except:
-			source_utils.scraper_error('YOURBITTORRENT')
+			source_utils.scraper_error('TORRENTPROJECT2')
 			return self.sources
 
 	def get_sources(self, link):
 		try:
 			url = '%s%s' % (self.base_link, link)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			result = client.request(url, timeout='5')
 			if result is None: return
-			if '<kbd>' not in result: return
-			hash = re.search(r'<kbd>(.+?)<', result, re.I).group(1)
+			hash = re.search(r'<a\s*title\s*=\s*["\']hash:(.+?)\s*torrent', result, re.I).group(1)
 
-			name = re.search(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.I).group(1).replace('Original Name: ', '')
+			name = re.search(r'<title>(.+?)</title>', result, re.I).group(1)
 			name = source_utils.clean_name(unquote_plus(name))
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
@@ -107,25 +107,24 @@ class source:
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
 			try:
-				seeders = int(re.search(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.I).group(1).replace(',', ''))
+				seeders = int(re.search(r'["\']tseeders["\']>\s*([0-9]+|[0-9]+,[0-9]+)\s*<', result, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
 			except:
-				source_utils.scraper_error('YOURBITTORRENT')
+				source_utils.scraper_error('TORRENTPROJECT2')
 				seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.search(r'File size:.*?["\']>(.+?)<', result, re.I).group(1)
-				size = re.sub('\s*in.*', '', size, re.I)
+				size = re.search(r'<div id\s*=\s*["\']torrent-size["\']>(.+?)<', result, re.I).group(1)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0
 			info = ' | '.join(info)
 
-			self.sources.append({'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+			self.sources.append({'provider': 'torrentproject2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
-			source_utils.scraper_error('YOURBITTORRENT')
+			source_utils.scraper_error('TORRENTPROJECT2')
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -168,30 +167,29 @@ class source:
 			[i.join() for i in threads2]
 			return self.sources
 		except:
-			source_utils.scraper_error('YOURBITTORRENT')
+			source_utils.scraper_error('TORRENTPROJECT2')
 			return self.sources
 
 	def get_pack_items(self, url):
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
-			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
+			links = re.findall(r'<a\s*href\s*=\s*["\'](.+?torrent.html)["\']', r, re.I)
 			for link in links:
 				url = '%s%s' % (self.base_link, link)
 				self.items.append((url))
 			return self.items
 		except:
-			source_utils.scraper_error('YOURBITTORRENT')
+			source_utils.scraper_error('TORRENTPROJECT2')
 
 	def get_pack_sources(self, url):
 		try:
-			# log_utils.log('url = %s' % str(url), __name__, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % str(url))
 			result = client.request(url, timeout='5')
 			if not result: return
-			if '<kbd>' not in result: return
-			hash = re.search(r'<kbd>(.+?)<', result, re.I).group(1)
+			hash = re.search(r'<a\s*title\s*=\s*["\']hash:(.+?)\s*torrent', result, re.I).group(1)
 
-			name = re.search(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.I).group(1).replace('Original Name: ', '')
+			name = re.search(r'<title>(.+?)</title>', result, re.I).group(1)
 			name = source_utils.clean_name(unquote_plus(name))
 			if not self.search_series:
 				if not self.bypass_filter:
@@ -213,25 +211,24 @@ class source:
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
 			try:
-				seeders = int(re.search(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.I).group(1).replace(',', ''))
+				seeders = int(re.search(r'["\']tseeders["\']>\s*([0-9]+|[0-9]+,[0-9]+)\s*<', result, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
 			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.search(r'File size:.*?["\']>(.+?)<', result, re.I).group(1)
-				size = re.sub('\s*in.*', '', size, re.I)
+				size = re.search(r'<div id\s*=\s*["\']torrent-size["\']>(.+?)<', result, re.I).group(1)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0
 			info = ' | '.join(info)
 
-			item = {'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+			item = {'provider': 'torrentproject2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 						'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 			if self.search_series: item.update({'last_season': last_season})
 			self.sources.append(item)
 		except:
-			source_utils.scraper_error('YOURBITTORRENT')
+			source_utils.scraper_error('TORRENTPROJECT2')
 
 	def resolve(self, url):
 		return url

@@ -100,7 +100,7 @@ class source:
 					for link in links:
 						url = unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 						url = source_utils.strip_non_ascii_and_unprintable(url)
-						hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+						hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 						name = url.split('&dn=')[1]
 						name = source_utils.clean_name(name)
 

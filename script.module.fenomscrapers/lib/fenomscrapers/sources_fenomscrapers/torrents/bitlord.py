@@ -110,7 +110,8 @@ class source:
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
@@ -203,7 +204,7 @@ class source:
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
 				if not self.search_series:
 					if not self.bypass_filter:
