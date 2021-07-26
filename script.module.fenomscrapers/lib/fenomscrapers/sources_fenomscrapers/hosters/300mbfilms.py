@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-04-2020)
+# modified by Venom for Fenomscrapers (updated 7-23-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -136,13 +136,10 @@ class source:
 				else:
 					link = client.request(r1)
 				if '<strong>Single' not in link: continue
-
-				# link = re.findall(r'<strong>Single(.+?)</tr', link, re.DOTALL | re.I)[0]
-				link = re.search(r'<strong>Single(.+?)</tr', link, re.I).group(1)
+				link = re.findall(r'<strong>Single(.+?)</tr', link, re.DOTALL | re.I)[0]
 				link = client.parseDOM(link, 'a', ret='href')
 				link = [(i.split('=')[-1]) for i in link]
-				for i in link:
-					urls.append(i)
+				for i in link: urls.append(i)
 				return urls
 		except:
 			source_utils.scraper_error('300MBFILMS')

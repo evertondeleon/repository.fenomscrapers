@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.4.2" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.4.3" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="script.module.requests" />
 		<import addon="script.module.myaccounts" version="1.0.0" />
@@ -26,14 +26,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.4.2 - July 03, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] btdb scraper removed.  Domain no longer exists.[/I]
-[COLOR yellow]--[/COLOR][I] Added new "torrentproject2" scraper.[/I]
-[COLOR yellow]--[/COLOR][I] glodls scraper is now pack capable.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed extratorrent scraper stopped returning seeder count.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed torrentz2 scraper stopped returning seeder count.[/I]
-[COLOR yellow]--[/COLOR][I] 7torrents scraper default has been changed to off.  Server timeout
-    frequently occurs.[/I]
+[B][COLOR red]Update - v1.4.3 - July 26, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed [B]300mbfilms[/B].[/I]
+[COLOR yellow]--[/COLOR][I] Scrapers no longer set any source "extra_info".  Addons will now be responsible to set their own.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed random issue where returned source from [B]eztv[/B] may have null value for a size.[/I]
 		</news>
 	</extension>
 </addon>

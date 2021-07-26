@@ -18,9 +18,6 @@ SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
 CAM = ['1xbet', 'betwin', '.cam.', 'camrip', 'cam.rip', 'dvdcam', 'dvd.cam', 'dvdts', 'hdcam', '.hd.cam', '.hctc', '.hc.tc', '.hdtc',
 			'.hd.tc',  'hdts', '.hd.ts', '.ts.', '.tc.', 'tsrip', 'telecine', 'telesync', 'tele.sync']
 
-VIDEO_3D = ['.3d.', '.sbs.', '.hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', '.tab.', '.htab.', 'topandbottom', 'top.and.bottom']
-CODEC_H265 = ['hevc', 'h265', 'h.265', 'x265', 'x.265']
-
 LANG = ['arabic', 'bgaudio', 'castellano', 'chinese', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
 			  'russian', 'spanish', 'tamil', 'telugu', 'truefrench', 'truespanish', 'turkish', 'hebrew']
 ABV_LANG = ['.zh.', '.zho.', '.chi.', '.chs.', '.nl.', '.nld.', '.dut,', '.fi.', '.fin.', '.fr.', '.fra.', '.fre.', '.de.', '.deu.', '.ger.', '.he.', '.heb.', '.hi.', '.hin.', '.it.', '.ita.',
@@ -85,10 +82,7 @@ def get_qual(term):
 def get_release_quality(release_info, release_link=None):
 	try:
 		quality = None ; info = []
-		if release_info:
-			quality = get_qual(release_info)
-			if any(value in release_info for value in VIDEO_3D): info.append('3D')
-			if any(value in release_info for value in CODEC_H265): info.append('HEVC')
+		if release_info: quality = get_qual(release_info)
 		if not quality:
 			if release_link:
 				release_link = release_link.lower()
@@ -582,13 +576,12 @@ def _size(siz):
 		div = 1 if siz.lower().endswith(('gb', 'gib')) else 1024
 		# if ',' in siz and siz.lower().endswith(('mb', 'mib')): siz = size.replace(',', '')
 		# elif ',' in siz and siz.lower().endswith(('gb', 'gib')): siz = size.replace(',', '.')
-		# float_size = float(re.sub(r'[^0-9|/.|/,]', '', siz.replace(',', '.'))) / div
 		float_size = float(re.sub(r'[^0-9|/.|/,]', '', siz.replace(',', ''))) / div #comma issue where 2,750 MB or 2,75 GB (sometimes replace with "." and sometimes not)
 		str_size = '%.2f GB' % float_size
 		return float_size, str_size
 	except:
 		from fenomscrapers.modules import log_utils
-		log_utils.error()
+		log_utils.error('failed on siz=%s' % siz)
 		return 0, ''
 
 def convert_size(size_bytes, to='GB'):

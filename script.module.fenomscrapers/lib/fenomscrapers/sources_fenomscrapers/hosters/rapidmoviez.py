@@ -73,7 +73,6 @@ class source:
 			if r: return r[0]
 			else: return None
 		except:
-			source_utils.scraper_error('RAPIDMOVIEZ')
 			return None
 
 	def sources(self, url, hostDict):

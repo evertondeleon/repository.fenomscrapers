@@ -82,10 +82,9 @@ class source:
 		for row in rows:
 			try:
 				try:
-					columns = re.findall(r'<td\s.+?>(.+?)</td>', row, re.DOTALL)
+					columns = re.findall(r'<td\s.+?>(.*?)</td>', row, re.DOTALL)
 					link = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\'].*title\s*=\s*["\'](.+?)["\']', columns[2], re.DOTALL | re.I)[0]
 				except: continue
-
 				url = str(client.replaceHTMLCodes(link[0]).split('&tr')[0])
 				try: url = unquote(url).decode('utf8')
 				except: pass
