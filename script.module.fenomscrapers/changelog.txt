@@ -1,4 +1,8 @@
 
+[B][COLOR red]Update - v1.4.4 - Aug. 01, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed [B]torrentfunk[/B] name and size parsing random issue.[/I]
+
+
 [B][COLOR red]Update - v1.4.3 - July 26, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed [B]300mbfilms[/B].[/I]
 [COLOR yellow]--[/COLOR][I] Scrapers no longer set any source "extra_info".  Addons will now be responsible to set their own.[/I]

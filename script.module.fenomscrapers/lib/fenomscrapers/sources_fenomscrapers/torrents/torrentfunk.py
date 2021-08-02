@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 7-02-2021)
+# created by Venom for Fenomscrapers (updated 8-01-2021)
 """
 	Fenomscrapers Project
 """
@@ -75,6 +75,7 @@ class source:
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
 			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
+
 			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', r, re.DOTALL | re.I)
 			threads = []
 			for link in links:
@@ -94,10 +95,7 @@ class source:
 
 			try: name = link[1].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', '.')
 			except: name = link[1].replace('&nbsp;', '.')
-			if '<span' in name:
-				nam = name.split('<span')[0].replace(' ', '.')
-				span = client.parseDOM(name, 'span')[0].replace('-', '.')
-				name = '%s%s' % (nam, span)
+			if '<span' in name: name = name.split('<span')[0].rstrip(' [')
 			name = source_utils.clean_name(name)
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
@@ -110,7 +108,6 @@ class source:
 			if not url.startswith('http'): link = urljoin(self.base_link, url)
 			link = client.request(link, timeout='5')
 			if link is None: 	return
-
 			hash = re.search(r'Infohash.*?>(?!<)(.+?)</', link, re.I).group(1)
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
@@ -121,7 +118,7 @@ class source:
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(0)
+				size = re.search(r'<b>Size:</b>.*?((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(1)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0
@@ -194,10 +191,7 @@ class source:
 
 				try: name = link[1].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', '.')
 				except: name = link[1].replace('&nbsp;', '.')
-				if '<span' in name:
-					nam = name.split('<span')[0].replace(' ', '.')
-					span = client.parseDOM(name, 'span')[0].replace('-', '.')
-					name = '%s%s' % (nam, span)
+				if '<span' in name: name = name.split('<span')[0].rstrip(' [')
 				name = source_utils.clean_name(name)
 
 				if not self.search_series:
@@ -237,7 +231,7 @@ class source:
 
 			quality, info = source_utils.get_release_quality(items[1], url)
 			try:
-				size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(0)
+				size = re.search(r'<b>Size:</b>.*?((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(1)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0
