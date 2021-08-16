@@ -118,9 +118,9 @@ class source:
 			for i in files:
 				if i['is_ready'] == '1' and i['type'] == 'video':
 					try:
-						source = 'SINGLE'
+						source = 'direct SINGLE'
 						if int(i['files_num_video']) > 3:
-							source = 'PACK [B](x%02d)[/B]' % int(i['files_num_video'])
+							source = ' direct PACK (x%02d)' % int(i['files_num_video'])
 						file_name = i['name']
 						name = source_utils.clean_name(file_name)
 						name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
@@ -139,7 +139,7 @@ class source:
 							if 'PACK' in source:
 								size = float(size) / int(i['files_num_video'])
 							dsize, isize = source_utils.convert_size(size, to='GB')
-							info.insert(0, isize)
+							if isize: info.insert(0, isize)
 						except:
 							source_utils.scraper_error('FURK')
 							dsize = 0

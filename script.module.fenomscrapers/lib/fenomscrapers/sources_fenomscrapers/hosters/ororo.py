@@ -122,10 +122,11 @@ class source:
 			url = urljoin(self.base_link, url)
 			url = client.request(url, headers=self.headers)
 			url = jsloads(url)['url']
-			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, __name__)
 
 			name = re.sub(r'(.*?)\/video/file/(.*?)/', '', url).split('.smil')[0].split('-')[0]
 			quality, info = source_utils.get_release_quality(name)
+			info = ' | '.join(info)
 
 			sources.append({'provider': 'ororo', 'source': 'direct', 'name': name, 'quality': quality, 'language': 'en', 'url': url,
 									'info': info, 'direct': True, 'debridonly': False, 'size': 0}) # Ororo does not return a file size

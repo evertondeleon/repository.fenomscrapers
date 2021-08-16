@@ -101,13 +101,13 @@ class source:
 				try:
 					size = str(result["size_gb"]) + ' GB'
 					dsize, isize = source_utils._size(size)
-					info.insert(0, isize)
+					if isize: info.insert(0, isize)
 				except:
 					source_utils.scraper_error('GDRIVE')
 					dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'gdrive', 'source': 'Google Drive', 'quality': quality, 'name': name, 'language': 'en',
+				sources.append({'provider': 'gdrive', 'source': 'direct', 'quality': quality, 'name': name, 'language': 'en',
 											'info': info, 'url': link, 'direct': True, 'debridonly': False, 'size': dsize})
 			except:
 				source_utils.scraper_error('GDRIVE')
