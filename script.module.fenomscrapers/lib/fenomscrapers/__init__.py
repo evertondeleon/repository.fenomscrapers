@@ -6,7 +6,7 @@ from fenomscrapers.modules.control import setting as getSetting
 
 debug = getSetting('debug.enabled') == 'true'
 
-def sources(specified_folders=None):
+def sources(specified_folders=None, ret_all=False):
 	try:
 		sourceDict = []
 		sourceFolder = getScraperFolder()
@@ -18,7 +18,7 @@ def sources(specified_folders=None):
 		for i in sourceSubFolders:
 			for loader, module_name, is_pkg in walk_packages([os.path.join(sourceFolderLocation, i)]):
 				if is_pkg: continue
-				if enabledCheck(module_name):
+				if ret_all or enabledCheck(module_name):
 					try:
 						module = loader.find_module(module_name).load_module(module_name)
 						sourceDict.append((module_name, module.source()))

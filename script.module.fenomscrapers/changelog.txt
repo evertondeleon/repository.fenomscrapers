@@ -1,4 +1,8 @@
 
+[B][COLOR red]Update - v1.4.6 - Aug. 25, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added ability to return all scraper sources to support addons bypassing provider setting.[/I]
+
+
 [B][COLOR red]Update - v1.4.5 - Aug. 15, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Small info label tweaks to Furk, Ororo, and Gdrive scrapers.[/I]
 
