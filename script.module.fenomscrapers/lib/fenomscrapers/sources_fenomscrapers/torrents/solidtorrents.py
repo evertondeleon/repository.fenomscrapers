@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 2-26-2021)
+# created by Venom for Fenomscrapers (updated 8-27-2021)
 """
 	Fenomscrapers Project
 """
@@ -22,8 +22,9 @@ class source:
 		self.language = ['en']
 		self.domains = ['solidtorrents.net']
 		self.base_link = 'https://solidtorrents.net'
-		self.search_link = '/api/v1/search?q=%s&category=all&sort=size'
-		#self.search_link = '/api/v1/search?q=%s&category=video&sort=seeders'
+		# self.search_link = '/api/v1/search?q=%s&category=all&sort=size'
+		# self.search_link = '/api/v1/search?q=%s&category=video&sort=seeders'
+		self.search_link = '/api/v1/search?q=%s&category=all&sort=seeders'
 		self.min_seeders = 0
 		self.pack_capable = True
 
@@ -79,7 +80,7 @@ class source:
 				urls.append(url + '&skip=40')
 				urls.append(url + '&skip=60')
 				urls.append(url + '&skip=80')
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls)
 			threads = []
 			for url in urls:
 				threads.append(workers.Thread(self.get_sources, url))
@@ -170,7 +171,7 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % str(link))
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return

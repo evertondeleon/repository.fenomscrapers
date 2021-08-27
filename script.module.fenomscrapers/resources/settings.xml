@@ -54,8 +54,8 @@
 		<setting label="32002" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=packScrapers)" />
 		<setting type="sep" />
 		<setting id="filter.undesirables" type="bool" label="32016" default="true" />
-        <setting id="undesirables.browse" type="action" label="Manage Default Undesirables" default="[B]Browse[/B]" action="RunPlugin(plugin://script.module.fenomscrapers/?action=undesirablesSelect)" subsetting="true" enable="eq(-1,true)" />
-        <setting id="undesirables.user_defined" label="Define Extra Undesirables (Comma Separated)" type="text" default="" subsetting="true" enable="eq(-2,true)" />
+        <setting id="undesirables.browse" type="action" label="32046" default="32047" action="RunPlugin(plugin://script.module.fenomscrapers/?action=undesirablesSelect)" subsetting="true" enable="eq(-1,true)" />
+        <setting id="undesirables.user_defined" label="32048" type="text" default="" subsetting="true" enable="eq(-2,true)" />
 		<setting label="32003" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=undesirablesFilter)" />
 		<setting id="filter.foreign.single.audio" type="bool" label="32017" default="true" />
 		<setting type="sep" />
@@ -63,7 +63,6 @@
 		<setting id="provider.7torrents" type="bool" label="32102" default="false" />
 		<setting id="provider.bitlord" type="bool" label="32103" default="true" />
 		<setting id="provider.bt4g" type="bool" label="32132" default="false" />
-		<!-- <setting id="provider.btdb" type="bool" label="32129" default="false" /> --> <!-- removed 7-3-21 site domain appears gone -->
 		<setting id="provider.btscene" type="bool" label="32104" default="false" />
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
 		<setting id="provider.extratorrent" type="bool" label="32106" default="false" />

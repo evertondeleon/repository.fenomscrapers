@@ -1,4 +1,10 @@
 
+[B][COLOR red]Update - v1.4.7 - Aug. 27, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Dutch lang file update.[/I]
+[COLOR yellow]--[/COLOR][I] ETTV fixed size and seeder reporting.[/I]
+[COLOR yellow]--[/COLOR][I] SOLIDTORRENTS, changed to sort by seeders.[/I]
+
+
 [B][COLOR red]Update - v1.4.6 - Aug. 25, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Added ability to return all scraper sources to support addons bypassing provider setting.[/I]
 

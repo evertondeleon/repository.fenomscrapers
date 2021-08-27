@@ -1,4 +1,4 @@
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.4.6" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.4.7" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="script.module.requests" />
 		<import addon="script.module.myaccounts" version="1.0.0" />
@@ -24,8 +24,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.4.6 - Aug. 25, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Added ability to return all scraper sources to support addons bypassing provider setting.[/I]
+[B][COLOR red]Update - v1.4.7 - Aug. 27, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Dutch lang file update.[/I]
+[COLOR yellow]--[/COLOR][I] ETTV fixed size and seeder reporting.[/I]
+[COLOR yellow]--[/COLOR][I] SOLIDTORRENTS, changed to sort by seeders.[/I]
 		</news>
 	</extension>
 </addon>

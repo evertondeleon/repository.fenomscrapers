@@ -188,24 +188,20 @@ msgid "Local Scrapers"
 msgstr "Lokale Scrapers"
 
 msgctxt "#32046"
-msgid ""
-msgstr ""
+msgid "Manage Default Undesirables"
+msgstr "Beheer Standaard Ongewenste"
 
 msgctxt "#32047"
-msgid ""
-msgstr ""
+msgid "[B]Browse[/B]"
+msgstr "[B]Bladeren[/B]"
 
 msgctxt "#32048"
-msgid ""
-msgstr ""
+msgid "Define Extra Undesirables (Comma Separated)"
+msgstr "Definieer Extra Ongewenste (Komma Gescheiden)"
 
 msgctxt "#32049"
 msgid ""
 msgstr ""
-
-
-
-
 
 msgctxt "#32050"
 msgid "General"
@@ -250,10 +246,6 @@ msgstr ""
 msgctxt "#32060"
 msgid ""
 msgstr ""
-
-
-
-
 
 msgctxt "#32061"
 msgid "$NUMBER[2]DDL"
@@ -415,8 +407,6 @@ msgctxt "#32100"
 msgid ""
 msgstr ""
 
-
-
 msgctxt "#32101"
 msgid "$NUMBER[1337]X"
 msgstr "$NUMBER[1337]X"
@@ -576,5 +566,3 @@ msgstr ""
 msgctxt "#32140"
 msgid ""
 msgstr ""
-
-

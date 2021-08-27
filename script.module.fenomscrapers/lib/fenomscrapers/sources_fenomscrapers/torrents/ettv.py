@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 7-02-2021)
+# modified by Venom for Fenomscrapers (updated 8-27-2021)
 """
 	Fenomscrapers Project
 """
@@ -70,7 +70,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 
 			r = client.request(url, timeout='10')
 			if not r: return self.sources
@@ -93,6 +93,7 @@ class source:
 			if not result or 'magnet' not in result: return
 			url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', result, re.I).group(1)
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&xl=')[0]
+			url = url.replace('&amp;', '&') # some links on ettv dbl "&amp;"
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources): return
 			hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
@@ -107,13 +108,13 @@ class source:
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 			try:
-				seeders = int(re.search(r'>Seeds:.*?["\']>([0-9]+|[0-9]+,[0-9]+)</', result, re.I).group(0).replace(',', ''))
+				seeders = int(re.search(r'>Seeds:.*?["\']>([0-9]+|[0-9]+,[0-9]+)</', result, re.I | re.S).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
 			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.search(r'>Total Size:.*>(\d.*?)<', result, re.I).group(1).strip()
+				size = re.search(r'>Total Size:.*?>(\d.*?)<', result, re.I | re.S).group(1).strip()
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0
