@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 7-02-2021)
+# modified by Venom for Fenomscrapers (updated 9-06-2021)
 """
 	Fenomscrapers Project
 """
@@ -21,8 +21,8 @@ class source:
 	def __init__(self):
 		self.priority = 3
 		self.language = ['en']
-		self.domains = ['limetorrents.info', 'limetorrents.co', 'limetor.com', 'limetorrents.asia']
-		self.base_link = 'https://www.limetorrents.info'
+		self.domains = ['limetorrents.pro', 'limetorrents.info', 'limetorrents.co', 'limetor.com', 'limetorrents.asia']
+		self.base_link = 'https://www.limetorrents.pro'
 		self.tvsearch = '/search/tv/{0}/1/'
 		self.moviesearch = '/search/movies/{0}/1/'
 		self.min_seeders = 0
@@ -108,11 +108,11 @@ class source:
 			try:
 				data = client.parseDOM(row, 'a', ret='href')[0]
 				if '/search/' in data: continue
-				data = re.sub(r'\s', '', data).strip()
+				# data = re.sub(r'\s', '', data).strip()
 				hash = re.search(r'/torrent/(.+?).torrent', data, re.I).group(1)
-
 				name = re.search(r'title\s*=\s*(.+?)$', data, re.I).group(1)
 				name = source_utils.clean_name(name)
+
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 				if source_utils.remove_lang(name_info): continue

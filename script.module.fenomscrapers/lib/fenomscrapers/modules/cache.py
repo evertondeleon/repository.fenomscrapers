@@ -36,7 +36,7 @@ def get(function, duration, *args):
 
 		if invalid: # If the cache is old, but we didn't get "fresh_result", return the old cache
 			if cache_result: return result
-			else: return None
+			else: return None # do not cache_insert() None type, sometimes servers just down momentarily
 		else:
 			cache_insert(key, fresh_result)
 			return literal_eval(fresh_result)

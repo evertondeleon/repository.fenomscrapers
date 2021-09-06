@@ -1,4 +1,9 @@
 
+[B][COLOR red]Update - v1.4.8 - Sept. 06, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] [B]"Extratorrent"[/B] and [B]"Magnet4you"[/B] scrapers have been removed, sites appear to be dead.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed size reporting issue from [B]"Torrentproject2"[/B].[/I]
+
+
 [B][COLOR red]Update - v1.4.7 - Aug. 27, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Dutch lang file update.[/I]
 [COLOR yellow]--[/COLOR][I] ETTV fixed size and seeder reporting.[/I]

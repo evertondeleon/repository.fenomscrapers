@@ -71,7 +71,6 @@ class source:
 		try:
 			self.scraper = cfscrape.create_scraper()
 			self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -88,9 +87,7 @@ class source:
 				search_link = self.tvshowsearch.format(self.key, data['imdb'], hdlr)
 			else:
 				search_link = self.msearch.format(self.key, data['imdb'])
-
 			sleep(2.1)
-			# rjson = client.request(search_link, error=True, timeout='5')
 			rjson = self.scraper.get(search_link).content
 			if not rjson or 'torrent_results' not in str(rjson): return sources
 			files = jsloads(rjson)['torrent_results']
@@ -150,7 +147,6 @@ class source:
 			search_link = self.tvshowsearch.format(self.key, data['imdb'], 'S%s' % self.season_xx)
 			# log_utils.log('search_link = %s' % str(search_link))
 			sleep(2.1)
-			# rjson = client.request(search_link, error=True, timeout='5')
 			rjson = self.scraper.get(search_link).content
 			if not rjson or 'torrent_results' not in str(rjson): return sources
 			files = jsloads(rjson)['torrent_results']

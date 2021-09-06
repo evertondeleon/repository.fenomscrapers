@@ -4,7 +4,6 @@
 """
 
 import re
-import unicodedata
 from fenomscrapers.modules import py_tools
 
 
@@ -40,7 +39,6 @@ def get_simple(title):
 		log_utils.error()
 		return title
 
-
 def geturl(title):
 	if not title: return
 	try:
@@ -59,9 +57,9 @@ def geturl(title):
 		log_utils.error()
 		return title
 
-
 def normalize(title):
 	try:
+		import unicodedata
 		title = ''.join(c for c in unicodedata.normalize('NFKD', py_tools.ensure_text(py_tools.ensure_str(title))) if unicodedata.category(c) != 'Mn')
 		return str(title)
 	except:

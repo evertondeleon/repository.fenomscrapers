@@ -525,10 +525,10 @@ def release_title_format(release_title):
 def clean_name(release_title):
 	try:
 		unwanted = [
-							'[.www.tamilrockers.com.]', 'tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.ws', 'www.tamilrockers.pl',
+							'[.www.tamilrockers.com.]', 'tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.ws', 'www.tamilrockers.pl', 'www.tamilrockerrs.pl',
 							'[.www.torrenting.com.]', 'www.torrenting.com', 'www.torrenting.org', 'www-torrenting-com', 'www-torrenting-org',
 							'[katmoviehd.eu]', '[katmoviehd.to]', '[katmoviehd.tv]', '+katmoviehd.pw+', 'katmoviehd-pw',
-							'[.www.torrent9.uno.]', '[www.torrent9.ph.]', 'www.torrent9.nz', '[.torrent9.tv.]', '[.torrent9.cz.]', '[ torrent9.cz ]', 'torrent9-cz-.-',
+							'[.www.torrent9.uno.]', '[www.torrent9.ph.]', 'www.torrent9.nz', '[.torrent9.tv.]', '[.torrent9.cz.]', '[ torrent9.cz ]', 'torrent9-cz-.-', 'torrent9.cz.].', 'torrent9-cz-]-',
 							'[agusiq.torrents.pl]', '[agusiq-torrents.pl]', 'agusiq-torrents-pl',
 							'[.oxtorrent.com.]', '[oxtorrent-com]', 'oxtorrent-com',
 							'[movcr.com]', 'www.movcr.tv', 'movcr-com', 'www.movcr.to',
@@ -543,7 +543,7 @@ def clean_name(release_title):
 							'[itfriend]', '[itf]',
 							'(imax)', '.imax.',
 							'www.2movierulz.ac', 'www.2movierulz.ms',
-							'www.3movierulz.com', 'www.3movierulz.tv',
+							'www.3movierulz.com', 'www.3movierulz.tv', 'www.8movierulz.ws',
 							'[zooqle.com]', '[horriblesubs]', '[gktorrent.com]', '[.www.omgtorrent.com.]', '[3d.hentai]', '[dark.media]', '[devil-torrents.pl]', 'mkvcinemas.live',
 							'[filetracker.pl]', 'www.bludv.tv', 'ramin.djawadi', '[prof]', '[reup]', '[.www.speed.cd.]', '[-bde4.com]', 'extramovies.casa',
 							'[ah]', '[ul]', '+13.+', 'taht.oyunlar', 'crazy4tv.com', '[tv]', '[noobsubs]', '[.freecourseweb.com.]', 'karibu', '989pa.com', '[aletorrenty.pl]',
@@ -554,7 +554,7 @@ def clean_name(release_title):
 			if release_title.lower().startswith(i):
 				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else r'%s' % i
 				release_title = re.sub(r'^%s' % pattern, '', release_title, 1, re.I)
-		release_title = release_title.lstrip(' 4.-[](){}')
+		release_title = release_title.lstrip(' 4.-[](){}:/')
 		return release_title
 	except:
 		from fenomscrapers.modules import log_utils
@@ -576,6 +576,8 @@ def _size(siz):
 		div = 1 if siz.lower().endswith(('gb', 'gib')) else 1024
 		# if ',' in siz and siz.lower().endswith(('mb', 'mib')): siz = size.replace(',', '')
 		# elif ',' in siz and siz.lower().endswith(('gb', 'gib')): siz = size.replace(',', '.')
+		dec_count = len(re.findall(r'[.]', siz))
+		if dec_count == 2: siz = siz.replace('.', ',', 1) # torrentproject2 likes to randomly use 2 decimals vs. a comma then a decimal
 		float_size = float(re.sub(r'[^0-9|/.|/,]', '', siz.replace(',', ''))) / div #comma issue where 2,750 MB or 2,75 GB (sometimes replace with "." and sometimes not)
 		str_size = '%.2f GB' % float_size
 		return float_size, str_size

@@ -5,7 +5,6 @@
 
 from datetime import datetime
 import inspect
-import unicodedata
 import xbmc
 from fenomscrapers.modules.control import getKodiVersion, transPath, setting as getSetting, lang, joinPath, existsPath
 from fenomscrapers.modules import py_tools
@@ -103,6 +102,7 @@ def is_printable(s, codec='utf8'):
 
 def normalize(title):
 	try:
+		import unicodedata
 		return ''.join(c for c in unicodedata.normalize('NFKD', py_tools.ensure_text(py_tools.ensure_str(title))) if unicodedata.category(c) != 'Mn')
 	except:
 		error()
