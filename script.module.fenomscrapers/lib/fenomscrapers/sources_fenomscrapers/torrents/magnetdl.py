@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 7-02-2021)
+# modified by Venom for Fenomscrapers (updated 9-09-2021)
 """
 	Fenomscrapers Project
 """
@@ -62,6 +62,8 @@ class source:
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			if title == 'The Fuck-It List' or title == 'The F**k-It List': title = 'The Fxxk-It List'
+			if title == 'The End of the Fucking World' or title == 'The End of the F***ing World': title = 'The End of the Fxxxing World'
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -138,6 +140,7 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			if self.title == 'The End of the Fucking World' or self.title == 'The End of the F***ing World': self.title = 'The End of the Fxxxing World'
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']

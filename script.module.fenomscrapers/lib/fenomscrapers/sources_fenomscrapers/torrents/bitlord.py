@@ -112,7 +112,6 @@ class source:
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
-
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue

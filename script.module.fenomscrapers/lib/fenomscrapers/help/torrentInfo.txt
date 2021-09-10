@@ -18,7 +18,7 @@ btdb (priority=3, proxy change 1-13-21 for v2 challenge) dead site as of 7-02-21
 btdig (priority=3) Captcha as of 5-26-21 and now removed
 btscene (priority=3, timeout least twice a week)
 ext.to (priority=3) v2 challenge as of 2-15-21, removed)
-extratorrent (priority=4, uses cfscrape) dead site as of 9-06-21 and now removed
+extratorrent (priority=4, uses cfscrape)
 eztv (priority=4) shows only, site does not do pack files)
 glodls (priority=3)
 idope (priority=5)
@@ -55,7 +55,7 @@ maxrls (hoster)
 rapidmoviez (hoster)
 rlsbb (hoster)-1-16-21 new proxy now v2 challenge so down.
 scenerls (hoster)
-extratorrent (torrent) dead site as of 9-06-21 and now removed
+extratorrent (torrent)
 limetorrents (torrent)
 torrentapi (torrent)
 torrentgalaxy (torrent)
