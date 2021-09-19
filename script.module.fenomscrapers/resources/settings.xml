@@ -121,5 +121,9 @@
 	<category label="32054">
 		<setting id="debug.enabled" type="bool" label="32033" default="false" />
 		<setting id="debug.location" type="enum" label="32034" lvalues="32035|32036" default="1" enable="eq(-1,true)" />
+		<setting id="debug.reversed" type="bool" label="32055" default="false" />
+		<setting type="action" label="32056" action="RunPlugin(plugin://script.module.fenomscrapers/?action=tools_clearLogFile)" visible="eq(-3,true) + eq(-2,1)" />
+		<setting type="action" label="32057" action="RunPlugin(plugin://script.module.fenomscrapers/?action=tools_viewLogFile&name=FenomScrapers)" visible="eq(-4,true) + eq(-3,1)" />
+		<setting type="action" label="32058" action="RunPlugin(plugin://script.module.fenomscrapers/?action=tools_uploadLogFile)" visible="eq(-5,true) + eq(-4,1)" />
 	</category>
 </settings>

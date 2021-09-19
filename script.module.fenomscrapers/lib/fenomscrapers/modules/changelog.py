@@ -3,15 +3,18 @@
 	Fenomscrapers Module
 """
 
-from fenomscrapers.modules import control
-
-fenomscrapers_path = control.addonPath()
-fenomscrapers_version = control.addonVersion()
-changelogfile = control.joinPath(fenomscrapers_path, 'changelog.txt')
+from fenomscrapers.modules.control import addonPath, addonVersion, joinPath
+from fenomscrapers.windows.textviewer import TextViewerXML
 
 
 def get():
+	fenomscrapers_path = addonPath()
+	fenomscrapers_version = addonVersion()
+	changelogfile = joinPath(fenomscrapers_path, 'changelog.txt')
 	r = open(changelogfile)
 	text = r.read()
 	r.close()
-	control.dialog.textviewer('[COLOR red]Fenomscrapers[/COLOR] -  v%s - ChangeLog' % fenomscrapers_version, text)
+	heading = '[B]FenomScrapers -  v%s - ChangeLog[/B]' % fenomscrapers_version
+	windows = TextViewerXML('textviewer.xml', fenomscrapers_path, heading=heading, text=text)
+	windows.run()
+	del windows

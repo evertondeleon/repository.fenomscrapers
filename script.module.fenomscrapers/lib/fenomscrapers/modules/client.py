@@ -372,7 +372,7 @@ def cleanHTML(txt):
 	return _replaceHTMLCodes(_replaceHTMLCodes(txt))
 
 def randomagent():
-# (my pc) Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0
+# (my pc) Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0
 # (Edge User-Agent) Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582
 	BR_VERS = [
 		['%s.0' % i for i in range(68, 85)],

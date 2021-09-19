@@ -14,7 +14,7 @@ except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import cfscrape
-from fenomscrapers.modules import source_utils
+from fenomscrapers.modules import source_utils, log_utils
 from fenomscrapers.modules import workers
 
 
@@ -33,7 +33,8 @@ class source:
 	def _get_token(self):
 		try:
 			token = self.scraper.get(self.token).content
-			token = jsloads(token)["token"] # json can handle byte encoded strings
+			if not token: return '3qk6aj27ws'
+			token = jsloads(token)["token"]
 			return token
 		except:
 			source_utils.scraper_error('TORRENTAPI')

@@ -23,7 +23,7 @@ class source:
 		self.base_link = 'https://glodls.to/'
 		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
 		self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
-		self.tvsearch_pack = 'search_results.php?search={0}&cat=72&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
+		self.tvsearch_pack = 'search_results.php?search={0}&cat=41,72&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc' # cat=72 timeout
 # cat=1 is (Movies:all)
 # cat=41 is (TV:all)
 # cat=71 is (Videos:all)
@@ -78,7 +78,6 @@ class source:
 			else: url = self.moviesearch.format(quote_plus(query))
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url)
-
 			headers = {'User-Agent': client.agent()}
 			result = client.request(url, headers=headers, timeout='5')
 			if not result: return sources
@@ -164,7 +163,8 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link))
 		try:
-			headers = {'User-Agent': client.agent()}
+			# headers = {'User-Agent': client.agent()}
+			headers = {'User-Agent': client.randomagent()}
 			result = client.request(link, headers=headers, timeout='5')
 			if not result: return
 			rows = client.parseDOM(result, 'tr', attrs={'class': 't-row'})

@@ -17,7 +17,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 3
 		self.language = ['en']
 # 7torr.com is a mirror of btscene
 		self.domain = ['7torrents.cc']

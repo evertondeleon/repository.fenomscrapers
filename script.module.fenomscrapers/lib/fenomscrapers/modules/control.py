@@ -97,6 +97,11 @@ def setUndesirables():
 		from fenomscrapers.modules import log_utils
 		log_utils.error()
 
+def refresh_debugReversed(): # called from service "onSettingsChanged" to clear fenomscrapers.log if setting to reverse has been changed
+	if homeWindow.getProperty('fenomscrapers.debug.reversed') != setting('debug.reversed'):
+		homeWindow.setProperty('fenomscrapers.debug.reversed', setting('debug.reversed'))
+		execute('RunPlugin(plugin://script.module.fenomscrapers/?action=tools_clearLogFile)')
+
 def lang(language_id):
 	text = getLangString(language_id)
 	if getKodiVersion() < 19:
@@ -107,9 +112,6 @@ def sleep(time):  # Modified `sleep` command that honors a user exit request
 	while time > 0 and not monitor.abortRequested():
 		xbmc.sleep(min(100, time))
 		time = time - 100
-
-def multiselectDialog(list, preselect=[], heading=addonInfo('name')):
-	return dialog.multiselect(heading, list, preselect=preselect)
 
 def isVersionUpdate():
 	versionFile = joinPath(dataPath, 'installed.version')
@@ -246,6 +248,15 @@ def idle():
 		return execute('Dialog.Close(busydialognocancel)')
 	else:
 		return execute('Dialog.Close(busydialog)')
+
+def yesnoDialog(line, heading=addonInfo('name'), nolabel='', yeslabel=''):
+	return dialog.yesno(heading, line, nolabel, yeslabel)
+
+def selectDialog(list, heading=addonInfo('name')):
+	return dialog.select(heading, list)
+
+def multiselectDialog(list, preselect=[], heading=addonInfo('name')):
+	return dialog.multiselect(heading, list, preselect=preselect)
 
 def notification(title=None, message=None, icon=None, time=3000, sound=False):
 	if title == 'default' or title is None: title = addonName()

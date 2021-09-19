@@ -5,23 +5,31 @@
 
 from datetime import datetime
 import inspect
-import xbmc
 from fenomscrapers.modules.control import getKodiVersion, transPath, setting as getSetting, lang, joinPath, existsPath
 from fenomscrapers.modules import py_tools
 
-LOGDEBUG = xbmc.LOGDEBUG #0
-LOGINFO = xbmc.LOGINFO #1
-LOGNOTICE = xbmc.LOGNOTICE if getKodiVersion() < 19 else xbmc.LOGINFO #(2 in 18, deprecated in 19 use LOGINFO(1))
-LOGWARNING = xbmc.LOGWARNING #(3 in 18, 2 in 19)
-LOGERROR = xbmc.LOGERROR #(4 in 18, 3 in 19)
-LOGSEVERE = xbmc.LOGSEVERE if getKodiVersion() < 19 else xbmc.LOGFATAL #(5 in 18, deprecated in 19 use LOGFATAL(4))
-LOGFATAL = xbmc.LOGFATAL #(6 in 18, 4 in 19)
-LOGNONE = xbmc.LOGNONE #(7 in 18, 5 in 19)
 if py_tools.isPY2:
+	LOGDEBUG = 0
+	LOGINFO = 1
+	LOGNOTICE = 2 # (2 in 18, deprecated in 19 use LOGINFO(1))
+	LOGWARNING = 3 # (3 in 18, 2 in 19)
+	LOGERROR = 4 # (4 in 18, 3 in 19)
+	LOGSEVERE = 5 # (5 in 18, deprecated in 19 use LOGFATAL(4))
+	LOGFATAL = 6 # (6 in 18, 4 in 19)
+	LOGNONE = 7 # (7 in 18, 5 in 19)
 	debug_list = ['DEBUG', 'INFO', 'NOTICE', 'WARNING', 'ERROR', 'SEVERE', 'FATAL']
 	from io import open #py2 open() does not support encoding param
 else:
+	LOGDEBUG = 0
+	LOGINFO = 1
+	LOGNOTICE = 1
+	LOGWARNING = 2
+	LOGERROR = 3
+	LOGSEVERE = 4
+	LOGFATAL = 4
+	LOGNONE = 5
 	debug_list = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL']
+
 DEBUGPREFIX = '[COLOR red][ FENOMSCRAPERS %s ][/COLOR]'
 LOGPATH = transPath('special://logpath/')
 
@@ -59,15 +67,25 @@ def log(msg, caller=None, level=LOGNOTICE):
 			if not existsPath(log_file):
 				f = open(log_file, 'w')
 				f.close()
-			with open(log_file, 'a', encoding='utf-8') as f: #with auto cleans up and closes
-				line = '[%s %s] %s: %s' % (datetime.now().date(), str(datetime.now().time())[:8], DEBUGPREFIX % debug_list[level], msg)
-				f.write(line.rstrip('\r\n') + '\n')
-				# f.writelines([line1, line2]) ## maybe an option for the 2 lines without using "\n"
+			reverse_log = getSetting('debug.reversed') == 'true'
+			if not reverse_log:
+				with open(log_file, 'a', encoding='utf-8') as f: #with auto cleans up and closes
+					line = '[%s %s] %s: %s' % (datetime.now().date(), str(datetime.now().time())[:8], DEBUGPREFIX % debug_list[level], msg)
+					f.write(line.rstrip('\r\n') + '\n')
+					# f.writelines([line1, line2]) ## maybe an option for the 2 lines without using "\n"
+			else:
+				with open(log_file, 'r+', encoding='utf-8') as f:
+					line = '[%s %s] %s: %s' % (datetime.now().date(), str(datetime.now().time())[:8], DEBUGPREFIX % debug_list[level], msg)
+					log_file = f.read()
+					f.seek(0, 0)
+					f.write(line.rstrip('\r\n') + '\n' + log_file)
 		else:
+			import xbmc
 			xbmc.log('%s: %s' % (DEBUGPREFIX % debug_list[level], msg, level))
 	except Exception as e:
 		import traceback
 		traceback.print_exc()
+		import xbmc
 		xbmc.log('[ script.module.fenomonscrapers ] log_utils.log() Logging Failure: %s' % (e), LOGERROR)
 
 def error(message=None, exception=True):
@@ -93,7 +111,82 @@ def error(message=None, exception=True):
 		log(msg=message, caller=caller, level=LOGERROR)
 		del(type, value, traceback) # So we don't leave our local labels/objects dangling
 	except Exception as e:
+		import xbmc
 		xbmc.log('[ script.module.fenomonscrapers ] log_utils.error() Logging Failure: %s' % (e), LOGERROR)
+
+def clear_logFile():
+	cleared = False
+	try:
+		from fenomscrapers.modules.control import yesnoDialog
+		if not yesnoDialog(lang(32060), '', ''): return 'canceled'
+		log_file = joinPath(LOGPATH, 'fenomscrapers.log')
+		if not existsPath(log_file):
+			f = open(log_file, 'w')
+			return f.close()
+		f = open(log_file, 'r+')
+		f.truncate(0) # need '0' when using r
+		f.close()
+		cleared = True
+	except Exception as e:
+		import xbmc
+		xbmc.log('[ script.module.fenomonscrapers ] log_utils.clear_logFile() Failure: %s' % (e), LOGERROR)
+		cleared = False
+	return cleared
+
+def view_LogFile(name):
+	try:
+		from fenomscrapers.windows.textviewer import TextViewerXML
+		from fenomscrapers.modules.control import addonPath
+		log_file = joinPath(LOGPATH, '%s.log' % name.lower())
+		if not existsPath(log_file):
+			from fenomscrapers.modules.control import notification
+			return notification(message='Log File not found, likely logging is not enabled.')
+		f = open(log_file, 'r', encoding='utf-8', errors='ignore')
+		text = f.read()
+		f.close()
+		heading = '[B]%s -  LogFile[/B]' % name
+		windows = TextViewerXML('textviewer.xml', addonPath(), heading=heading, text=text)
+		windows.run()
+		del windows
+	except:
+		error()
+
+def upload_LogFile():
+	from fenomscrapers.modules.control import notification
+	url = 'https://paste.kodi.tv/'
+	log_file = joinPath(LOGPATH, 'fenomscrapers.log')
+	if not existsPath(log_file):
+		return notification(message='Log File not found, likely logging is not enabled.')
+	try:
+		import requests
+		from fenomscrapers.modules.control import addonVersion, selectDialog
+		f = open(log_file, 'r', encoding='utf-8', errors='ignore')
+		text = f.read()
+		f.close()
+		UserAgent = 'FenomScrpaers %s' % addonVersion()
+		response = requests.post(url + 'documents', data=text.encode('utf-8', errors='ignore'), headers={'User-Agent': UserAgent})
+		# log('log_response: ' + str(response))
+		if 'key' in response.json():
+			result = url + response.json()['key']
+			log('FenomScrapers log file uploaded to: %s' % result)
+			from sys import platform as sys_platform
+			supported_platform = any(value in sys_platform for value in ['win32', 'linux2'])
+			highlight_color = 'gold'
+			list = [('[COLOR %s]url:[/COLOR]  %s' % (highlight_color, str(result)), str(result))]
+			if supported_platform: list += [('[COLOR %s]  -- Copy url To Clipboard[/COLOR]' % highlight_color, ' ')]
+			select = selectDialog([i[0] for i in list], lang(32059))
+			if 'Copy url To Clipboard' in list[select][0]:
+				from fenomscrapers.modules.source_utils import copy2clip
+				copy2clip(list[select - 1][1])
+		elif 'message' in response.json():
+			notification(message='FenomScrapers Log upload failed: %s' % str(response.json()['message']))
+			log('FenomScrapers Log upload failed: %s' % str(response.json()['message']), level=LOGERROR)
+		else:
+			notification(message='FenomScrapers Log upload failed')
+			log('FenomScrapers Log upload failed: %s' % response.text, level=LOGERROR)
+	except:
+		error('FenomScrapers log upload failed')
+		notification(message='pastebin post failed: See log for more info')
 
 def is_printable(s, codec='utf8'):
 	try: s.decode(codec)

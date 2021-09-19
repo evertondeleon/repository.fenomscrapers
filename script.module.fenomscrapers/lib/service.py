@@ -8,7 +8,6 @@ from fenomscrapers.modules import control
 window = control.homeWindow
 LOGNOTICE = xbmc.LOGNOTICE if control.getKodiVersion() < 19 else xbmc.LOGINFO # (2 in 18, deprecated in 19 use LOGINFO(1))
 
-
 class CheckSettingsFile:
 	def run(self):
 		try:
@@ -29,20 +28,19 @@ class CheckSettingsFile:
 			import traceback
 			traceback.print_exc()
 
-
 class SettingsMonitor(control.monitor_class):
 	def __init__ (self):
 		control.monitor_class.__init__(self)
 		control.setUndesirables()
+		window.setProperty('fenomscrapers.debug.reversed', control.setting('debug.reversed'))
 		xbmc.log('[ script.module.fenomscrapers ]  Settings Monitor Service Starting...', LOGNOTICE)
 
-	def onSettingsChanged(self):
-		# Kodi callback when the addon settings are changed
+	def onSettingsChanged(self): # Kodi callback when the addon settings are changed
 		window.clearProperty('fenomscrapers_settings')
 		control.sleep(50)
 		refreshed = control.make_settings_dict()
 		control.setUndesirables()
-
+		control.refresh_debugReversed()
 
 class AddonCheckUpdate:
 	def run(self):
@@ -76,13 +74,11 @@ class AddonCheckUpdate:
 			import traceback
 			traceback.print_exc()
 
-
 class SyncMyAccounts:
 	def run(self):
 		xbmc.log('[ script.module.fenomscrapers ]  Sync "My Accounts" Service Starting...', LOGNOTICE)
 		control.syncMyAccounts(silent=True)
 		return xbmc.log('[ script.module.fenomscrapers ]  Finished Sync "My Accounts" Service', LOGNOTICE)
-
 
 def main():
 	while not control.monitor.abortRequested():

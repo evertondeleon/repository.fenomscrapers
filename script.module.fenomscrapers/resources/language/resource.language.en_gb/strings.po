@@ -224,27 +224,27 @@ msgid "Debug"
 msgstr ""
 
 msgctxt "#32055"
-msgid ""
+msgid "Write FenomScrapers log in reverse order"
 msgstr ""
 
 msgctxt "#32056"
-msgid ""
+msgid "Clear FenomScrapers log file"
 msgstr ""
 
 msgctxt "#32057"
-msgid ""
+msgid "View FenomScrapers log file"
 msgstr ""
 
 msgctxt "#32058"
-msgid ""
+msgid "Upload FenomScrapers log file to pastebin"
 msgstr ""
 
 msgctxt "#32059"
-msgid ""
+msgid "FenomScrapers log file uploaded to:"
 msgstr ""
 
 msgctxt "#32060"
-msgid ""
+msgid "Are you sure?"
 msgstr ""
 
 msgctxt "#32061"

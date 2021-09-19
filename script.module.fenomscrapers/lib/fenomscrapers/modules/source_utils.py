@@ -30,7 +30,7 @@ UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'am
 				'gears.media', 'gearsmedia', 'gostfilm', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'hurtom', 'idea.film', 'ideafilm', 'jaskier', 'kapatejl6', 'kb.1080p',
 				'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm', 'megapeer', 'minutemen.empire', 'newstudio',
 				'omskbird', '.ost.', 'paravozik', 'profix.media', 'rifftrax', 'sample', 'soundtrack', 'subtitle.only', 'sunshinestudio', 'teaser', 'trailer', 'tumbler.studio',
-				'tvshows', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666']
+				'tvshows', 'ultradox', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666']
 
 season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
 			'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three',
@@ -641,3 +641,32 @@ def __top_domain(url):
 	except:
 		from fenomscrapers.modules import log_utils
 		log_utils.error()
+
+def copy2clip(txt):
+	from sys import platform as sys_platform
+	platform = sys_platform
+	if platform == "win32":
+		try:
+			from subprocess import check_call
+			# cmd = "echo " + txt.strip() + "|clip"
+			cmd = "echo " + txt.replace('&', '^&').strip() + "|clip" # "&" is a command seperator
+			return check_call(cmd, shell=True)
+		except:
+			from fenomscrapers.modules import log_utils
+			log_utils.error('Windows: Failure to copy to clipboard')
+	elif platform == "darwin":
+		try:
+			from subprocess import check_call
+			cmd = "echo " + txt.strip() + "|pbcopy"
+			return check_call(cmd, shell=True)
+		except:
+			from fenomscrapers.modules import log_utils
+			log_utils.error('Mac: Failure to copy to clipboard')
+	elif platform == "linux":
+		try:
+			from subprocess import Popen, PIPE
+			p = Popen(["xsel", "-pi"], stdin=PIPE)
+			p.communicate(input=txt)
+		except:
+			from fenomscrapers.modules import log_utils
+			log_utils.error('Linux: Failure to copy to clipboard')

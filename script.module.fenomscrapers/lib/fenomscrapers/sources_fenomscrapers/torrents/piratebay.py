@@ -153,7 +153,7 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+			# log_utils.log('link = %s' % str(link))
 			rjson = client.request(link, timeout='5')
 			if not rjson or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
 				return

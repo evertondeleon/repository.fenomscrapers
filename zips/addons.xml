@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.4.9" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.5.0" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="script.module.requests" />
 		<import addon="script.module.myaccounts" version="1.0.0" />
@@ -26,9 +26,9 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.4.9 - Sept. 09, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] [B]"Extratorrent"[/B] scraper site is back up.[/I]
-[COLOR yellow]--[/COLOR][I] Few tweaks to magnetdl scraper for title issue due to site query phrase restrictions.[/I]
+[B][COLOR red]Update - v1.5.0 - Sept. 18, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] [B]"Ultradox"[/B] Russian group has been added to list of undesirables.[/I]
+[COLOR yellow]--[/COLOR][I] You can now view, clear, and upload to pastebin the FenomScrapers log file.  See new settings under [B]"Debug"[/B] category.[/I]
 		</news>
 	</extension>
 </addon>

@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+	Fenomscrapers Module
+"""
 
 from sys import argv
 try: #Py2
@@ -94,3 +97,18 @@ elif action == 'cleanSettings':
 elif action == 'undesirablesSelect':
 	from fenomscrapers.modules import source_utils
 	source_utils.undesirablesSelect()
+
+elif action == 'tools_clearLogFile':
+	from fenomscrapers.modules import log_utils
+	cleared = log_utils.clear_logFile()
+	if cleared == 'canceled': pass
+	elif cleared: control.notification(message='FenomScrapers Log File Successfully Cleared')
+	else: control.notification(message='Error clearing FenomScrapers Log File, see kodi.log for more info')
+
+elif action == 'tools_viewLogFile':
+	from fenomscrapers.modules import log_utils
+	log_utils.view_LogFile(name)
+
+elif action == 'tools_uploadLogFile':
+	from fenomscrapers.modules import log_utils
+	log_utils.upload_LogFile()
