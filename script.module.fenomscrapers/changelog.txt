@@ -1,4 +1,8 @@
 
+[B][COLOR red]Update - v1.5.1 - Sept. 18, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed missing [B]"amp;"[/B] in settings.xml causing settings cleaner to error.[/I]
+
+
 [B][COLOR red]Update - v1.5.0 - Sept. 18, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] [B]"Ultradox"[/B] Russian group has been added to list of undesirables.[/I]
 [COLOR yellow]--[/COLOR][I] You can now view, clear, and upload to pastebin the FenomScrapers log file.  See new settings under [B]"Debug"[/B] category.[/I]
