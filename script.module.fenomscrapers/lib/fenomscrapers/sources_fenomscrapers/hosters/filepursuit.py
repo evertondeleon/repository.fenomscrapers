@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 1-09-2021)
+# (updated 9-20-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -12,7 +12,7 @@ try: #Py2
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
-from fenomscrapers.modules import control
+from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -58,7 +58,7 @@ class source:
 		sources = []
 		if not url: return sources
 		try:
-			api_key = control.setting('filepursuit.api')
+			api_key = getSetting('filepursuit.api')
 			if api_key == '': return sources
 			headers = {"x-rapidapi-host": "filepursuit.p.rapidapi.com", "x-rapidapi-key": api_key}
 

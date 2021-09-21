@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.5.2" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.5.3" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="script.module.requests" />
 		<import addon="script.module.myaccounts" version="1.0.0" />
@@ -26,8 +26,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.5.2 - Sept. 19, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Fixed encoding issue when opening changelog file.[/I]
+[B][COLOR red]Update - v1.5.3 - Sept. 21, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added quality check for 1O8Op and 72Op where some uploaders are using the letter "O" vs a zero.[/I]
+[COLOR yellow]--[/COLOR][I] EasyNews tweaks and now pulls in a few additional sources.[/I]
+[COLOR yellow]--[/COLOR][I] Library scraper tweaks, source file name was not being passed.[/I]
 		</news>
 	</extension>
 </addon>

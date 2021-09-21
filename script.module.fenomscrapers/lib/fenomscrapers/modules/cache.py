@@ -9,7 +9,7 @@ import re
 from time import time
 try: from sqlite3 import dbapi2 as db
 except ImportError: from pysqlite2 import dbapi2 as db
-from fenomscrapers.modules import control
+from fenomscrapers.modules.control import existsPath, dataPath, makeFile, cacheFile
 
 
 def get(function, duration, *args):
@@ -82,8 +82,8 @@ def cache_insert(key, value):
 		dbcur.close() ; dbcon.close()
 
 def get_connection():
-	if not control.existsPath(control.dataPath): control.makeFile(control.dataPath)
-	dbcon = db.connect(control.cacheFile, timeout=60) # added timeout 3/23/21 for concurrency with threads
+	if not existsPath(dataPath): makeFile(dataPath)
+	dbcon = db.connect(cacheFile, timeout=60) # added timeout 3/23/21 for concurrency with threads
 	dbcon.row_factory = _dict_factory
 	return dbcon
 

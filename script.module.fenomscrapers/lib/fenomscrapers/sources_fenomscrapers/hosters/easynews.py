@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 2-19-2021)
+# (updated 9-20-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -12,11 +12,11 @@ try: #Py2
 	from urlparse import parse_qs
 except ImportError: #Py3
 	from urllib.parse import urlencode, quote, parse_qs
-from fenomscrapers.modules import control
+from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
 SORT = {'s1': 'relevance', 's1d': '-', 's2': 'dsize', 's2d': '-', 's3': 'dtime', 's3d': '-'}
-SEARCH_PARAMS = {'st': 'adv', 'sb': 1, 'fex': 'mkv, mp4, avi, mpg, wemb', 'fty[]': 'VIDEO', 'spamf': 1, 'u': '1', 'gx': 1, 'pno': 1, 'sS': 3}
+SEARCH_PARAMS = {'st': 'adv', 'sb': 1, 'fex': 'm4v,3gp,mov,divx,xvid,wmv,avi,mpg,mpeg,mp4,mkv,avc,flv,webm', 'fty[]': 'VIDEO', 'spamf': 1, 'u': '1', 'gx': 1, 'pno': 1, 'sS': 3}
 SEARCH_PARAMS.update(SORT)
 
 
@@ -61,7 +61,7 @@ class source:
 		auth = self._get_auth()
 		if not auth: return sources
 		try:
-			title_chk = control.setting('easynews.title.chk') == 'true'
+			title_chk = getSetting('easynews.title.chk') == 'true'
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -88,6 +88,7 @@ class source:
 		for item in files:
 			try:
 				post_hash, post_title, ext, duration = item['0'], item['10'], item['11'], item['14']
+				# log_utils.log('post_title = %s' % post_title, __name__, log_utils.LOGDEBUG)
 				checks = [False] * 5
 				if 'alangs' in item and item['alangs'] and 'eng' not in item['alangs']: checks[1] = True
 				if re.match('^\d+s', duration) or re.match('^[0-5]m', duration): checks[2] = True
@@ -132,8 +133,8 @@ class source:
 
 	def _get_auth(self):
 		auth = None
-		username = control.setting('easynews.user')
-		password = control.setting('easynews.password')
+		username = getSetting('easynews.user')
+		password = getSetting('easynews.password')
 		if username == '' or password == '': return auth
 		try: # Python 2
 			user_info = '%s:%s' % (username, password)
@@ -159,8 +160,9 @@ class source:
 
 	def _translate_search(self, query):
 		params = SEARCH_PARAMS
-		params['pby'] = 100
+		params['pby'] = 350
 		params['safeO'] = 1 # 1 is the moderation (adult filter) ON, 0 is OFF.
-		params['gps'] = params['sbj'] = query
+		# params['gps'] = params['sbj'] = query # gps stands for "group search" and does so by keywords, sbj=subject and can limit results, use gps only
+		params['gps'] = query
 		url = self.base_link + self.search_link
 		return url, params

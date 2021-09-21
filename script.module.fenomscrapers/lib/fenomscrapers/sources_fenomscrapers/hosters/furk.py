@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 1-09-2021)
+# (updated 9-20-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -12,7 +12,7 @@ try: #Py2
 	from urllib import urlencode
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode
-from fenomscrapers.modules import control
+from fenomscrapers.modules.control import setting as getSetting, setSetting
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import source_utils
 
@@ -31,9 +31,9 @@ class source:
 
 	def get_api(self):
 		try:
-			user_name = control.setting('furk.user_name')
-			user_pass = control.setting('furk.user_pass')
-			api_key = control.setting('furk.api')
+			user_name = getSetting('furk.user_name')
+			user_pass = getSetting('furk.user_pass')
+			api_key = getSetting('furk.api')
 			if api_key == '':
 				if user_name == '' or user_pass == '': return
 				s = requests.Session()
@@ -42,7 +42,7 @@ class source:
 				p = jsloads(p.text)
 				if p['status'] == 'ok':
 					api_key = p['api_key']
-					control.setSetting('furk.api', api_key)
+					setSetting('furk.api', api_key)
 				else: pass
 			return api_key
 		except:

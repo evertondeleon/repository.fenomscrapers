@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (updated 05-19-2021)
+# (updated 9-20-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -10,10 +10,11 @@ try: #Py2
 	from urllib import unquote, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import unquote, quote_plus, unquote_plus
-from fenomscrapers.modules import control
+from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
-cloudflare_worker_url = control.setting('gdrive.cloudflare_url').strip()
+cloudflare_worker_url = getSetting('gdrive.cloudflare_url').strip()
+
 
 def getResults(searchTerm):
 	url = '{}/searchjson/{}'.format(cloudflare_worker_url, searchTerm)
@@ -83,7 +84,7 @@ class source:
 			if cloudflare_worker_url == '': return sources
 			results = getResults(url)
 			if not results: return sources
-			if control.setting('gdrive.title.chk') == 'true':
+			if getSetting('gdrive.title.chk') == 'true':
 				simpleQuery = get_simple(url)
 				results = filteredResults(results, simpleQuery)
 		except:

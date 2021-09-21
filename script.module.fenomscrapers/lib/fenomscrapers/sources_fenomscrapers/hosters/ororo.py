@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
-# (updated 1-09-2021)
+# (updated 9-20-2021)
 '''
 	Fenomscrapers Project
 '''
 
-import base64
+from base64 import b64encode
 from json import loads as jsloads
 import re
 try: #Py2
@@ -13,7 +13,7 @@ except ImportError: #Py3
 	from urllib.parse import urljoin
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
-from fenomscrapers.modules import control
+from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
 
@@ -28,22 +28,20 @@ class source:
 		self.movie_link = '/api/v2/movies/%s'
 		self.show_link = '/api/v2/shows/%s'
 		self.episode_link = '/api/v2/episodes/%s'
-		self.user = control.setting('ororo.user')
-		self.password = control.setting('ororo.pass')
+		self.user = getSetting('ororo.user')
+		self.password = getSetting('ororo.pass')
 		self.headers = {
 			'Authorization': self._get_auth(),
 			'User-Agent': 'Placenta for Kodi'}
 
 	def _get_auth(self):
-		try:
-			# Python 2
+		try: # Python 2
 			user_info = '%s:%s' % (self.user, self.password)
-			auth = 'Basic ' + base64.b64encode(user_info)
-		except:
-			# Python 3
+			auth = 'Basic ' + b64encode(user_info)
+		except: # Python 3
 			user_info = '%s:%s' % (self.user, self.password)
 			user_info = user_info.encode('utf-8')
-			auth = 'Basic ' + base64.b64encode(user_info).decode('utf-8')
+			auth = 'Basic ' + b64encode(user_info).decode('utf-8')
 		return auth
 
 	def movie(self, imdb, title, aliases, year): # seems Ororo does not provide Movies

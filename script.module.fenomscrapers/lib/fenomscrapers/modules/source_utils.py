@@ -10,9 +10,9 @@ from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules.control import homeWindow, setting as getSetting, setSetting, multiselectDialog
 
 
-RES_4K = ['.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd'] # some idiots use "uhd.1080p" in their uploads, "uhd" now removed
-RES_1080 = ['1080p', '1080i', 'hd1080', '1080hd']
-RES_720 = ['720p', '720i', 'hd720', '720hd']
+RES_4K = ['.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '216op', '2160i', 'hd2160', '2160hd'] # some idiots use "uhd.1080p" in their uploads, "uhd" now removed
+RES_1080 = ['1080p', '1o8op', '1080i', 'hd1080', '1080hd'] # some idots using letter o vs. a zero
+RES_720 = ['720p', '72op', '720i', 'hd720', '720hd']
 RES_SD = ['576p', '576i', 'sd576', '576sd', 'x576', '480p', '480i', 'sd480', '480sd']
 SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
 CAM = ['1xbet', 'betwin', '.cam.', 'camrip', 'cam.rip', 'dvdcam', 'dvd.cam', 'dvdts', 'hdcam', '.hd.cam', '.hctc', '.hc.tc', '.hdtc',
