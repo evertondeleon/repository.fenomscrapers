@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 2-26-2021)
+# created by Venom for Fenomscrapers (updated 9-22-2021)
 """
 	Fenomscrapers Project
 """
@@ -123,7 +123,7 @@ class source:
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = file.get('size')
-					size = str(size) + ' GB' if len(str(size)) == 1 else str(size) + ' MB'
+					size = str(size) + ' GB' if len(str(size)) <= 2 else str(size) + ' MB' # bitlord size is all over the place between MB and GB
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -229,7 +229,7 @@ class source:
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = file.get('size')
-					size = str(size) + ' GB' if len(str(size)) == 1 else str(size) + ' MB'
+					size = str(size) + ' GB' if len(str(size)) <= 2 else str(size) + ' MB' # bitlord size is all over the place between MB and GB
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

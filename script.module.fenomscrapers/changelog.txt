@@ -1,4 +1,9 @@
 
+[B][COLOR red]Update - v1.5.4 - Sept. 25, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Improved regex range check of show packs.  This helps to pull a few new sources that previously failed.[/I]
+[COLOR yellow]--[/COLOR][I] BITLORD scraper tweak to deal with their size reporting MB vs GB from one source link to the next.[/I]
+
+
 [B][COLOR red]Update - v1.5.3 - Sept. 21, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Added quality check for 1O8Op and 72Op where some uploaders are using the letter "O" vs a zero.[/I]
 [COLOR yellow]--[/COLOR][I] EasyNews tweaks and now pulls in a few additional sources.[/I]

@@ -165,8 +165,7 @@ def remove_lang(release_info):
 
 def single_checkPack(release_title, query):
 	range_pattern = r'%s%s' % (query.lower(), '[-]\d{2}([-,.[({]|$)')
-	if bool(re.search(range_pattern, release_title.lower())):
-		return True
+	if bool(re.search(range_pattern, release_title.lower())): return True
 	else: return False
 
 def filter_season_pack(show_title, aliases, year, season, release_title):
@@ -282,7 +281,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 # remove season ranges that do not begin at 1
 		season_range_regex = [
-				r'(?:season|seasons|s)[.-]?(?:0?[2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]?to[.-]?|[.-]?thru[.-]?|[.-])(?:season|seasons|s|)[.-]?(?:0?[2-9]{1}|[1-3]{1}[0-9]{1})'] # "seasons.5-6", seasons5.to.6, seasons.5.thru.6
+				r'(?:season|seasons|s)[.-]?(?:0?[2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]?to[.-]?|[.-]?thru[.-]?|[.-])(?:season|seasons|s|)[.-]?(?:0?[3-9]{1}(?!\d{2}p)|[1-3]{1}[0-9]{1}(?!\d{2}p))'] # seasons.5-6, seasons5.to.6, seasons.5.thru.6, season.2-9.s02-s09.1080p
 		for item in season_range_regex:
 			if bool(re.search(item, release_title)):
 				return False, 0
