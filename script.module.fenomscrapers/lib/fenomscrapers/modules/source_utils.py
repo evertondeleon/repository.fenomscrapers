@@ -7,16 +7,15 @@ from json import loads as jsloads
 import re
 from string import printable
 from fenomscrapers.modules import cleantitle
-from fenomscrapers.modules.control import homeWindow, setting as getSetting, setSetting, multiselectDialog
+from fenomscrapers.modules.control import homeWindow, setting as getSetting, setSetting
 
 
 RES_4K = ['.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '216op', '2160i', 'hd2160', '2160hd'] # some idiots use "uhd.1080p" in their uploads, "uhd" now removed
 RES_1080 = ['1080p', '1o8op', '1080i', 'hd1080', '1080hd'] # some idots using letter o vs. a zero
 RES_720 = ['720p', '72op', '720i', 'hd720', '720hd']
-RES_SD = ['576p', '576i', 'sd576', '576sd', 'x576', '480p', '480i', 'sd480', '480sd']
 SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
 CAM = ['1xbet', 'betwin', '.cam.', 'camrip', 'cam.rip', 'dvdcam', 'dvd.cam', 'dvdts', 'hdcam', '.hd.cam', '.hctc', '.hc.tc', '.hdtc',
-			'.hd.tc',  'hdts', '.hd.ts', '.ts.', '.tc.', 'tsrip', 'telecine', 'telesync', 'tele.sync']
+			'.hd.tc', 'hdts', '.hd.ts', '.ts.', '.tc.', 'tsrip', 'telecine', 'telesync', 'tele.sync']
 
 LANG = ['arabic', 'bgaudio', 'castellano', 'chinese', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
 			  'russian', 'spanish', 'tamil', 'telugu', 'truefrench', 'truespanish', 'turkish', 'hebrew']
@@ -30,7 +29,7 @@ UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'am
 				'gears.media', 'gearsmedia', 'gostfilm', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'hurtom', 'idea.film', 'ideafilm', 'jaskier', 'kapatejl6', 'kb.1080p',
 				'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm', 'megapeer', 'minutemen.empire', 'newstudio',
 				'omskbird', '.ost.', 'paravozik', 'profix.media', 'rifftrax', 'sample', 'soundtrack', 'subtitle.only', 'sunshinestudio', 'teaser', 'trailer', 'tumbler.studio',
-				'tvshows', 'ultradox', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666']
+				'tvshows', 'ultradox', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666', '.p.web.dl', '.d.web.dl']
 
 season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
 			'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three',
@@ -63,6 +62,7 @@ def get_undesirables():
 	return undesirables
 
 def undesirablesSelect():
+	from fenomscrapers.modules.control import multiselectDialog
 	chosen = getSetting('undesirables.choice').replace(' ', '').split(',')
 	try: preselect = [UNDESIRABLES.index(i) for i in chosen]
 	except: preselect = [UNDESIRABLES.index(i) for i in UNDESIRABLES]
