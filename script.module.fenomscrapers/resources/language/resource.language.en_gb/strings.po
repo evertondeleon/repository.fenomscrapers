@@ -552,7 +552,7 @@ msgid "TORRENTPROJECT2 (Pack capable)"
 msgstr ""
 
 msgctxt "#32137"
-msgid ""
+msgid "BITCQ (Pack capable)"
 msgstr ""
 
 msgctxt "#32138"

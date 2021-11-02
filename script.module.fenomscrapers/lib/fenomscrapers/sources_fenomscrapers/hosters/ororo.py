@@ -119,6 +119,7 @@ class source:
 
 			url = urljoin(self.base_link, url)
 			url = client.request(url, headers=self.headers)
+			if not url: return sources
 			url = jsloads(url)['url']
 			# log_utils.log('url = %s' % url, __name__)
 

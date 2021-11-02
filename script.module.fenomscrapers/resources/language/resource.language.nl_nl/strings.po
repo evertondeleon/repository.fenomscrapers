@@ -552,8 +552,8 @@ msgid "TORRENTPROJECT2 (Pack capable)"
 msgstr "TORRENTPPROJECT2 (Pack geschikt)"
 
 msgctxt "#32137"
-msgid ""
-msgstr ""
+msgid "BITCQ (Pack capable)"
+msgstr "BITCQ (Pack geschikt)"
 
 msgctxt "#32138"
 msgid ""
