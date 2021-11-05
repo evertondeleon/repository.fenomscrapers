@@ -1,15 +1,15 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-26-2021)
+# modified by Venom for Fenomscrapers (updated 11-05-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
@@ -71,8 +71,7 @@ class source:
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url).replace('%3A+', '+')
+			url = ('%s%s' % (self.base_link, self.search_link % quote_plus(query))).replace('%3A+', '+')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			# result = scraper.get(url).content
 			result = py_tools.ensure_str(scraper.get(url).content, errors='replace')

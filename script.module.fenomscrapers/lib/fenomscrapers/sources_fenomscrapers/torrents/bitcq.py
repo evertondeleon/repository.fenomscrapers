@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (11-02-2021)
+# created by Venom for Fenomscrapers (11-05-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin
+	from urllib.parse import parse_qs
 	from urllib.parse import urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -22,7 +22,6 @@ class source:
 		self.language = ['en']
 		self.domain = ['bitcq.com']
 		self.base_link = 'https://bitcq.com'
-		# self.search_link = '/search?q=%s&category[]=1&country[]=1'
 		self.search_link = '/search?q=%s&category[]=1'
 		self.min_seeders = 0
 		self.pack_capable = True
@@ -67,14 +66,9 @@ class source:
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
-
-			query = '%s %s' % (title, hdlr)
-			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
-			url = self.search_link % quote_plus(query)
-
-			url = urljoin(self.base_link, url)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', '%s %s' % (title, hdlr))
+			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
 			r = client.request(url, timeout='5')
 			if not r: return sources
 			if any(value in str(r) for value in ['something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable']):
@@ -92,14 +86,13 @@ class source:
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+				name = source_utils.clean_name(url.split('&dn=')[1])
 
-				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 
-				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+				if not episode_title: # filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
@@ -151,7 +144,7 @@ class source:
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url)
+				link = '%s%s' % (self.base_link, url)
 				threads.append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
@@ -180,9 +173,8 @@ class source:
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+				name = source_utils.clean_name(url.split('&dn=')[1])
 
-				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(name)
 				if not self.search_series:
 					if not self.bypass_filter:
 						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):

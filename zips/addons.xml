@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.5.6" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.5.7" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="script.module.requests" />
 		<import addon="script.module.myaccounts" version="1.0.0" />
@@ -26,9 +26,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.5.6 - Nov. 02, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Removed EXTRATORRENT scraper, site appears dead.[/I]
-[COLOR yellow]--[/COLOR][I] Added BTCQ scraper.[/I]
+[B][COLOR red]Update - v1.5.7 - Nov. 05, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added EXTRATORRENT back in per request of proxy found.  This is officially my LAST attempt to keep this scraper alive.[/I]
+[COLOR yellow]--[/COLOR][I] GDRIVE scraper re-written to follow standard FenomScraper methods and title checking.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed TORRENTZ2 for site query change.[/I]
 		</news>
 	</extension>
 </addon>

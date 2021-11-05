@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 9-22-2021)
+# created by Venom for Fenomscrapers (updated 11-05-2021)
 """
 	Fenomscrapers Project
 """
@@ -7,10 +7,10 @@
 from json import loads as jsloads
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -71,11 +71,9 @@ class source:
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
-			api_url = urljoin(self.base_link, self.api_search_link)
-
+			api_url = '%s%s' % (self.base_link, self.api_search_link)
 			headers = cache.get(self._get_token_and_cookies, 1)
 			if not headers: return sources
 			headers.update({'Referer': url})
@@ -164,7 +162,7 @@ class source:
 						quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, self.search_link % url).replace('+', '-')
+				link = ('%s%s' % (self.base_link, self.search_link % url)).replace('+', '-')
 				threads.append(workers.Thread(self.get_sources_packs, link, url.replace('+', '-')))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
@@ -186,7 +184,7 @@ class source:
 				'filters[category]': 4,
 				'filters[adult]': False,
 				'filters[risky]': False}
-			api_url = urljoin(self.base_link, self.api_search_link)
+			api_url = '%s%s' % (self.base_link, self.api_search_link)
 			rjson = client.request(api_url, post=query_data, headers=self.headers, timeout='5')
 			if not rjson: return
 			files = jsloads(rjson)

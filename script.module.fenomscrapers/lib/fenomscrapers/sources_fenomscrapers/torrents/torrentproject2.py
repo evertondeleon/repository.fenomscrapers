@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (7-02-2021)
+# created by Venom for Fenomscrapers (11-05-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -68,9 +68,7 @@ class source:
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
-
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url).replace('+', '-')
+			url = ('%s%s' % (self.base_link, self.search_link % quote_plus(query))).replace('+', '-')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url, timeout='5')
@@ -155,7 +153,7 @@ class source:
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url).replace('+', '-')
+				link = ('%s%s' % (self.base_link, url)).replace('+', '-')
 				threads.append(workers.Thread(self.get_pack_items, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]

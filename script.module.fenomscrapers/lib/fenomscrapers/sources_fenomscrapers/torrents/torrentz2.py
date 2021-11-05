@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated url 7-02-2021)
+# created by Venom for Fenomscrapers (updated url 11-05-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -21,14 +21,7 @@ class source:
 		self.language = ['en']
 		self.domains = ['torrentzeu.org']
 		self.base_link = 'https://torrentzeu.org'
-# https://torrentz2.is  # down as of 11/30/20
-# https://torrentz.pl  # down as of 11/30/20
-# https://torrentsmirror.com  # down as of 11/30/20
-# https://torrentz2is.me javascript
-# https://torrentzeu.org/v1.php?q=joker+2019
-# https://torrentzeu.org/data.php?q=joker+2019 (seems like best alternative, single request)
-# https://torrentz2eu.me/search.php?q=joker+2019
-		self.search_link = '/data.php?q=%s'
+		self.search_link = '/kick.php?q=%s'
 		self.min_seeders = 0
 		self.pack_capable = True
 
@@ -73,11 +66,10 @@ class source:
 			year = data['year']
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
-			query = '"^%s" %s' % (title, hdlr)
-			query = re.sub(r'[^A-Za-z0-9\s\.\-\"\^]+', '', query)
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			query = '%s %s' % (title, hdlr)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
+			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
+			# log_utils.log('url = %s' % url)
 
 			r = client.request(url, timeout='5')
 			if not r: return sources
@@ -107,11 +99,9 @@ class source:
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 				try:
-					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) #keep an eye on this, looks like they gaffed their col's (seeders and size)
+					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) # keep an eye on this, looks like they gaffed their col's (seeders and size)
 					if self.min_seeders > seeders: continue
-				except:
-					source_utils.scraper_error('TORRENTZ2')
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
@@ -155,7 +145,7 @@ class source:
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url)
+				link = '%s%s' % (self.base_link, url)
 				threads.append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
@@ -204,7 +194,7 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 				try:
-					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) #keep an eye on this, looks like they gaffed their col's (seeders and size)
+					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) # keep an eye on this, looks like they gaffed their col's (seeders and size)
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 

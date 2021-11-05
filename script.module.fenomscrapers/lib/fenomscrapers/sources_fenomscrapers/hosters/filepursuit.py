@@ -8,10 +8,10 @@ from json import loads as jsloads
 import re
 import requests
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus
 from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -74,8 +74,7 @@ class source:
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url, headers=headers)
@@ -100,8 +99,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				# link_header = client.request(url, output='headers', timeout='5') # to slow to check validity of links
-				# if not any(value in str(link_header) for value in ['stream', 'video/mkv']):
-					# continue
+				# if not any(value in str(link_header) for value in ['stream', 'video/mkv']): continue
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:

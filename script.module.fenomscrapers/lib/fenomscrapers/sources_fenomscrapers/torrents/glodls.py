@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 7-03-2021)
+# modified by Venom for Fenomscrapers (updated 11-05-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -76,7 +76,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			if 'tvshowtitle' in data: url = self.tvsearch.format(quote_plus(query))
 			else: url = self.moviesearch.format(quote_plus(query))
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
 			headers = {'User-Agent': client.agent()}
 			result = client.request(url, headers=headers, timeout='5')
@@ -151,7 +151,7 @@ class source:
 
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url)
+				link = '%s%s' % (self.base_link, url)
 				threads.append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]

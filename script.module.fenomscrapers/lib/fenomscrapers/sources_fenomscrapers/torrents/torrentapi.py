@@ -14,7 +14,7 @@ except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import cfscrape
-from fenomscrapers.modules import source_utils, log_utils
+from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
 
@@ -22,7 +22,7 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.base_link = 'https://torrentapi.org' #-just to satisfy scraper_test
+		self.base_link = 'https://torrentapi.org' # just to satisfy scraper_test
 		self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&ranked=0&limit=100&format=json_extended' # string query
 		self.tvshowsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&search_string={2}&ranked=0&limit=100&format=json_extended' # imdb_id + string query
 		self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&ranked=0&limit=100&format=json_extended'
@@ -99,8 +99,7 @@ class source:
 			try:
 				url = file["download"].split('&tr')[0]
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				name = unquote_plus(file["title"])
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(unquote_plus(file["title"]))
 
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
@@ -158,8 +157,7 @@ class source:
 			try:
 				url = file["download"].split('&tr')[0]
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				name = unquote_plus(file["title"])
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(unquote_plus(file["title"]))
 
 				if not self.bypass_filter:
 					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 7-03-2021)
+# modified by Venom for Fenomscrapers (updated 11-05-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -70,8 +70,8 @@ class source:
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url) + str(category) + '&v=t&s=sz&sd=d'
+			url = ('%s%s' % (self.base_link, self.search_link % quote_plus(query))) + str(category) + '&v=t&s=sz&sd=d'
+
 			urls.append(url)
 			urls.append(url.replace('pg=1', 'pg=2'))
 			# log_utils.log('urls = %s' % urls)
@@ -111,9 +111,7 @@ class source:
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				try:
 					name = re.search(r'<a\s*class\s*=\s*["\'].+?>(.+?)</a>', row, re.I).group(1)
-					name = client.cleanHTML(name)
-					name = unquote_plus(name)
-					name = source_utils.clean_name(name)
+					name = source_utils.clean_name(unquote_plus(client.cleanHTML(name)))
 				except: continue
 
 				# some titles have foreign title translation in front so remove it
@@ -177,7 +175,8 @@ class source:
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url) + str(category) + '&v=t&s=sz&sd=d'
+				link = ('%s%s' % (self.base_link, url)) + str(category) + '&v=t&s=sz&sd=d'
+
 				threads.append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
@@ -213,9 +212,7 @@ class source:
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				try:
 					name = re.search(r'<a class\s*=\s*["\'].+?>(.+?)</a>', row, re.I).group(1)
-					name = client.cleanHTML(name)
-					name = unquote_plus(name)
-					name = source_utils.clean_name(name)
+					name = source_utils.clean_name(unquote_plus(client.cleanHTML(name)))
 				except: continue
 
 				# some titles have foreign title translation in front so remove it

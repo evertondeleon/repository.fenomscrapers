@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-26-2021)
+# modified by Venom for Fenomscrapers (updated 11-05-2021)
 """
 	Fenomscrapers Project
 """
@@ -7,10 +7,10 @@
 from json import loads as jsloads
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote
+	from urllib.parse import parse_qs, urlencode, quote
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -71,7 +71,7 @@ class source:
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote(query)
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			rjson = client.request(url, timeout='5')
@@ -142,7 +142,7 @@ class source:
 						self.search_link % quote(query + ' Complete')]
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url)
+				link = '%s%s' % (self.base_link, url)
 				threads.append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]

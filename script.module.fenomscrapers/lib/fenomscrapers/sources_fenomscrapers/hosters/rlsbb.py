@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-26-2021)
+# modified by Venom for Fenomscrapers (updated 11-05-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urlencode, urljoin
+	from urllib.parse import parse_qs, urlencode
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
@@ -79,7 +79,7 @@ class source:
 			if int(year) >= 2021: self.base_link = self.base_new
 			else: self.base_link = self.base_old
 
-			url = urljoin(self.base_link, query)
+			url = '%s%s' % (self.base_link, query)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			# r = scraper.get(url).content
@@ -91,7 +91,7 @@ class source:
 					# query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
 					query = re.sub(r'\s', '-', query)
 					query = query + "-S" + season
-					url = urljoin(self.base_link, query)
+					url = '%s%s' % (self.base_link, query)
 					# r = scraper.get(url).content
 					r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
 					isSeasonQuery = True

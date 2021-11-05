@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 7-23-2021)
+# modified by Venom for Fenomscrapers (updated 11-05-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
@@ -69,8 +69,7 @@ class source:
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			r = client.request(url)
 			if not r: return sources

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 7-03-2021)
+# modified by Venom for Fenomscrapers (updated 11-05-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -20,7 +20,7 @@ class source:
 		self.priority = 8
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = ['1337x.to', '1337x.st', '1337x.ws', '1337x.eu', '1337x.se', '1337x.is'] # all are behind cloudflare except .to
-		self.base_link = 'https://1337x.to/'
+		self.base_link = 'https://1337x.to'
 		self.tvsearch = 'https://1337x.to/sort-category-search/%s/TV/size/desc/1/'
 		self.moviesearch = 'https://1337x.to/sort-category-search/%s/Movies/size/desc/1/'
 		self.min_seeders = 1
@@ -71,10 +71,8 @@ class source:
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
-			if 'tvshowtitle' in data:
-				urls.append(self.tvsearch % (quote(query)))
-			else:
-				urls.append(self.moviesearch % (quote(query)))
+			if 'tvshowtitle' in data: urls.append(self.tvsearch % (quote(query)))
+			else: urls.append(self.moviesearch % (quote(query)))
 			url2 = ''.join(urls).replace('/1/', '/2/')
 			urls.append(url2)
 			# log_utils.log('urls = %s' % urls)
@@ -107,11 +105,9 @@ class source:
 			return
 		for row in rows:
 			try:
-				data = client.parseDOM(row, 'a', ret='href')[1]
-				link = urljoin(self.base_link, data)
+				link = '%s%s' % (self.base_link, client.parseDOM(row, 'a', ret='href')[1])
 
-				name = client.parseDOM(row, 'a')[1]
-				name = source_utils.clean_name(unquote_plus(name))
+				name = source_utils.clean_name(unquote_plus(client.parseDOM(row, 'a')[1]))
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
 					continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 8-01-2021)
+# created by Venom for Fenomscrapers (updated 11-05-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -68,10 +68,8 @@ class source:
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url)
-
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
 			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
@@ -105,7 +103,7 @@ class source:
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
-			if not url.startswith('http'): link = urljoin(self.base_link, url)
+			if not url.startswith('http'): link = '%s%s' % (self.base_link, url)
 			link = client.request(link, timeout='5')
 			if link is None: 	return
 			hash = re.search(r'Infohash.*?>(?!<)(.+?)</', link, re.I).group(1)
@@ -158,7 +156,7 @@ class source:
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url)
+				link = '%s%s' % (self.base_link, url)
 				threads.append(workers.Thread(self.get_pack_items, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
@@ -210,7 +208,7 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 
-				if not url.startswith('http'): url = urljoin(self.base_link, url)
+				if not url.startswith('http'): url = '%s%s' % (self.base_link, url)
 				if self.search_series: self.items.append((name, name_info, url, package, last_season))
 				else: self.items.append((name, name_info, url, package))
 			except:

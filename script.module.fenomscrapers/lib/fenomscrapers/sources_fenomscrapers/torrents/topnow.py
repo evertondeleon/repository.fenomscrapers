@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 7-02-2021)
+# created by Venom for Fenomscrapers (updated 11-05-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -69,7 +69,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			if 'tvshowtitle' in data: url = self.show_link % query.replace(' ', '-')
 			else: url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 			r = client.request(url, timeout='5')
 			if not r: return sources

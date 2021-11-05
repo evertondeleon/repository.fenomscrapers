@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 9-09-2021)
+# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 11-05-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
@@ -21,11 +21,13 @@ class source:
 	def __init__(self):
 		self.priority = 4
 		self.language = ['en']
-		self.domains = ['extratorrent.si']
-		self.base_link = 'https://extratorrent.si'
-		self.msearch_link = '/search/?new=1&search=%s&s_cat=4'
-		self.tvsearch_link = '/search/?new=1&search=%s&s_cat=8'
-		self.packsearch_link = '/search/?page=2&new=1&search=%s&s_cat=8' # page1 appears broken, scrape page2 only for packs
+		self.domains = ['extratorrent.proxyninja.org']
+		# self.base_link = 'https://extratorrent.si' # dead
+		self.base_link = 'https://extratorrent.proxyninja.org'
+		self.msearch_link = '/search/?new=1&search=%s&s_cat=1'
+		self.tvsearch_link = '/search/?new=1&search=%s&s_cat=2'
+		# new proxy site does not have page issue ".si" use to have and pack file category no longer exists
+		# self.packsearch_link = '/search/?page=2&new=1&search=%s&s_cat=2' # page1 appears broken, scrape page2 only for packs
 		self.min_seeders = 1
 		self.pack_capable = True
 
@@ -63,7 +65,7 @@ class source:
 		self.sources = []
 		if not url: return self.sources
 		try:
-			scraper = cfscrape.create_scraper()
+			self.scraper = cfscrape.create_scraper()
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -77,25 +79,16 @@ class source:
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
-
 			url = self.tvsearch_link % quote_plus(query) if 'tvshowtitle' in data else self.msearch_link % quote_plus(query)
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, url)
 			urls.append(url)
 			urls.append('%s%s' % (url, '&page=2')) # next page seems to be working once again
 			# urls.append('%s%s' % (url, '&page=3'))
 			# log_utils.log('urls = %s' % urls)
 
-			links = []
-			for x in urls:
-				r = py_tools.ensure_str(scraper.get(x).content, errors='replace')
-				if not r: continue
-				list = client.parseDOM(r, 'tr', attrs={'class': 'tlr'})
-				list += client.parseDOM(r, 'tr', attrs={'class': 'tlz'})
-				for item in list:
-					links.append(item)
 			threads = []
-			for link in links:
-				threads.append(workers.Thread(self.get_sources, link))
+			for url in urls:
+				threads.append(workers.Thread(self.get_sources, url))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -103,41 +96,50 @@ class source:
 			source_utils.scraper_error('EXTRATORRENT')
 			return self.sources
 
-	def get_sources(self, link):
+	def get_sources(self, url):
 		try:
-			url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', link, re.I).group(1)
-			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-			url = source_utils.strip_non_ascii_and_unprintable(url)
-			if url in str(self.sources): return
-			hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-
-			name = url.split('&dn=')[1]
-			name = source_utils.clean_name(name)
-
-			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
-			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-			if source_utils.remove_lang(name_info): return
-
-			if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-				ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-				if any(re.search(item, name.lower()) for item in ep_strings): return
-			try:
-				seeders = int(client.parseDOM(link, 'td', attrs={'class': 'sn'})[0].replace(',', ''))
-				if self.min_seeders > seeders: return
-			except: seeders = 0
-
-			quality, info = source_utils.get_release_quality(name_info, url)
-			try:
-				size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(0)
-				dsize, isize = source_utils._size(size)
-				info.insert(0, isize)
-			except: dsize = 0
-			info = ' | '.join(info)
-
-			self.sources.append({'provider': 'extratorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
-											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			r = py_tools.ensure_str(self.scraper.get(url).content, errors='replace')
+			if not r: return
+			rows = client.parseDOM(r, 'tr', attrs={'class': 'tlr'})
+			rows += client.parseDOM(r, 'tr', attrs={'class': 'tlz'})
 		except:
 			source_utils.scraper_error('EXTRATORRENT')
+			return
+
+		for row in rows:
+			try:
+				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
+				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				url = source_utils.strip_non_ascii_and_unprintable(url)
+				if url in str(self.sources): continue
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+
+				name = url.split('&dn=')[1]
+				name = source_utils.clean_name(name)
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
+				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
+				if source_utils.remove_lang(name_info): continue
+
+				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					if any(re.search(item, name.lower()) for item in ep_strings): continue
+				try:
+					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'sn'})[0].replace(',', ''))
+					if self.min_seeders > seeders: continue
+				except: seeders = 0
+
+				quality, info = source_utils.get_release_quality(name_info, url)
+				try:
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
+				except: dsize = 0
+				info = ' | '.join(info)
+
+				self.sources.append({'provider': 'extratorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			except:
+				source_utils.scraper_error('EXTRATORRENT')
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
@@ -160,16 +162,16 @@ class source:
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
-						self.packsearch_link % quote_plus(query + ' S%s' % self.season_xx),
-						self.packsearch_link % quote_plus(query + ' Season %s' % self.season_x)]
+						self.tvsearch_link % quote_plus(query + ' S%s' % self.season_xx),
+						self.tvsearch_link % quote_plus(query + ' Season %s' % self.season_x)]
 			if self.search_series:
 				queries = [
-						self.packsearch_link % quote_plus(query + ' Season'),
-						self.packsearch_link % quote_plus(query + ' Complete')]
+						self.tvsearch_link % quote_plus(query + ' Season'),
+						self.tvsearch_link % quote_plus(query + ' Complete')]
 
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url)
+				link = '%s%s' % (self.base_link, url)
 				threads.append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
@@ -217,7 +219,7 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 				try:
-					seeders = int(client.parseDOM(link, 'td', attrs={'class': 'sn'})[0].replace(',', ''))
+					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'sn'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 

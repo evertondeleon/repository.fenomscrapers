@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (3-12-2021)
+# created by Venom for Fenomscrapers (11-05-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -7,10 +7,10 @@
 from json import loads as jsloads
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -21,7 +21,7 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 		self.domain = ['torrent-paradise.ml/']
-		self.base_link = 'https://torrent-paradise.ml/'
+		self.base_link = 'https://torrent-paradise.ml'
 		self.search_link = '/api/search?q=%s'
 		self.min_seeders = 0
 		self.pack_capable = True
@@ -69,8 +69,7 @@ class source:
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url)
 
 			rjson = client.request(url, timeout='5')
@@ -140,7 +139,7 @@ class source:
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
-				link = urljoin(self.base_link, url)
+				link = '%s%s' % (self.base_link, url)
 				threads.append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]

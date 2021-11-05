@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (1-28-2021)
+# created by Venom for Fenomscrapers (11-05-2021)
 """
 	Fenomscrapers Project
 """
@@ -7,10 +7,11 @@
 from json import loads as jsloads
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode
+	from urllib.parse import parse_qs, urlencode
+
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -39,18 +40,14 @@ class source:
 		try:
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
 			title = data['title'].replace('&', 'and')
 			aliases = data['aliases']
 			hdlr = data['year']
 			year = data['year']
 			imdb = data['imdb']
-
-			url = self.search_link % imdb
-			api_url = urljoin(self.base_link, url)
-			# log_utils.log('api_url = %s' % api_url, log_utils.LOGDEBUG)
-
-			rjson = client.request(api_url, timeout='5')
+			url = '%s%s' % (self.base_link, self.search_link % imdb)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			rjson = client.request(url, timeout='5')
 			if not rjson: return sources
 			files = jsloads(rjson)
 			if files.get('status') == 'error' or files.get('data').get('movie_count') == 0:

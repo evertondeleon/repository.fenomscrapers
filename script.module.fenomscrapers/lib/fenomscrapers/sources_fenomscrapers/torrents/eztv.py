@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 7-02-2021)
+# modified by Venom for Fenomscrapers (updated 11-05-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
 try: #Py2
-	from urlparse import parse_qs, urljoin
+	from urlparse import parse_qs
 	from urllib import urlencode, quote_plus, unquote, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote_plus, unquote, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -62,7 +62,7 @@ class source:
 			# query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query) #eztv has issues with dashes in titles
 			query = re.sub(r'[^A-Za-z0-9\s\.]+', '', query)
 			url = self.search_link % (quote_plus(query).replace('+', '-'))
-			url = urljoin(self.base_link, url)
+			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
 			html = client.request(url, timeout='5')
 			try:
