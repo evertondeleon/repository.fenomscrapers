@@ -10,19 +10,19 @@ from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules.control import homeWindow, setting as getSetting, setSetting
 
 
-RES_4K = ['.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '216op', '2160i', 'hd2160', '2160hd'] # some idiots use "uhd.1080p" in their uploads, "uhd" now removed
-RES_1080 = ['1080p', '1o8op', '1080i', 'hd1080', '1080hd'] # some idots using letter o vs. a zero
-RES_720 = ['720p', '72op', '720i', 'hd720', '720hd']
-SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
-CAM = ['1xbet', 'betwin', '.cam.', 'camrip', 'cam.rip', 'dvdcam', 'dvd.cam', 'dvdts', 'hdcam', '.hd.cam', '.hctc', '.hc.tc', '.hdtc',
-			'.hd.tc', 'hdts', '.hd.ts', '.ts.', '.tc.', 'tsrip', 'telecine', 'telesync', 'tele.sync']
+RES_4K = ('.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '216op', '2160i', 'hd2160', '2160hd') # some idiots use "uhd.1080p" in their uploads, "uhd" now removed
+RES_1080 = ('1080p', '1o8op', '1080i', 'hd1080', '1080hd') # some idots using letter o vs. a zero
+RES_720 = ('720p', '72op', '720i', 'hd720', '720hd')
+SCR = ('dvdscr', 'screener', '.scr.', '.r5', '.r6')
+CAM = ('1xbet', 'betwin', '.cam.', 'camrip', 'cam.rip', 'dvdcam', 'dvd.cam', 'dvdts', 'hdcam', '.hd.cam', '.hctc', '.hc.tc', '.hdtc',
+			'.hd.tc', 'hdts', '.hd.ts', '.ts.', '.tc.', 'tsrip', 'telecine', 'telesync', 'tele.sync')
 
-LANG = ['arabic', 'bgaudio', 'castellano', 'chinese', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
-			  'russian', 'spanish', 'tamil', 'telugu', 'truefrench', 'truespanish', 'turkish', 'hebrew']
-ABV_LANG = ['.zh.', '.zho.', '.chi.', '.chs.', '.nl.', '.nld.', '.dut,', '.fi.', '.fin.', '.fr.', '.fra.', '.fre.', '.de.', '.deu.', '.ger.', '.he.', '.heb.', '.hi.', '.hin.', '.it.', '.ita.',
-						'.ja.', '.jpn.', '.ko.', '.kor.', '.pl.', '.pol.', '.pt.', '.por.', '.ru.', '.rus.', '.es.', '.spa.', '.sv.', '.swe.', '.tr.', '.tur.', '.uk.', '.ukr.', '.vi.', '.vie.']
-DUBBED = ['dublado', 'dubbed', 'pldub']
-SUBS = ['subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs']
+LANG = ('arabic', 'bgaudio', 'castellano', 'chinese', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
+			  'russian', 'spanish', 'tamil', 'telugu', 'truefrench', 'truespanish', 'turkish', 'hebrew')
+ABV_LANG = ('.zh.', '.zho.', '.chi.', '.chs.', '.nl.', '.nld.', '.dut,', '.fi.', '.fin.', '.fr.', '.fra.', '.fre.', '.de.', '.deu.', '.ger.', '.he.', '.heb.', '.hi.', '.hin.', '.it.', '.ita.',
+						'.ja.', '.jpn.', '.ko.', '.kor.', '.pl.', '.pol.', '.pt.', '.por.', '.ru.', '.rus.', '.es.', '.spa.', '.sv.', '.swe.', '.tr.', '.tur.', '.uk.', '.ukr.', '.vi.', '.vie.')
+DUBBED = ('dublado', 'dubbed', 'pldub')
+SUBS = ('subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs')
 
 UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'amedia', 'baibako', 'bigsinema', 'bonus.disc', 'courage.bambey',
 				'.cbr', '.cbz', 'coldfilm', 'dilnix', 'dutchreleaseteam', 'e.book.collection', 'empire.minutemen', 'eniahd', '.exe', 'exkinoray', 'extras.only',
@@ -31,16 +31,16 @@ UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'am
 				'omskbird', '.ost.', 'paravozik', 'profix.media', 'rifftrax', 'sample', 'soundtrack', 'subtitle.only', 'sunshinestudio', 'teaser', 'trailer', 'tumbler.studio',
 				'tvshows', 'ultradox', 'viruseproject', 'vostfr', 'vo.stfr', 'web.dlrip', 'webdlrip', 'wish666', '.p.web.dl', '.d.web.dl']
 
-season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
+season_list = ('one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
 			'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three',
-			'twenty-four', 'twenty-five']
+			'twenty-four', 'twenty-five')
 
-season_ordinal_list = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth',
+season_ordinal_list = ('first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth',
 			'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth', 'twentieth', 'twenty-first',
-			'twenty-second', 'twenty-third', 'twenty-fourth', 'twenty-fifth']
+			'twenty-second', 'twenty-third', 'twenty-fourth', 'twenty-fifth')
 
-season_ordinal2_list = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th', '15th', '16th',
-			'17th', '18th', '19th', '20th', '21st', '22nd', '23rd', '24th', '25th']
+season_ordinal2_list = ('1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th', '15th', '16th',
+			'17th', '18th', '19th', '20th', '21st', '22nd', '23rd', '24th', '25th')
 
 season_dict = {'1': 'one', '2': 'two', '3': 'three', '4': 'four', '5': 'five', '6': 'six', '7': 'seven', '8': 'eigh', '9': 'nine', '10': 'ten',
 			'11': 'eleven', '12': 'twelve', '13': 'thirteen', '14': 'fourteen', '15': 'fifteen', '16': 'sixteen', '17': 'seventeen',
@@ -56,8 +56,28 @@ season_ordinal2_dict = {'1': '1st', '2': '2nd', '3': '3rd', '4': '4th', '5': '5t
 			'11': '11th', '12': '12th', '13': '13th', '14': '14th', '15': '15th', '16': '16th', '17': '17th', '18': '18th', '19': '19th',
 			'20': '20th', '21': '21st', '22': '22nd', '23': '23rd', '24': '24th', '25': '25th'}
 
+unwanted_tags = ('tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.ws', 'www.tamilrockers.pl', 'www.tamilrockerrs.pl',
+			'www.torrenting.com', 'www.torrenting.org', 'www-torrenting-com', 'www-torrenting-org',
+			'+katmoviehd.pw+', 'katmoviehd-pw',
+			'www.torrent9.nz', 'torrent9-cz-.-', 'torrent9.cz.].', 'torrent9-cz-]-',
+			'agusiq-torrents-pl', 'oxtorrent-com',
+			'www.movcr.tv', 'movcr-com', 'www.movcr.to',
+			'(imax)', '.imax.',
+			'xtorrenty.org', 'nastoletni.wilkoak', 'www.scenetime.com', 'kst-vn',
+			'www.2movierulz.ac', 'www.2movierulz.ms',
+			'www.3movierulz.com', 'www.3movierulz.tv', 'www.3movierulz.ws', 'www.3movierulz.ms', 'www.8movierulz.ws',
+			'mkvcinemas.live',
+			'www.bludv.tv', 'ramin.djawadi', 'extramovies.casa',
+			'+13.+', 'taht.oyunlar', 'crazy4tv.com', 'karibu', '989pa.com',
+			'best-torrents-net', '1-3-3-8.com', 'ssrmovies.club', 'www.tamilmv.bid', 'www.1tamilmv.org',
+			'va:', 'oxtorrent-sh', 'zgxybbs-fdns-uk', 'www.tamilblasters.mx',
+			'www.1tamilmv.work', 'www.7movierulz.pw', 'www.xbay.me', 'www-tamilrockers-cl', 'www.tamilrockers.cl', 'www.tamilrockers.li',
+			'crazy4tv-com', '(es)')
+
+home_getProperty = homeWindow.getProperty
+
 def get_undesirables():
-	undesirables = homeWindow.getProperty('fenom.undesirables')
+	undesirables = home_getProperty('fenom.undesirables')
 	undesirables = list(set(undesirables.replace(' ', '').split(',')))
 	return undesirables
 
@@ -110,6 +130,7 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 	try: aliases = aliases_to_array(jsloads(aliases))
 	except: aliases = None
 	title_list = []
+	title_list_append = title_list.append
 	if aliases:
 		for item in aliases:
 			try:
@@ -118,7 +139,7 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 				if years: # for movies only, scraper to pass None for episodes
 					for i in years: alias = alias.replace(i, '')
 				if alias in title_list: continue
-				title_list.append(alias)
+				title_list_append(alias)
 			except:
 				from fenomscrapers.modules import log_utils
 				log_utils.error()
@@ -126,7 +147,7 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 		match = True
 		title = title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
-		title_list.append(title)
+		title_list_append(title)
 
 		release_title = release_title_format(release_title) # converts to .lower()
 		h = hdlr.lower()
@@ -150,10 +171,10 @@ def remove_lang(release_info):
 	try:
 		if any(value in release_info for value in DUBBED): return True
 		if any(value in release_info for value in SUBS): return True
-		if homeWindow.getProperty('fenom.filter.undesirables') == 'true':
+		if home_getProperty('fenom.filter.undesirables') == 'true':
 			undesirables = get_undesirables()
 			if any(value in release_info for value in undesirables): return True
-		if homeWindow.getProperty('fenom.filter.foreign.single.audio') == 'true':
+		if home_getProperty('fenom.filter.foreign.single.audio') == 'true':
 			if any(value in release_info for value in LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
 			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
 		if release_info.endswith('.srt.') and not any(value in release_info for value in ['with.srt', '.avi', '.mkv', '.mp4']): return True
@@ -172,20 +193,21 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 	try: aliases = aliases_to_array(jsloads(aliases))
 	except: aliases = None
 	title_list = []
+	title_list_append = title_list.append
 	if aliases:
 		for item in aliases:
 			try:
 				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
 				if alias in title_list: continue
-				title_list.append(alias)
+				title_list_append(alias)
 			except:
 				from fenomscrapers.modules import log_utils
 				log_utils.error()
 	try:
 		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# show_title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', show_title)
-		title_list.append(show_title)
+		title_list_append(show_title)
 
 		season_fill = season.zfill(2)
 		season_check = '.s%s.' % season
@@ -201,7 +223,8 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 		release_title = release_title_format(release_title)
 		t = release_title.replace('-', '.')
 		for i in split_list:
-			t = t.split(i)[0]
+			t_split = t.split
+			t = t_split(i)[0]
 		if all(cleantitle.get(x) != cleantitle.get(t) for x in title_list):
 			return False
 
@@ -245,26 +268,28 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 	try: aliases = aliases_to_array(jsloads(aliases))
 	except: aliases = None
 	title_list = []
+	title_list_append = title_list.append
 	if aliases:
 		for item in aliases:
 			try:
 				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
 				if alias in title_list: continue
-				title_list.append(alias)
+				title_list_append(alias)
 			except:
 				from fenomscrapers.modules import log_utils
 				log_utils.error()
 	try:
 		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# show_title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', show_title)
-		title_list.append(show_title)
+		title_list_append(show_title)
 
 		split_list = ['.all.seasons', 'seasons', 'season', 'the.complete', 'complete', 'all.torrent', 'total.series', 'tv.series', 'series', 'edited', 's1', 's01', year] #s1 or s01 used so show pack only kept that begin with 1
 		release_title = release_title_format(release_title)
 		t = release_title.replace('-', '.')
 		for i in split_list:
-			t = t.split(i)[0]
+			t_split = t.split
+			t = t_split(i)[0]
 		if all(cleantitle.get(x) != cleantitle.get(t) for x in title_list):
 			return False, 0
 
@@ -523,37 +548,17 @@ def release_title_format(release_title):
 
 def clean_name(release_title):
 	try:
-		unwanted = [
-							'[.www.tamilrockers.com.]', 'tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.ws', 'www.tamilrockers.pl', 'www.tamilrockerrs.pl',
-							'[.www.torrenting.com.]', 'www.torrenting.com', 'www.torrenting.org', 'www-torrenting-com', 'www-torrenting-org',
-							'[katmoviehd.eu]', '[katmoviehd.to]', '[katmoviehd.tv]', '+katmoviehd.pw+', 'katmoviehd-pw',
-							'[.www.torrent9.uno.]', '[www.torrent9.ph.]', 'www.torrent9.nz', '[.torrent9.tv.]', '[.torrent9.cz.]', '[ torrent9.cz ]', 'torrent9-cz-.-', 'torrent9.cz.].', 'torrent9-cz-]-',
-							'[agusiq.torrents.pl]', '[agusiq-torrents.pl]', 'agusiq-torrents-pl',
-							'[.oxtorrent.com.]', '[oxtorrent-com]', 'oxtorrent-com',
-							'[movcr.com]', 'www.movcr.tv', 'movcr-com', 'www.movcr.to',
-							'[ex-torrenty.org]', '[xtorrenty.org]', 'xtorrenty.org',
-							'[acesse.]', '[acesse-hd-elite-me]', '[acesse.hd-elite.me].',
-							'[torrentcouch.net]', '[torrentcouch-net]',
-							'[.www.cpasbien.cm.]', '[.www.cpasbien.pw.]',
-							'[auratorrent.pl].nastoletni.wilkoak', '[auratorrent.pl]',
-							'[.www.nextorrent.site.]', '[nextorrent.net]',
-							'[www.scenetime.com]', 'www.scenetime.com',
-							'[kst.vn]', 'kst-vn',
-							'[itfriend]', '[itf]',
-							'(imax)', '.imax.',
-							'www.2movierulz.ac', 'www.2movierulz.ms',
-							'www.3movierulz.com', 'www.3movierulz.tv', 'www.8movierulz.ws',
-							'[zooqle.com]', '[horriblesubs]', '[gktorrent.com]', '[.www.omgtorrent.com.]', '[3d.hentai]', '[dark.media]', '[devil-torrents.pl]', 'mkvcinemas.live',
-							'[filetracker.pl]', 'www.bludv.tv', 'ramin.djawadi', '[prof]', '[reup]', '[.www.speed.cd.]', '[-bde4.com]', 'extramovies.casa',
-							'[ah]', '[ul]', '+13.+', 'taht.oyunlar', 'crazy4tv.com', '[tv]', '[noobsubs]', '[.freecourseweb.com.]', 'karibu', '989pa.com', '[aletorrenty.pl]',
-							'best-torrents-net', '[.www.torrentday.com.]', '1-3-3-8.com', 'ssrmovies.club', 'www.tamilmv.bid', 'www.1tamilmv.org', '[h3h2.com]']
-		if release_title.lower().startswith('rifftrax'): return release_title # removed by "undesirables" anyway so exit
+		releasetitle_startswith = release_title.lower().startswith
+		if releasetitle_startswith('rifftrax'): return release_title # removed by "undesirables" anyway so exit
 		release_title = strip_non_ascii_and_unprintable(release_title).lstrip('/ ').replace(' ', '.')
-		for i in unwanted:
-			if release_title.lower().startswith(i):
-				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else r'%s' % i
+		for i in unwanted_tags:
+			if releasetitle_startswith(i):
+				i_startswith = i.startswith
+				pattern = r'\%s' % i if i_startswith('[') or i_startswith('+') else r'%s' % i
 				release_title = re.sub(r'^%s' % pattern, '', release_title, 1, re.I)
-		release_title = release_title.lstrip(' 4.-[](){}:/')
+		release_title = release_title.lstrip('.-:/')
+		release_title = re.sub(r'^\[.*?]', '', release_title, 1, re.I)
+		release_title = release_title.lstrip('.-[](){}:/')
 		return release_title
 	except:
 		from fenomscrapers.modules import log_utils
