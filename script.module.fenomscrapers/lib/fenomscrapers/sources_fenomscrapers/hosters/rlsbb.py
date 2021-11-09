@@ -5,11 +5,6 @@
 '''
 
 import re
-try: #Py2
-	from urlparse import parse_qs
-	from urllib import urlencode
-except ImportError: #Py3
-	from urllib.parse import parse_qs, urlencode
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
@@ -21,47 +16,17 @@ class source:
 		self.priority = 26
 		self.language = ['en']
 		self.domains = ['proxybb.com', 'rlsbb.ru', 'rlsbb.to']
-		self.base_new = 'http://proxybb.com'
-		self.base_old = 'http://old3.proxybb.com'
+		self.base_new = 'http://proxybb.com/'
+		self.base_old = 'http://old3.proxybb.com/'
 		self.search_link = 'http://search.proxybb.com/?s=%s' #may use in future but adds a request to do so.
+		self.movie = True
+		self.tvshow = True
 
-	def movie(self, imdb, title, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			source_utils.scraper_error('RLSBB')
-			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
-		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			source_utils.scraper_error('RLSBB')
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url: return
-			url = parse_qs(url)
-			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urlencode(url)
-			return url
-		except:
-			source_utils.scraper_error('RLSBB')
-			return
-
-	def sources(self, url, hostDict):
+	def sources(self, data, hostDict):
 		sources = []
-		if not url: return sources
+		if not data: return sources
 		try:
 			scraper = cfscrape.create_scraper(delay=5)
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')

@@ -30,33 +30,8 @@ class source:
 		# self.base_link = 'http://rapidmoviez.cr/' # cloudflare IUAM challenge failure
 		self.scraper = cfscrape.create_scraper()
 		self.headers = {'User-Agent': client.agent()}
-
-	def movie(self, imdb, title, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
-		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url: return
-			url = parse_qs(url)
-			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urlencode(url)
-			return url
-		except:
-			return
+		self.movie = True
+		self.tvshow = True
 
 	def search(self, title, year):
 		try:
@@ -75,13 +50,11 @@ class source:
 		except:
 			return None
 
-	def sources(self, url, hostDict):
+	def sources(self, data, hostDict):
 		self.sources = []
-		if not url: return self.sources
+		if not data: return self.sources
 		try:
 			self.hostDict = hostDict
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')

@@ -8,10 +8,9 @@ from base64 import b64encode
 import re
 import requests
 try: #Py2
-	from urllib import urlencode, quote
-	from urlparse import parse_qs
+	from urllib import quote
 except ImportError: #Py3
-	from urllib.parse import urlencode, quote, parse_qs
+	from urllib.parse import quote
 from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
@@ -27,43 +26,16 @@ class source:
 		self.domain = 'easynews.com'
 		self.base_link = 'https://members.easynews.com'
 		self.search_link = '/2.0/search/solr-search/advanced'
+		self.movie = True
+		self.tvshow = True
 
-	def movie(self, imdb, title, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
-		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url: return
-			url = parse_qs(url)
-			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def sources(self, url, hostDict):
+	def sources(self, data, hostDict):
 		sources = []
-		if not url: return sources
+		if not data: return sources
 		auth = self._get_auth()
 		if not auth: return sources
 		try:
 			title_chk = getSetting('easynews.title.chk') == 'true'
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -91,7 +63,7 @@ class source:
 				# log_utils.log('post_title = %s' % post_title, __name__, log_utils.LOGDEBUG)
 				checks = [False] * 5
 				if 'alangs' in item and item['alangs'] and 'eng' not in item['alangs']: checks[1] = True
-				if re.match('^\d+s', duration) or re.match('^[0-5]m', duration): checks[2] = True
+				if re.match(r'^\d+s', duration) or re.match('^[0-5]m', duration): checks[2] = True
 				if 'passwd' in item and item['passwd']: checks[3] = True
 				if 'virus' in item and item['virus']: checks[4] = True
 				if 'type' in item and item['type'].upper() != 'VIDEO': checks[5] = True

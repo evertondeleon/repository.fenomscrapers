@@ -6,12 +6,6 @@
 
 from json import loads as jsloads
 import re
-try: #Py2
-	from urlparse import parse_qs
-	from urllib import urlencode
-except ImportError: #Py3
-	from urllib.parse import parse_qs, urlencode
-
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -25,21 +19,13 @@ class source:
 		self.search_link = '/api/v2/list_movies.json?query_term=%s' #accepts imdb_id as query_term
 		self.min_seeders = 0
 		self.pack_capable = False
+		self.movie = True
+		self.tvshow = False
 
-	def movie(self, imdb, title, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def sources(self, url, hostDict):
+	def sources(self, data, hostDict):
 		sources = []
-		if not url: return sources
+		if not data: return sources
 		try:
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 			title = data['title'].replace('&', 'and')
 			aliases = data['aliases']
 			hdlr = data['year']

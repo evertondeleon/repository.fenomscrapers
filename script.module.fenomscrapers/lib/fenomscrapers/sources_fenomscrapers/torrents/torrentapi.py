@@ -8,10 +8,9 @@ from json import loads as jsloads
 import re
 from time import sleep
 try: #Py2
-	from urlparse import parse_qs
-	from urllib import urlencode, quote_plus, unquote_plus
+	from urllib import unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
+	from urllib.parse import unquote_plus
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import source_utils
@@ -29,6 +28,8 @@ class source:
 		self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
 		self.min_seeders = 0
 		self.pack_capable = True
+		self.movie = True
+		self.tvshow = True
 
 	def _get_token(self):
 		try:
@@ -39,41 +40,12 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 
-	def movie(self, imdb, title, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
-		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url: return
-			url = parse_qs(url)
-			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def sources(self, url, hostDict):
+	def sources(self, data, hostDict):
 		sources = []
-		if not url: return sources
+		if not data: return sources
 		try:
 			self.scraper = cfscrape.create_scraper()
 			self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -126,9 +98,9 @@ class source:
 				source_utils.scraper_error('TORRENTAPI')
 		return sources
 
-	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
+	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		sources = []
-		if not url: return sources
+		if not data: return sources
 		if search_series: # torrentapi does not have showPacks
 			return sources
 		try:
@@ -136,8 +108,6 @@ class source:
 			self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
 
 			self.bypass_filter = bypass_filter
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			self.aliases = data['aliases']

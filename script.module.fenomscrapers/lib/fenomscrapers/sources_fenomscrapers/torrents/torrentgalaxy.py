@@ -6,10 +6,9 @@
 
 import re
 try: #Py2
-	from urlparse import parse_qs
-	from urllib import urlencode, quote_plus, unquote_plus
+	from urllib import quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
+	from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import py_tools
@@ -26,41 +25,14 @@ class source:
 		self.search_link = '/torrents.php?search=%s&sort=seeders&order=desc'
 		self.min_seeders = 0
 		self.pack_capable = True
+		self.movie = True
+		self.tvshow = True
 
-	def movie(self, imdb, title, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
-		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url: return
-			url = parse_qs(url)
-			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def sources(self, url, hostDict):
+	def sources(self, data, hostDict):
 		sources = []
-		if not url: return sources
+		if not data: return sources
 		try:
 			scraper = cfscrape.create_scraper()
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -121,17 +93,14 @@ class source:
 				source_utils.scraper_error('TORRENTGALAXY')
 		return sources
 
-	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
+	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
-		if not url: return self.sources
+		if not data: return self.sources
 		try:
 			self.scraper = cfscrape.create_scraper()
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			self.aliases = data['aliases']

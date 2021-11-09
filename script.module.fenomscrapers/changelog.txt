@@ -1,4 +1,8 @@
 
+[B][COLOR red]Update - v1.5.8 - Nov. 08, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] All providers have been re-written to remove old encoding methods.[/I]
+
+
 [B][COLOR red]Update - v1.5.7 - Nov. 05, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Added EXTRATORRENT back in per request of proxy found.  This is officially my LAST attempt to keep this scraper alive.[/I]
 [COLOR yellow]--[/COLOR][I] GDRIVE scraper re-written to follow standard FenomScraper methods and title checking.[/I]

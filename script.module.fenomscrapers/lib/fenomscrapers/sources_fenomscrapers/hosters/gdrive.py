@@ -7,10 +7,9 @@
 import re
 import requests
 try: #Py2
-	from urlparse import parse_qs
-	from urllib import urlencode, unquote, quote_plus
+	from urllib import unquote, quote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urlencode, unquote, quote_plus
+	from urllib.parse import unquote, quote_plus
 from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
@@ -29,44 +28,13 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 		self.title_chk = (getSetting('gdrive.title.chk') == 'true')
+		self.movie = True
+		self.tvshow = True
 
-	def movie(self, imdb, title, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			source_utils.scraper_error('GDRIVE')
-			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
-		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			source_utils.scraper_error('GDRIVE')
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url: return
-			url = parse_qs(url)
-			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urlencode(url)
-			return url
-		except:
-			source_utils.scraper_error('GDRIVE')
-			return
-
-	def sources(self, url, hostDict):
+	def sources(self, data, hostDict):
 		sources = []
-		if not url: return sources
+		if not data: return sources
 		try:
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']

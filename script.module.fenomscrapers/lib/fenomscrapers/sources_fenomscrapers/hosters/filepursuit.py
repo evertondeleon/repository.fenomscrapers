@@ -8,10 +8,9 @@ from json import loads as jsloads
 import re
 import requests
 try: #Py2
-	from urlparse import parse_qs
-	from urllib import urlencode, quote_plus
+	from urllib import quote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urlencode, quote_plus
+	from urllib.parse import quote_plus
 from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -23,47 +22,16 @@ class source:
 		self.language = ['en']
 		self.base_link = 'https://filepursuit.p.rapidapi.com' # 'https://rapidapi.com/azharxes/api/filepursuit' to obtain key
 		self.search_link = '/?type=video&q=%s'
+		self.movie = True
+		self.tvshow = True
 
-	def movie(self, imdb, title, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			source_utils.scraper_error('FILEPURSUIT')
-			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
-		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			source_utils.scraper_error('FILEPURSUIT')
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url: return
-			url = parse_qs(url)
-			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urlencode(url)
-			return url
-		except:
-			source_utils.scraper_error('FILEPURSUIT')
-			return
-
-	def sources(self, url, hostDict):
+	def sources(self, data, hostDict):
 		sources = []
-		if not url: return sources
+		if not data: return sources
 		try:
 			api_key = getSetting('filepursuit.api')
 			if api_key == '': return sources
 			headers = {"x-rapidapi-host": "filepursuit.p.rapidapi.com", "x-rapidapi-key": api_key}
-
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')

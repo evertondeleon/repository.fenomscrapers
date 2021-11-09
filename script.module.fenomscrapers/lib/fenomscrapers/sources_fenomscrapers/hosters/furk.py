@@ -6,12 +6,6 @@
 
 from json import dumps as jsdumps, loads as jsloads
 import requests
-# import sys
-try: #Py2
-	from urlparse import parse_qs
-	from urllib import urlencode
-except ImportError: #Py3
-	from urllib.parse import parse_qs, urlencode
 from fenomscrapers.modules.control import setting as getSetting, setSetting
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import source_utils
@@ -28,6 +22,8 @@ class source:
 		self.tfile_link = "/api/file/get?api_key=%s&t_files=1&id=%s"
 		self.login_link = "/api/login/login?login=%s&pwd=%s"
 		self.files = []
+		self.movie = True
+		self.tvshow = True
 
 	def get_api(self):
 		try:
@@ -48,42 +44,12 @@ class source:
 		except:
 			source_utils.scraper_error('FURK')
 
-	def movie(self, imdb, title, aliases, year):
-		try:
-			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
-		try:
-			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if not url: return
-			url = parse_qs(url)
-			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
-			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
-			url = urlencode(url)
-			return url
-		except:
-			return
-
-	def sources(self, url, hostDict):
+	def sources(self, data, hostDict):
 		sources = []
-		if not url: return sources
+		if not data: return sources
 		api_key = self.get_api()
 		if not api_key: return sources
 		try:
-			data = parse_qs(url)
-			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases'] # not used atm

@@ -16,7 +16,6 @@ from fenomscrapers.modules import client
 from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
-
 class source:
 	def __init__(self):
 		self.priority = 25
@@ -33,6 +32,8 @@ class source:
 		self.headers = {
 			'Authorization': self._get_auth(),
 			'User-Agent': 'Placenta for Kodi'}
+		self.movie = False
+		self.tvshow = True
 
 	def _get_auth(self):
 		try: # Python 2
@@ -44,78 +45,26 @@ class source:
 			auth = 'Basic ' + b64encode(user_info).decode('utf-8')
 		return auth
 
-	def movie(self, imdb, title, aliases, year): # seems Ororo does not provide Movies
+	def sources(self, data, hostDict):
+		sources = []
+		if not data: return sources
 		try:
-			if (self.user == '' or self.password == ''): return
-			url = cache.get(self.ororo_moviecache, 60, self.user)
-			if not url: return
-			url = [i[0] for i in url if imdb == i[1]]
-			if not url: return
-			url = self.movie_link % url[0]
-			return url
-		except:
-			source_utils.scraper_error('ORORO')
-			return
+			if (self.user == '' or self.password == ''): return sources
 
-	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
-		try:
-			if (self.user == '' or self.password == ''): return
 			url = cache.get(self.ororo_tvcache, 120, self.user)
-			if not url: return
-			url = [i[0] for i in url if imdb == i[1]]
-			if not url: return
+			if not url: return sources
+			url = [i[0] for i in url if data['imdb'] == i[1]]
+			if not url: return sources
 			url = self.show_link % url[0]
-			return url
-		except:
-			source_utils.scraper_error('ORORO')
-			return
 
-	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
-		try:
-			if (self.user == '' or self.password == ''): return
-			if not url: return
 			url = urljoin(self.base_link, url)
 			r = client.request(url, headers=self.headers)
 			r = jsloads(r)['episodes']
 			r = [(str(i['id']), str(i['season']), str(i['number']), str(i['airdate'])) for i in r]
-			url = [i for i in r if season == i[1] and episode == i[2]]
-			url += [i for i in r if premiered == i[3]]
-			if not url: return
+			url = [i for i in r if data['season'] == i[1] and data['episode'] == i[2]]
+			url += [i for i in r if data['premiered'] == i[3]]
+			if not url: return sources
 			url= self.episode_link % url[0][0]
-			return url
-		except:
-			source_utils.scraper_error('ORORO')
-			return
-
-	def ororo_moviecache(self, user):
-		try:
-			url = urljoin(self.base_link, self.moviesearch_link)
-			r = client.request(url, headers=self.headers)
-			r = jsloads(r)['movies']
-			r = [(str(i['id']), str(i['imdb_id'])) for i in r]
-			r = [(i[0], 'tt' + re.sub(r'[^0-9]', '', i[1])) for i in r]
-			return r
-		except:
-			source_utils.scraper_error('ORORO')
-			return
-
-	def ororo_tvcache(self, user):
-		try:
-			url = urljoin(self.base_link, self.tvsearch_link)
-			r = client.request(url, headers=self.headers)
-			r = jsloads(r)['shows']
-			r = [(str(i['id']), str(i['imdb_id'])) for i in r]
-			r = [(i[0], 'tt' + re.sub(r'[^0-9]', '', i[1])) for i in r]
-			return r
-		except:
-			source_utils.scraper_error('ORORO')
-			return
-
-	def sources(self, url, hostDict):
-		sources = []
-		if not url: return sources
-		try:
-			if (self.user == '' or self.password == ''): return sources
 
 			url = urljoin(self.base_link, url)
 			url = client.request(url, headers=self.headers)
@@ -133,6 +82,18 @@ class source:
 		except:
 			source_utils.scraper_error('ORORO')
 			return sources
+
+	def ororo_tvcache(self, user):
+		try:
+			url = urljoin(self.base_link, self.tvsearch_link)
+			r = client.request(url, headers=self.headers)
+			r = jsloads(r)['shows']
+			r = [(str(i['id']), str(i['imdb_id'])) for i in r]
+			r = [(i[0], 'tt' + re.sub(r'[^0-9]', '', i[1])) for i in r]
+			return r
+		except:
+			source_utils.scraper_error('ORORO')
+			return
 
 	def resolve(self, url):
 		return url
