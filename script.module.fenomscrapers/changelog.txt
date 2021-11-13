@@ -1,4 +1,9 @@
 
+[B][COLOR red]Update - v1.6.0 - Nov. 12, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed aliases handling.[/I]
+[COLOR yellow]--[/COLOR][I] Removed EXTRATORRENT scraper. Proxy is now cloudflare v2 challenge and dead.[/I]
+
+
 [B][COLOR red]Update - v1.5.9 - Nov. 09, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed release_title issue for TV Show "4400".[/I]
 

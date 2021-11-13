@@ -3,7 +3,6 @@
 	Fenomscrapers Module
 """
 
-from json import loads as jsloads
 import re
 from string import printable
 from fenomscrapers.modules import cleantitle
@@ -127,8 +126,7 @@ def aliases_to_array(aliases, filter=None):
 		return []
 
 def check_title(title, aliases, release_title, hdlr, year, years=None):
-	try: aliases = aliases_to_array(jsloads(aliases))
-	except: aliases = None
+	aliases = aliases_to_array(aliases)
 	title_list = []
 	title_list_append = title_list.append
 	if aliases:
@@ -190,8 +188,7 @@ def single_checkPack(release_title, query):
 	else: return False
 
 def filter_season_pack(show_title, aliases, year, season, release_title):
-	try: aliases = aliases_to_array(jsloads(aliases))
-	except: aliases = None
+	aliases = aliases_to_array(aliases)
 	title_list = []
 	title_list_append = title_list.append
 	if aliases:
@@ -265,8 +262,7 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 		return True
 
 def filter_show_pack(show_title, aliases, imdb, year, season, release_title, total_seasons):
-	try: aliases = aliases_to_array(jsloads(aliases))
-	except: aliases = None
+	aliases = aliases_to_array(aliases)
 	title_list = []
 	title_list_append = title_list.append
 	if aliases:

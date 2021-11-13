@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.5.9" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.6.0" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="script.module.requests" />
 		<import addon="script.module.myaccounts" version="1.0.0" />
@@ -26,8 +26,9 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.5.9 - Nov. 09, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Fixed release_title issue for TV Show "4400".[/I]
+[B][COLOR red]Update - v1.6.0 - Nov. 12, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed aliases handling.[/I]
+[COLOR yellow]--[/COLOR][I] Removed EXTRATORRENT scraper. Proxy is now cloudflare v2 challenge and dead.[/I]
 		</news>
 	</extension>
 </addon>
