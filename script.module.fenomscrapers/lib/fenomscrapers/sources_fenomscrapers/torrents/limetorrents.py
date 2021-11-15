@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-05-2021)
+# modified by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
-try: #Py2
-	from urllib import quote_plus, unquote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
-from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -33,6 +29,7 @@ class source:
 	def sources(self, data, hostDict):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.scraper = cfscrape.create_scraper()
 
@@ -55,9 +52,10 @@ class source:
 			url2 = url.replace('/1/', '/2/')
 			urls.append(url2)
 			threads = []
+			append = threads.append
 			for url in urls:
 				link = ('%s%s' % (self.base_link, url)).replace('+', '-')
-				threads.append(workers.Thread(self.get_sources, link))
+				append(workers.Thread(self.get_sources, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -69,7 +67,7 @@ class source:
 		# log_utils.log('link = %s' % link)
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = py_tools.ensure_str(self.scraper.get(link, headers=headers).content, errors='replace')
+			r = self.scraper.get(link, headers=headers).text
 			if not r or '<table' not in r: return
 			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			rows = client.parseDOM(table, 'tr')
@@ -108,7 +106,7 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				self.sources.append({'provider': 'limetorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+				self.sources_append({'provider': 'limetorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('LIMETORRENTS')
@@ -116,6 +114,7 @@ class source:
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.scraper = cfscrape.create_scraper()
 			self.search_series = search_series
@@ -138,9 +137,10 @@ class source:
 						self.tvsearch.format(quote_plus(query + ' Season')),
 						self.tvsearch.format(quote_plus(query + ' Complete'))]
 			threads = []
+			append = threads.append
 			for url in queries:
 				link = ('%s%s' % (self.base_link, url)).replace('+', '-')
-				threads.append(workers.Thread(self.get_sources_packs, link))
+				append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -152,7 +152,7 @@ class source:
 		# log_utils.log('link = %s' % str(link))
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = py_tools.ensure_str(self.scraper.get(link, headers=headers).content, errors='replace')
+			r = self.scraper.get(link, headers=headers).text
 			if not r or '<table' not in r: return
 			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			rows = client.parseDOM(table, 'tr')
@@ -202,7 +202,7 @@ class source:
 				item = {'provider': 'limetorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
-				self.sources.append(item)
+				self.sources_append(item)
 			except:
 				source_utils.scraper_error('LIMETORRENTS')
 

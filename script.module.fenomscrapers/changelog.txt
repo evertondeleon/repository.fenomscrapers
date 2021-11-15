@@ -1,4 +1,9 @@
 
+[B][COLOR red]Update - v2.0.0 - Nov. 14, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] First official py3 only version for Kodi Matrix.[/I]
+[COLOR yellow]--[/COLOR][I] cfscrape updated to v1.2.59.[/I]
+
+
 [B][COLOR red]Update - v1.6.0 - Nov. 12, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed aliases handling.[/I]
 [COLOR yellow]--[/COLOR][I] Removed EXTRATORRENT scraper. Proxy is now cloudflare v2 challenge and dead.[/I]

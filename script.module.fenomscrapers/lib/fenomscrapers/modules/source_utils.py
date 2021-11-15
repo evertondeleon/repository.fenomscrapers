@@ -23,7 +23,7 @@ ABV_LANG = ('.zh.', '.zho.', '.chi.', '.chs.', '.nl.', '.nld.', '.dut,', '.fi.',
 DUBBED = ('dublado', 'dubbed', 'pldub')
 SUBS = ('subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs')
 
-UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'amedia', 'baibako', 'bigsinema', 'bonus.disc', 'courage.bambey',
+UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'amedia', 'audiobooks', 'baibako', 'bigsinema', 'bonus.disc', 'courage.bambey',
 				'.cbr', '.cbz', 'coldfilm', 'dilnix', 'dutchreleaseteam', 'e.book.collection', 'empire.minutemen', 'eniahd', '.exe', 'exkinoray', 'extras.only',
 				'gears.media', 'gearsmedia', 'gostfilm', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'hurtom', 'idea.film', 'ideafilm', 'jaskier', 'kapatejl6', 'kb.1080p',
 				'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm', 'megapeer', 'minutemen.empire', 'newstudio',
@@ -173,9 +173,9 @@ def remove_lang(release_info):
 			undesirables = get_undesirables()
 			if any(value in release_info for value in undesirables): return True
 		if home_getProperty('fenom.filter.foreign.single.audio') == 'true':
-			if any(value in release_info for value in LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
-			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
-		if release_info.endswith('.srt.') and not any(value in release_info for value in ['with.srt', '.avi', '.mkv', '.mp4']): return True
+			if any(value in release_info for value in LANG) and not any(value in release_info for value in ('.eng.', '.en.', 'english')): return True
+			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ('.eng.', '.en.', 'english')): return True
+		if release_info.endswith('.srt.') and not any(value in release_info for value in ('with.srt', '.avi', '.mkv', '.mp4')): return True
 		return False
 	except:
 		from fenomscrapers.modules import log_utils
@@ -572,7 +572,7 @@ def strip_non_ascii_and_unprintable(text):
 
 def _size(siz):
 	try:
-		if siz in ['0', 0, '', None]: return 0, ''
+		if siz in ('0', 0, '', None): return 0, ''
 		div = 1 if siz.lower().endswith(('gb', 'gib')) else 1024
 		# if ',' in siz and siz.lower().endswith(('mb', 'mib')): siz = size.replace(',', '')
 		# elif ',' in siz and siz.lower().endswith(('gb', 'gib')): siz = size.replace(',', '.')
@@ -611,13 +611,13 @@ def scraper_error(provider):
 def is_host_valid(url, domains):
 	try:
 		# ('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif') # possibly consider adding
-		if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.', '.sample.']) or any(url.lower().endswith(x) for x in ['.rar', '.zip', '.iso', '.sample']):
+		if any(x in url.lower() for x in ('.rar.', '.zip.', '.iso.', '.sample.')) or any(url.lower().endswith(x) for x in ('.rar', '.zip', '.iso', '.sample')):
 			return False, ''
 		host = __top_domain(url)
 		hosts = [domain.lower() for domain in domains if host and host in domain.lower()]
 		if hosts and '.' not in host: host = hosts[0]
-		if hosts and any([h for h in ['google', 'picasa', 'blogspot'] if h in host]): host = 'gvideo'
-		if hosts and any([h for h in ['akamaized', 'ocloud'] if h in host]): host = 'CDN'
+		if hosts and any([h for h in ('google', 'picasa', 'blogspot') if h in host]): host = 'gvideo'
+		if hosts and any([h for h in ('akamaized', 'ocloud') if h in host]): host = 'CDN'
 		return any(hosts), host
 	except:
 		from fenomscrapers.modules import log_utils
@@ -625,10 +625,7 @@ def is_host_valid(url, domains):
 		return False, ''
 
 def __top_domain(url):
-	try: #Py2
-		from urlparse import urlparse
-	except ImportError: #Py3
-		from urllib.parse import urlparse
+	from urllib.parse import urlparse
 	try:
 		elements = urlparse(url)
 		domain = elements.netloc or elements.path

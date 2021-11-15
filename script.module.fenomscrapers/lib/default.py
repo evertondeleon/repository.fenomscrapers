@@ -4,10 +4,7 @@
 """
 
 from sys import argv
-try: #Py2
-	from urlparse import parse_qsl
-except ImportError: #Py3
-	from urllib.parse import parse_qsl
+from urllib.parse import parse_qsl
 from fenomscrapers import sources_fenomscrapers
 from fenomscrapers.modules import control
 
@@ -18,7 +15,6 @@ query = params.get('query')
 name = params.get('name')
 
 if action is None:
-	xbmc.log('Hello from FenomScrapers', 2)
 	control.openSettings('0.0', 'script.module.fenomscrapers')
 
 if action == "FenomScrapersSettings":

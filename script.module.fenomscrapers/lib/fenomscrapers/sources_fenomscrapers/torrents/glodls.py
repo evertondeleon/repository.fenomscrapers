@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-05-2021)
+# modified by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
-try: #Py2
-	from urllib import quote_plus, unquote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -23,10 +20,7 @@ class source:
 		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
 		self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
 		self.tvsearch_pack = 'search_results.php?search={0}&cat=41,72&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc' # cat=72 timeout
-# cat=1 is (Movies:all)
-# cat=41 is (TV:all)
-# cat=71 is (Videos:all)
-# cat=72 is (Packs:all)
+		# cat=1 is (Movies:all) ; cat=41 is (TV:all) ; cat=71 is (Videos:all) ; cat=72 is (Packs:all)
 		self.min_seeders = 0 # to many items with no value but cached links
 		self.pack_capable = False
 		self.movie = True
@@ -35,6 +29,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -87,8 +82,8 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'glodls', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
-											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				append({'provider': 'glodls', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+							'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('GLODLS')
 		return sources
@@ -96,6 +91,7 @@ class source:
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
@@ -118,9 +114,10 @@ class source:
 						self.tvsearch_pack.format(quote_plus(query + ' Complete'))]
 
 			threads = []
+			append = threads.append
 			for url in queries:
 				link = '%s%s' % (self.base_link, url)
-				threads.append(workers.Thread(self.get_sources_packs, link))
+				append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -131,7 +128,6 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link))
 		try:
-			# headers = {'User-Agent': client.agent()}
 			headers = {'User-Agent': client.randomagent()}
 			result = client.request(link, headers=headers, timeout='5')
 			if not result: return
@@ -183,7 +179,7 @@ class source:
 				item = {'provider': 'glodls', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
-				self.sources.append(item)
+				self.sources_append(item)
 			except:
 				source_utils.scraper_error('GLODLS')
 

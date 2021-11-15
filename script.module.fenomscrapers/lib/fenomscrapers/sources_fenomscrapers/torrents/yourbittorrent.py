@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-05-2021)
+# created by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
-try: #Py2
-	from urllib import quote_plus, unquote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -30,6 +27,7 @@ class source:
 	def sources(self, data, hostDict):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.title = data['tvshowtitle'].lower() if 'tvshowtitle' in data else data['title'].lower()
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -46,8 +44,9 @@ class source:
 			if not r: return self.sources
 			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
 			threads = []
+			append = threads.append
 			for link in links:
-				threads.append(workers.Thread(self.get_sources, link))
+				append(workers.Thread(self.get_sources, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -78,9 +77,7 @@ class source:
 			try:
 				seeders = int(re.search(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
-			except:
-				source_utils.scraper_error('YOURBITTORRENT')
-				seeders = 0
+			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
@@ -91,15 +88,17 @@ class source:
 			except: dsize = 0
 			info = ' | '.join(info)
 
-			self.sources.append({'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+			self.sources_append({'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
 
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
-		self.items = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
+		self.items = []
+		self.items_append = self.items.append
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
@@ -121,15 +120,17 @@ class source:
 						self.search_link % quote_plus(query + ' Season'),
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
+			append = threads.append
 			for url in queries:
 				link = ('%s%s' % (self.base_link, url)).replace('+', '-')
-				threads.append(workers.Thread(self.get_pack_items, link))
+				append(workers.Thread(self.get_pack_items, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 
 			threads2 = []
+			append2 = threads2.append
 			for i in self.items:
-				threads2.append(workers.Thread(self.get_pack_sources, i))
+				append2(workers.Thread(self.get_pack_sources, i))
 			[i.start() for i in threads2]
 			[i.join() for i in threads2]
 			return self.sources
@@ -144,7 +145,7 @@ class source:
 			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
 			for link in links:
 				url = '%s%s' % (self.base_link, link)
-				self.items.append((url))
+				self.items_append((url))
 			return self.items
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
@@ -195,7 +196,7 @@ class source:
 			item = {'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 						'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 			if self.search_series: item.update({'last_season': last_season})
-			self.sources.append(item)
+			self.sources_append(item)
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
 

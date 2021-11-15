@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (11-05-2021)
+# created by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -25,6 +25,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			title = data['title'].replace('&', 'and')
 			aliases = data['aliases']
@@ -32,7 +33,7 @@ class source:
 			year = data['year']
 			imdb = data['imdb']
 			url = '%s%s' % (self.base_link, self.search_link % imdb)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 			rjson = client.request(url, timeout='5')
 			if not rjson: return sources
 			files = jsloads(rjson)
@@ -66,8 +67,8 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'ytsmx', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
-											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				append({'provider': 'ytsmx', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+							'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('YTSMX')
 		return sources

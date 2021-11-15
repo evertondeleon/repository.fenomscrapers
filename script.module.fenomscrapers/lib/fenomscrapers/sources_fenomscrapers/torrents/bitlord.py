@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-05-2021)
+# created by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
 
 from json import loads as jsloads
 import re
-try: #Py2
-	from urllib import quote_plus, unquote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -32,6 +29,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -98,7 +96,7 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'bitlord', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+				append({'provider': 'bitlord', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('BITLORD')
@@ -107,6 +105,7 @@ class source:
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
@@ -129,9 +128,10 @@ class source:
 						quote_plus(query + ' Season'),
 						quote_plus(query + ' Complete')]
 			threads = []
+			append = threads.append
 			for url in queries:
 				link = ('%s%s' % (self.base_link, self.search_link % url)).replace('+', '-')
-				threads.append(workers.Thread(self.get_sources_packs, link, url.replace('+', '-')))
+				append(workers.Thread(self.get_sources_packs, link, url.replace('+', '-')))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -204,7 +204,7 @@ class source:
 				item = {'provider': 'bitlord', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
-				self.sources.append(item)
+				self.sources_append(item)
 			except:
 				source_utils.scraper_error('BITLORD')
 

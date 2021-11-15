@@ -1,17 +1,13 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-05-2021)
+# modified by Venom for Fenomscrapers (updated 11-13-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-try: #Py2
-	from urllib import quote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus
+from urllib.parse import quote_plus
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
-from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -29,6 +25,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			scraper = cfscrape.create_scraper(delay=5)
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
@@ -42,11 +39,9 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = ('%s%s' % (self.base_link, self.search_link % quote_plus(query))).replace('%3A+', '+')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-			# result = scraper.get(url).content
-			result = py_tools.ensure_str(scraper.get(url).content, errors='replace')
+			result = scraper.get(url).text
 
-			if not result or "Sorry, but you are looking for something that isn't here" in str(result):
-				return sources
+			if not result or "Sorry, but you are looking for something that isn't here" in str(result): return sources
 			posts = client.parseDOM(result, "div", attrs={"class": "post"})
 			if not posts: return sources
 		except:
@@ -72,8 +67,7 @@ class source:
 					links = client.parseDOM(i, "a", ret="href")
 					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', i).group(0)
 
-					for link in links:
-						url = link
+					for url in links:
 						if url in str(sources): continue
 						valid, host = source_utils.is_host_valid(url, hostDict)
 						if not valid: continue
@@ -82,12 +76,11 @@ class source:
 						try:
 							dsize, isize = source_utils._size(size)
 							info.insert(0, isize)
-						except:
-							dsize = 0
+						except: dsize = 0
 						info = ' | '.join(info)
 
-						sources.append({'provider': 'maxrls', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en',
-															'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+						append({'provider': 'maxrls', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en',
+										'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('MAXRLS')
 		return sources

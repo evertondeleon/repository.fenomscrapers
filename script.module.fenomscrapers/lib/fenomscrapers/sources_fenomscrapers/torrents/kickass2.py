@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-05-2021)
+# modified by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
-try: #Py2
-	from urllib import quote_plus, unquote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -39,6 +36,7 @@ class source:
 	def sources(self, data, hostDict):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -62,8 +60,9 @@ class source:
 				url2 = url + '/2/'
 				urls.append(url2)
 			threads = []
+			append = threads.append
 			for url in urls:
-				threads.append(workers.Thread(self.get_sources, url))
+				append(workers.Thread(self.get_sources, url))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -111,7 +110,7 @@ class source:
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
-				self.sources.append({'provider': 'kickass2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+				self.sources_append({'provider': 'kickass2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('KICKASS2')
@@ -119,6 +118,7 @@ class source:
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
@@ -140,9 +140,10 @@ class source:
 						self.tvsearch.format(quote_plus(query + ' Season')),
 						self.tvsearch.format(quote_plus(query + ' Complete'))]
 			threads = []
+			append = threads.append
 			for url in queries:
 				link = '%s%s' % (self.base_link, url)
-				threads.append(workers.Thread(self.get_sources_packs, link))
+				append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -200,7 +201,7 @@ class source:
 				item = {'provider': 'kickass2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
-				self.sources.append(item)
+				self.sources_append(item)
 			except:
 				source_utils.scraper_error('KICKASS2')
 

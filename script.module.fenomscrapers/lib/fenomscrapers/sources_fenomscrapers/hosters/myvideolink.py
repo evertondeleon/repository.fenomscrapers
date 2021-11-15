@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-05-2021)
+# modified by Venom for Fenomscrapers (updated 11-14-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-try: #Py2
-	from urllib import quote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus
+from urllib.parse import quote_plus
 from fenomscrapers.modules import client
-from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 
 
@@ -19,15 +15,15 @@ class source:
 		self.priority = 22
 		self.language = ['en']
 		self.domains = ['new.myvideolinks.net']
-		self.base_link = 'http://new.myvideolinks.net'
+		self.base_link = 'http://get.myvideolinks.net'
 		self.search_link = '/?s=%s'
-		# http://new.myvideolinks.net/search/%s/feed/rss2/
 		self.movie = True
 		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -47,7 +43,7 @@ class source:
 		except:
 			source_utils.scraper_error('MYVIDEOLINK')
 			return sources
-		items = []
+		links = []
 		for post in posts:
 			try:
 				name = source_utils.strip_non_ascii_and_unprintable(post[1])
@@ -99,7 +95,7 @@ class source:
 
 				for link in links:
 					try:
-						url = py_tools.ensure_text(client.replaceHTMLCodes(str(link)), errors='replace')
+						url = client.replaceHTMLCodes(str(link))
 						if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
 						if url in str(sources): continue
 
@@ -111,12 +107,11 @@ class source:
 							size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', results).group(0)
 							dsize, isize = source_utils._size(size)
 							info.insert(0, isize)
-						except:
-							dsize = 0
+						except: dsize = 0
 						info = ' | '.join(info)
 
-						sources.append({'provider': 'myvideolink', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
-													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+						append({'provider': 'myvideolink', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
+										'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 					except:
 						source_utils.scraper_error('MYVIDEOLINK')
 			except:

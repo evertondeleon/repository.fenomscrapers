@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-05-2021)
+# created by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
-try: #Py2
-	from urllib import quote_plus, unquote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -29,6 +26,7 @@ class source:
 	def sources(self, data, hostDict):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -47,8 +45,9 @@ class source:
 			table = client.parseDOM(result, 'tbody')[0]
 			rows = client.parseDOM(table, 'tr')
 			threads = []
+			append = threads.append
 			for row in rows:
-				threads.append(workers.Thread(self.get_sources, row))
+				append(workers.Thread(self.get_sources, row))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -95,7 +94,7 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				self.sources.append({'provider': 'isohunt2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+				self.sources_append({'provider': 'isohunt2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 													'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('ISOHUNT2')

@@ -23,7 +23,7 @@ execute = xbmc.executebuiltin
 jsonrpc = xbmc.executeJSONRPC
 monitor_class = xbmc.Monitor
 monitor = xbmc.Monitor()
-transPath = xbmc.translatePath if getKodiVersion() < 19 else xbmcvfs.translatePath
+transPath = xbmcvfs.translatePath
 joinPath = os.path.join
 
 dialog = xbmcgui.Dialog()
@@ -63,8 +63,7 @@ def make_settings_dict(): # service runs upon a setting change
 		for item in root:
 			dict_item = {}
 			setting_id = item.get('id')
-			if getKodiVersion() >= 18: setting_value = item.text
-			else: setting_value = item.get('value')
+			setting_value = item.text
 			if setting_value is None: setting_value = ''
 			dict_item = {setting_id: setting_value}
 			settings_dict.update(dict_item)
@@ -103,10 +102,8 @@ def refresh_debugReversed(): # called from service "onSettingsChanged" to clear 
 		execute('RunPlugin(plugin://script.module.fenomscrapers/?action=tools_clearLogFile)')
 
 def lang(language_id):
-	text = getLangString(language_id)
-	if getKodiVersion() < 19:
-		text = text.encode('utf-8', 'replace')
-	return text
+	return getLangString(language_id)
+
 
 def sleep(time):  # Modified `sleep` command that honors a user exit request
 	while time > 0 and not monitor.abortRequested():
@@ -120,8 +117,8 @@ def isVersionUpdate():
 			f = open(versionFile, 'w')
 			f.close()
 	except:
-		LOGNOTICE = xbmc.LOGNOTICE if getKodiVersion() < 19 else xbmc.LOGINFO #(2 in 18, deprecated in 19 use LOGINFO(1))
-		xbmc.log('FenomScrapers Addon Data Path Does not Exist. Creating Folder....', LOGNOTICE)
+		LOGINFO = 1 # (LOGNOTICE(2) deprecated in 19, use LOGINFO(1))
+		xbmc.log('FenomScrapers Addon Data Path Does not Exist. Creating Folder....', LOGINFO)
 		addon_folder = transPath('special://profile/addon_data/script.module.fenomscrapers')
 		xbmcvfs.mkdirs(addon_folder)
 	try:
@@ -140,25 +137,16 @@ def isVersionUpdate():
 
 def clean_settings():
 	def _make_content(dict_object):
-		if kodi_version >= 18:
-			content = '<settings version="2">'
-			for item in dict_object:
-				if item['id'] in active_settings:
-					if 'default' in item and 'value' in item: content += '\n    <setting id="%s" default="%s">%s</setting>' % (item['id'], item['default'], item['value'])
-					elif 'default' in item: content += '\n    <setting id="%s" default="%s"></setting>' % (item['id'], item['default'])
-					elif 'value' in item: content += '\n    <setting id="%s">%s</setting>' % (item['id'], item['value'])
-					else: content += '\n    <setting id="%s"></setting>'
-				else: removed_settings.append(item)
-		else:
-			content = '<settings>'
-			for item in dict_object:
-				if item['id'] in active_settings:
-					if 'value' in item: content += '\n    <setting id="%s" value="%s" />' % (item['id'], item['value'])
-					else: content += '\n    <setting id="%s" value="" />' % item['id']
-				else: removed_settings.append(item)
+		content = '<settings version="2">'
+		for item in dict_object:
+			if item['id'] in active_settings:
+				if 'default' in item and 'value' in item: content += '\n    <setting id="%s" default="%s">%s</setting>' % (item['id'], item['default'], item['value'])
+				elif 'default' in item: content += '\n    <setting id="%s" default="%s"></setting>' % (item['id'], item['default'])
+				elif 'value' in item: content += '\n    <setting id="%s">%s</setting>' % (item['id'], item['value'])
+				else: content += '\n    <setting id="%s"></setting>'
+			else: removed_settings.append(item)
 		content += '\n</settings>'
 		return content
-	kodi_version = getKodiVersion()
 	addon_id = 'script.module.fenomscrapers'
 	try:
 		removed_settings = []
@@ -180,9 +168,7 @@ def clean_settings():
 			dict_item = {}
 			setting_id = item.get('id')
 			setting_default = item.get('default')
-			if kodi_version >= 18:
-				setting_value = item.text
-			else: setting_value = item.get('value')
+			setting_value = item.text
 			dict_item['id'] = setting_id
 			if setting_value:
 				dict_item['value'] = setting_value
@@ -222,12 +208,8 @@ def openSettings(query=None, id=addonInfo('id')):
 		execute('Addon.OpenSettings(%s)' % id)
 		if not query: return
 		c, f = query.split('.')
-		if getKodiVersion() >= 18:
-			execute('SetFocus(%i)' % (int(c) - 100))
-			execute('SetFocus(%i)' % (int(f) - 80))
-		else:
-			execute('SetFocus(%i)' % (int(c) + 100))
-			execute('SetFocus(%i)' % (int(f) + 200))
+		execute('SetFocus(%i)' % (int(c) - 100))
+		execute('SetFocus(%i)' % (int(f) - 80))
 	except:
 		return
 

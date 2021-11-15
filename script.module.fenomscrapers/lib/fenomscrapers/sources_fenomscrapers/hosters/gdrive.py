@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-# (updated 11-04-2021)
+# (updated 11-13-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
 import requests
-try: #Py2
-	from urllib import unquote, quote_plus
-except ImportError: #Py3
-	from urllib.parse import unquote, quote_plus
+from urllib.parse import unquote, quote_plus
 from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
@@ -34,6 +31,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -69,8 +67,8 @@ class source:
 					dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'gdrive', 'source': 'direct', 'name': name, 'name_info': name_info,
-											'quality': quality, 'language': 'en', 'url': link, 'info': info,  'direct': True, 'debridonly': False, 'size': dsize})
+				append({'provider': 'gdrive', 'source': 'direct', 'name': name, 'name_info': name_info,
+								'quality': quality, 'language': 'en', 'url': link, 'info': info,  'direct': True, 'debridonly': False, 'size': dsize})
 			except:
 				source_utils.scraper_error('GDRIVE')
 		return sources

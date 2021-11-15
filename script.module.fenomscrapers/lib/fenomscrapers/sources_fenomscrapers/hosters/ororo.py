@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 9-20-2021)
+# (updated 11-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -7,10 +7,7 @@
 from base64 import b64encode
 from json import loads as jsloads
 import re
-try: #Py2
-	from urlparse import urljoin
-except ImportError: #Py3
-	from urllib.parse import urljoin
+from urllib.parse import urljoin
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules.control import setting as getSetting
@@ -36,18 +33,15 @@ class source:
 		self.tvshow = True
 
 	def _get_auth(self):
-		try: # Python 2
-			user_info = '%s:%s' % (self.user, self.password)
-			auth = 'Basic ' + b64encode(user_info)
-		except: # Python 3
-			user_info = '%s:%s' % (self.user, self.password)
-			user_info = user_info.encode('utf-8')
-			auth = 'Basic ' + b64encode(user_info).decode('utf-8')
+		user_info = '%s:%s' % (self.user, self.password)
+		user_info = user_info.encode('utf-8')
+		auth = 'Basic ' + b64encode(user_info).decode('utf-8')
 		return auth
 
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			if (self.user == '' or self.password == ''): return sources
 
@@ -70,14 +64,14 @@ class source:
 			url = client.request(url, headers=self.headers)
 			if not url: return sources
 			url = jsloads(url)['url']
-			# log_utils.log('url = %s' % url, __name__)
+			# log_utils.log('url = %s' % url)
 
 			name = re.sub(r'(.*?)\/video/file/(.*?)/', '', url).split('.smil')[0].split('-')[0]
 			quality, info = source_utils.get_release_quality(name)
 			info = ' | '.join(info)
 
-			sources.append({'provider': 'ororo', 'source': 'direct', 'name': name, 'quality': quality, 'language': 'en', 'url': url,
-									'info': info, 'direct': True, 'debridonly': False, 'size': 0}) # Ororo does not return a file size
+			append({'provider': 'ororo', 'source': 'direct', 'name': name, 'quality': quality, 'language': 'en', 'url': url,
+							'info': info, 'direct': True, 'debridonly': False, 'size': 0}) # Ororo does not return a file size
 			return sources
 		except:
 			source_utils.scraper_error('ORORO')

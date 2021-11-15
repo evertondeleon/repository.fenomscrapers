@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-05-2021)
+# created by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
-try: #Py2
-	from urllib import quote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus
+from urllib.parse import quote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -29,6 +26,7 @@ class source:
 	def sources(self, data, hostDict):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -47,8 +45,9 @@ class source:
 
 			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', r, re.DOTALL | re.I)
 			threads = []
+			append = threads.append
 			for link in links:
-				threads.append(workers.Thread(self.get_sources, link))
+				append(workers.Thread(self.get_sources, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -93,15 +92,17 @@ class source:
 			except: dsize = 0
 			info = ' | '.join(info)
 
-			self.sources.append({'provider': 'torrentfunk', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+			self.sources_append({'provider': 'torrentfunk', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('TORRENTFUNK')
 
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
-		self.items = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
+		self.items = []
+		self.items_append = self.items.append
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
@@ -123,15 +124,17 @@ class source:
 						self.search_link % quote_plus(query + ' Season'),
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
+			append = threads.append
 			for url in queries:
 				link = '%s%s' % (self.base_link, url)
-				threads.append(workers.Thread(self.get_pack_items, link))
+				append(workers.Thread(self.get_pack_items, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 
 			threads2 = []
+			append2 = threads2.append
 			for i in self.items:
-				threads2.append(workers.Thread(self.get_pack_sources, i))
+				append2(workers.Thread(self.get_pack_sources, i))
 			[i.start() for i in threads2]
 			[i.join() for i in threads2]
 			return self.sources
@@ -178,14 +181,14 @@ class source:
 
 				if not url.startswith('http'): url = '%s%s' % (self.base_link, url)
 				if self.search_series: self.items.append((name, name_info, url, package, last_season))
-				else: self.items.append((name, name_info, url, package))
+				else: self.items_append((name, name_info, url, package))
 			except:
 				source_utils.scraper_error('TORRENTFUNK')
 
 	def get_pack_sources(self, items):
 		try:
 			link = client.request(items[2], timeout='5')
-			if link is None: 	return
+			if link is None: return
 			hash = re.search(r'Infohash.*?>(?!<)(.+?)</', link, re.I).group(1)
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, items[0])
@@ -206,7 +209,7 @@ class source:
 			item = {'provider': 'torrentfunk', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': items[0], 'name_info': items[1], 'quality': quality,
 						'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': items[3]}
 			if self.search_series: item.update({'last_season': items[4]})
-			self.sources.append(item)
+			self.sources_append(item)
 		except:
 			source_utils.scraper_error('TORRENTFUNK')
 

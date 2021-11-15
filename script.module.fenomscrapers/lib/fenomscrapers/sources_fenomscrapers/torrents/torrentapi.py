@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 7-03-2021)
+# modified by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -7,10 +7,7 @@
 from json import loads as jsloads
 import re
 from time import sleep
-try: #Py2
-	from urllib import unquote_plus
-except ImportError: #Py3
-	from urllib.parse import unquote_plus
+from urllib.parse import unquote_plus
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import source_utils
@@ -43,6 +40,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			self.scraper = cfscrape.create_scraper()
 			self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
@@ -61,6 +59,7 @@ class source:
 			else:
 				search_link = self.msearch.format(self.key, data['imdb'])
 			sleep(2.1)
+			# log_utils.log('search_link = %s' % str(search_link))
 			rjson = self.scraper.get(search_link).content
 			if not rjson or 'torrent_results' not in str(rjson): return sources
 			files = jsloads(rjson)['torrent_results']
@@ -92,8 +91,8 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
-											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+								'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('TORRENTAPI')
 		return sources
@@ -101,6 +100,7 @@ class source:
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		if search_series: # torrentapi does not have showPacks
 			return sources
 		try:
@@ -115,7 +115,6 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 			search_link = self.tvshowsearch.format(self.key, data['imdb'], 'S%s' % self.season_xx)
-			# log_utils.log('search_link = %s' % str(search_link))
 			sleep(2.1)
 			rjson = self.scraper.get(search_link).content
 			if not rjson or 'torrent_results' not in str(rjson): return sources
@@ -148,8 +147,8 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package})
+				append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+								'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package})
 			except:
 				source_utils.scraper_error('TORRENTAPI')
 		return sources

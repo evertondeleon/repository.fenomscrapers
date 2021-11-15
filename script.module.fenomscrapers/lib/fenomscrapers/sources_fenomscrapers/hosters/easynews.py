@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 9-20-2021)
+# (updated 11-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -7,10 +7,7 @@
 from base64 import b64encode
 import re
 import requests
-try: #Py2
-	from urllib import quote
-except ImportError: #Py3
-	from urllib.parse import quote
+from urllib.parse import quote
 from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
@@ -32,15 +29,14 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		auth = self._get_auth()
 		if not auth: return sources
 		try:
 			title_chk = getSetting('easynews.title.chk') == 'true'
-
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
-
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
 			years = [str(year), str(int(year)+1), str(int(year)-1)] if 'tvshowtitle' not in data else None
@@ -60,7 +56,6 @@ class source:
 		for item in files:
 			try:
 				post_hash, post_title, ext, duration = item['0'], item['10'], item['11'], item['14']
-				# log_utils.log('post_title = %s' % post_title, __name__, log_utils.LOGDEBUG)
 				checks = [False] * 5
 				if 'alangs' in item and item['alangs'] and 'eng' not in item['alangs']: checks[1] = True
 				if re.match(r'^\d+s', duration) or re.match('^[0-5]m', duration): checks[2] = True
@@ -94,8 +89,8 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'easynews', 'source': 'direct', 'name': name, 'name_info': name_info, 'quality': quality, 'language': "en", 'url': file_dl,
-											'info': info, 'direct': True, 'debridonly': False, 'size': dsize})
+				append({'provider': 'easynews', 'source': 'direct', 'name': name, 'name_info': name_info, 'quality': quality, 'language': "en", 'url': file_dl,
+								'info': info, 'direct': True, 'debridonly': False, 'size': dsize})
 			except:
 				source_utils.scraper_error('EASYNEWS')
 		return sources
@@ -104,18 +99,17 @@ class source:
 		return url
 
 	def _get_auth(self):
-		auth = None
-		username = getSetting('easynews.user')
-		password = getSetting('easynews.password')
-		if username == '' or password == '': return auth
-		try: # Python 2
-			user_info = '%s:%s' % (username, password)
-			auth = 'Basic ' + b64encode(user_info)
-		except: # Python 3
+		try:
+			auth = None
+			username = getSetting('easynews.user')
+			password = getSetting('easynews.password')
+			if username == '' or password == '': return auth
 			user_info = '%s:%s' % (username, password)
 			user_info = user_info.encode('utf-8')
 			auth = 'Basic ' + b64encode(user_info).decode('utf-8')
-		return auth
+			return auth
+		except:
+			source_utils.scraper_error('EASYNEWS')
 
 	def _query(self, data):
 		if 'tvshowtitle' not in data:

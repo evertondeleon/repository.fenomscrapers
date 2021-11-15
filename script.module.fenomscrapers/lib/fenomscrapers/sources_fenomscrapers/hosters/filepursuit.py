@@ -1,16 +1,12 @@
 # -*- coding: UTF-8 -*-
-# (updated 9-20-2021)
+# (updated 11-14-2021)
 '''
 	Fenomscrapers Project
 '''
 
 from json import loads as jsloads
 import re
-import requests
-try: #Py2
-	from urllib import quote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus
+from urllib.parse import quote_plus
 from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -28,6 +24,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			api_key = getSetting('filepursuit.api')
 			if api_key == '': return sources
@@ -43,7 +40,7 @@ class source:
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 
 			r = client.request(url, headers=headers)
 			if not r: return sources
@@ -67,7 +64,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				# link_header = client.request(url, output='headers', timeout='5') # to slow to check validity of links
-				# if not any(value in str(link_header) for value in ['stream', 'video/mkv']): continue
+				# if not any(value in str(link_header) for value in ('stream', 'video/mkv')): continue
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
@@ -76,7 +73,7 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'filepursuit', 'source': 'direct', 'quality': quality, 'name': name, 'name_info': name_info, 'language': "en",
+				append({'provider': 'filepursuit', 'source': 'direct', 'quality': quality, 'name': name, 'name_info': name_info, 'language': "en",
 							'url': url, 'info': info, 'direct': True, 'debridonly': False, 'size': dsize})
 			except:
 				source_utils.scraper_error('FILEPURSUIT')

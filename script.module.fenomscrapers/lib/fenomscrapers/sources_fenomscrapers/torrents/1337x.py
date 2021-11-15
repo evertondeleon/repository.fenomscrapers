@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-05-2021)
+# modified by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
-try: #Py2
-	from urllib import quote, unquote_plus
-except ImportError: #Py3
-	from urllib.parse import quote, unquote_plus
+from urllib.parse import quote, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -29,8 +26,10 @@ class source:
 
 	def sources(self, data, hostDict):
 		self.sources = []
-		self.items = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
+		self.items = []
+		self.items_append = self.items.append
 		try:
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -49,14 +48,16 @@ class source:
 			# log_utils.log('urls = %s' % urls)
 
 			threads = []
+			append = threads.append
 			for url in urls:
-				threads.append(workers.Thread(self.get_items, url))
+				append(workers.Thread(self.get_items, url))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 
 			threads2 = []
+			append2 = threads2.append
 			for i in self.items:
-				threads2.append(workers.Thread(self.get_sources, i))
+				append2(workers.Thread(self.get_sources, i))
 			[i.start() for i in threads2]
 			[i.join() for i in threads2]
 			return self.sources
@@ -77,10 +78,8 @@ class source:
 		for row in rows:
 			try:
 				link = '%s%s' % (self.base_link, client.parseDOM(row, 'a', ret='href')[1])
-
 				name = source_utils.clean_name(unquote_plus(client.parseDOM(row, 'a')[1]))
-				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
-					continue
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 				if source_utils.remove_lang(name_info): continue
 
@@ -95,7 +94,7 @@ class source:
 					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
 					dsize, isize = source_utils._size(size)
 				except: isize = '0' ; dsize = 0
-				self.items.append((name, name_info, link, isize, dsize, seeders))
+				self.items_append((name, name_info, link, isize, dsize, seeders))
 			except:
 				source_utils.scraper_error('1337X')
 
@@ -112,7 +111,7 @@ class source:
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
-			self.sources.append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1],
+			self.sources_append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1],
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})
 		except:
 			source_utils.scraper_error('1337X')

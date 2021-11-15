@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (11-05-2021)
-'''
+# created by Venom for Fenomscrapers (updated 11-14-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
-try: #Py2
-	from urllib import quote_plus, unquote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -29,6 +26,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -41,7 +39,7 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			r = client.request(url, timeout='5')
 			if not r: return sources
-			if any(value in str(r) for value in ['something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable']):
+			if any(value in str(r) for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')):
 				return sources
 			table = client.parseDOM(r, 'tbody')
 			rows = client.parseDOM(table, 'tr')
@@ -79,8 +77,8 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'bitcq', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				append({'provider': 'bitcq', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('BITCQ')
 				return sources
@@ -89,11 +87,11 @@ class source:
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-
 			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
@@ -110,9 +108,10 @@ class source:
 						self.search_link % quote_plus(query + ' Season'),
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
+			append = threads.append
 			for url in queries:
 				link = '%s%s' % (self.base_link, url)
-				threads.append(workers.Thread(self.get_sources_packs, link))
+				append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -125,8 +124,7 @@ class source:
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
-			if any(value in str(r) for value in ['something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable']):
-				return
+			if any(value in str(r) for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')): return
 			table = client.parseDOM(r, 'tbody')
 			rows = client.parseDOM(table, 'tr')
 		except:
@@ -175,7 +173,7 @@ class source:
 				item = {'provider': 'bitcq', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
-				self.sources.append(item)
+				self.sources_append(item)
 			except:
 				source_utils.scraper_error('BITCQ')
 

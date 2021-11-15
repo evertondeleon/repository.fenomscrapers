@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-05-2021)
+# modified by Venom for Fenomscrapers (updated 11-13-2021) # site seems dead yet again
 '''
 	Fenomscrapers Project
 '''
@@ -7,7 +7,6 @@
 import re
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
-from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 
 
@@ -25,6 +24,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			scraper = cfscrape.create_scraper(delay=5)
 
@@ -38,7 +38,6 @@ class source:
 			isSeasonQuery = False
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-			# query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			query = re.sub(r'\s', '-', query)
 
 			if int(year) >= 2021: self.base_link = self.base_new
@@ -46,19 +45,15 @@ class source:
 
 			url = '%s%s' % (self.base_link, query)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
-			# r = scraper.get(url).content
-			r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
+			r = scraper.get(url).text
 			if not r or 'nothing was found' in r:
 				if 'tvshowtitle' in data:
 					season = re.search(r'S(.*?)E', hdlr).group(1)
 					query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', title)
-					# query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
 					query = re.sub(r'\s', '-', query)
 					query = query + "-S" + season
 					url = '%s%s' % (self.base_link, query)
-					# r = scraper.get(url).content
-					r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
+					r = scraper.get(url).text
 					isSeasonQuery = True
 				else: return sources 
 			if not r or 'nothing was found' in r: return sources
@@ -70,12 +65,14 @@ class source:
 			return sources
 
 		release_title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title).replace(' ', '.')
-		items = [] ; count = 0
+		count = 0
+
 		for post in posts:
 			if count >= 300: break # to limit large link list and slow scrape time
+			items = []
+			items_append = items.append
 			try:
 				post_titles = re.findall(r'(?:.*>|>\sRelease Name.*|\s)(%s.*?)<' % release_title, post, re.I) #parse all matching release_titles in each post(content) group
-				items = []
 				if len(post_titles) >1:
 					index = 0
 					for name in post_titles:
@@ -88,14 +85,14 @@ class source:
 						try: size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', container).group(0).replace(',', '.')
 						except: size = '0'
 						container = client.parseDOM(container, 'a', ret='href')
-						items.append((name, size, container))
+						items_append((name, size, container))
 						index += 1
 				elif len(post_titles) == 1:
 					name = post_titles[0]
 					container = client.parseDOM(post, 'a', ret='href') #parse all links in a single post(content) group
 					try: size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0).replace(',', '.')
 					except: size = '0'
-					items.append((name, size, container))
+					items_append((name, size, container))
 				else: continue
 
 				for group_name, size, links in items:
@@ -108,11 +105,10 @@ class source:
 							name = i.rsplit("/", 1)[-1]
 							if hdlr not in name.upper(): continue
 
-						name = client.replaceHTMLCodes(name)
-						name = source_utils.strip_non_ascii_and_unprintable(name)
+						name = source_utils.strip_non_ascii_and_unprintable(client.replaceHTMLCodes(name))
 						name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 
-						url = py_tools.ensure_text(client.replaceHTMLCodes(str(i)), errors='replace')
+						url = client.replaceHTMLCodes(str(i))
 						if url in str(sources): continue
 						if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
 
@@ -126,12 +122,11 @@ class source:
 								except: raise Exception()
 							dsize, isize = source_utils._size(size)
 							info.insert(0, isize)
-						except:
-							dsize = 0
+						except: dsize = 0
 						info = ' | '.join(info)
 
-						sources.append({'provider': 'rlsbb','source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
-													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+						append({'provider': 'rlsbb','source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
+										'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 						count += 1
 			except:
 				source_utils.scraper_error('RLSBB')

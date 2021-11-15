@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 9-20-2021)
+# (updated 11-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -47,6 +47,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		api_key = self.get_api()
 		if not api_key: return sources
 		try:
@@ -81,45 +82,47 @@ class source:
 
 			files = p.get('files')
 			if not files: return sources
-			for i in files:
-				if i['is_ready'] == '1' and i['type'] == 'video':
-					try:
-						source = 'direct SINGLE'
-						if int(i['files_num_video']) > 3:
-							source = ' direct PACK (x%02d)' % int(i['files_num_video'])
-						file_name = i['name']
-						name = source_utils.clean_name(file_name)
-						name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
-
-						file_id = i['id']
-						file_dl = i['url_dl']
-
-						if content_type == 'episode':
-							url = jsdumps({'content': 'episode', 'file_id': file_id, 'season': season, 'episode': episode})
-						else:
-							url = jsdumps({'content': 'movie', 'file_id': file_id, 'title': title, 'year': year})
-
-						quality, info = source_utils.get_release_quality(name_info, file_dl)
-						try:
-							size = float(i['size'])
-							if 'PACK' in source:
-								size = float(size) / int(i['files_num_video'])
-							dsize, isize = source_utils.convert_size(size, to='GB')
-							if isize: info.insert(0, isize)
-						except:
-							source_utils.scraper_error('FURK')
-							dsize = 0
-						info = ' | '.join(info)
-
-						sources.append({'provider': 'furk', 'source': source, 'name': name, 'name_info': name_info, 'quality': quality, 'language': "en", 'url': url,
-													'info': info, 'direct': True, 'debridonly': False, 'size': dsize})
-					except:
-						source_utils.scraper_error('FURK')
-				else:
-					continue
-			return sources
 		except:
 			source_utils.scraper_error('FURK')
+			return sources
+
+		for i in files:
+			try:
+				if i['is_ready'] == '1' and i['type'] == 'video':
+					source = 'direct SINGLE'
+					if int(i['files_num_video']) > 3:
+						source = ' direct PACK (x%02d)' % int(i['files_num_video'])
+					file_name = i['name']
+					name = source_utils.clean_name(file_name)
+					name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+
+					file_id = i['id']
+					file_dl = i['url_dl']
+
+					if content_type == 'episode':
+						url = jsdumps({'content': 'episode', 'file_id': file_id, 'season': season, 'episode': episode})
+					else:
+						url = jsdumps({'content': 'movie', 'file_id': file_id, 'title': title, 'year': year})
+
+					quality, info = source_utils.get_release_quality(name_info, file_dl)
+					try:
+						size = float(i['size'])
+						if 'PACK' in source:
+							size = float(size) / int(i['files_num_video'])
+						dsize, isize = source_utils.convert_size(size, to='GB')
+						if isize: info.insert(0, isize)
+					except:
+						source_utils.scraper_error('FURK')
+						dsize = 0
+					info = ' | '.join(info)
+
+					append({'provider': 'furk', 'source': source, 'name': name, 'name_info': name_info, 'quality': quality, 'language': "en", 'url': url,
+									'info': info, 'direct': True, 'debridonly': False, 'size': dsize})
+				else:
+					continue
+			except:
+				source_utils.scraper_error('FURK')
+		return sources
 
 	def resolve(self, url):
 		try:

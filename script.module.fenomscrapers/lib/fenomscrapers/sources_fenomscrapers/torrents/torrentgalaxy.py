@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-05-2021)
+# created by Venom for Fenomscrapers (updated 11-14-2021)
 """
 	Fenomscrapers Project
 """
 
 import re
-try: #Py2
-	from urllib import quote_plus, unquote_plus
-except ImportError: #Py3
-	from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
-from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -31,6 +27,7 @@ class source:
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
+		append = sources.append
 		try:
 			scraper = cfscrape.create_scraper()
 
@@ -49,7 +46,7 @@ class source:
 				url = self.search_link % data['imdb']
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			result = py_tools.ensure_str(scraper.get(url).content, errors='replace')
+			result = scraper.get(url).text
 			if not result: return sources
 			rows = client.parseDOM(result, 'div', attrs={'class': 'tgxtablerow txlight'})
 			if not rows: return sources
@@ -87,8 +84,8 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'torrentgalaxy', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				append({'provider': 'torrentgalaxy', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+								'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('TORRENTGALAXY')
 		return sources
@@ -96,6 +93,7 @@ class source:
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
 		if not data: return self.sources
+		self.sources_append = self.sources.append
 		try:
 			self.scraper = cfscrape.create_scraper()
 			self.search_series = search_series
@@ -118,9 +116,10 @@ class source:
 						self.search_link % quote_plus(query + ' Season'),
 						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
+			append = threads.append
 			for url in queries:
 				link = '%s%s' % (self.base_link, url)
-				threads.append(workers.Thread(self.get_sources_packs, link))
+				append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -131,7 +130,7 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link))
 		try:
-			result = py_tools.ensure_str(self.scraper.get(link).content, errors='replace')
+			result = self.scraper.get(link).text
 			if not result: return
 			rows = client.parseDOM(result, 'div', attrs={'class': 'tgxtablerow txlight'})
 			if not rows: return
@@ -181,7 +180,7 @@ class source:
 				item = {'provider': 'torrentgalaxy', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
-				self.sources.append(item)
+				self.sources_append(item)
 			except:
 				source_utils.scraper_error('TORRENTGALAXY')
 

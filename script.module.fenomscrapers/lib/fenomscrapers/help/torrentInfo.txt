@@ -56,7 +56,7 @@ maxrls (hoster)
 rapidmoviez (hoster)
 rlsbb (hoster) 1-16-21 new proxy now v2 challenge so down.
 scenerls (hoster)
-extratorrent (torrent)
+extratorrent (torrent) removed 11-12-21 proxy returns cloudflare v2 challenge
 limetorrents (torrent)
 torrentapi (torrent)
 torrentgalaxy (torrent)
