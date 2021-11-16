@@ -1,4 +1,4 @@
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.0" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.1" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -25,8 +25,9 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.0.0 - Nov. 14, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] First official py3 only version for Kodi Matrix.[/I]
+[B][COLOR red]Update - v2.0.1 - Nov. 15, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added [B]"audiobook"[/B] to UNDESIRABLES.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed issue where newly added UNDESIRABLE items were not be added to users custom UNDESIRABLES filter.[/I]
 		</news>
 	</extension>
 </addon>

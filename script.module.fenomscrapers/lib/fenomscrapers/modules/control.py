@@ -76,25 +76,38 @@ def setUndesirables():
 	try:
 		from fenomscrapers.modules.source_utils import UNDESIRABLES
 		filter_undesirables = setting('filter.undesirables')
+		list_undesirables = ','.join(UNDESIRABLES)
 		if filter_undesirables == 'true':
 			try:
 				undesirables = ''
 				default = setting('undesirables.choice')
 				if default: undesirables += default
-				else: undesirables += ','.join(UNDESIRABLES)
+				else: undesirables += list_undesirables
 				user = setting('undesirables.user_defined')
 				if user: undesirables += '%s%s' % (',', user)
 				undesirables = undesirables.lower()
 			except:
 				from fenomscrapers.modules import log_utils
-				undesirables = ','.join(UNDESIRABLES)
+				undesirables = list_undesirables
 				log_utils.error('Error: Undesirables Window Properties: ')
 			homeWindow.setProperty('fenom.undesirables', undesirables)
+		homeWindow.setProperty('fenom.default.undesirables', list_undesirables)
 		homeWindow.setProperty('fenom.filter.undesirables', filter_undesirables)
 		homeWindow.setProperty('fenom.filter.foreign.single.audio', setting('filter.foreign.single.audio'))
 	except:
 		from fenomscrapers.modules import log_utils
 		log_utils.error()
+
+def checkDefaultUndesirables():
+	from fenomscrapers.modules.source_utils import UNDESIRABLES
+	default_undesirables = homeWindow.getProperty('fenom.default.undesirables')
+	if not default_undesirables: return
+	default_undesirables = list(default_undesirables.split(','))
+	new_undesirables = [i for i in UNDESIRABLES if not i in default_undesirables]
+	if not new_undesirables: return
+	chosen = setting('undesirables.choice').replace(' ', '').split(',')
+	chosen += new_undesirables
+	setSetting('undesirables.choice', ','.join(chosen))
 
 def refresh_debugReversed(): # called from service "onSettingsChanged" to clear fenomscrapers.log if setting to reverse has been changed
 	if homeWindow.getProperty('fenomscrapers.debug.reversed') != setting('debug.reversed'):
@@ -103,7 +116,6 @@ def refresh_debugReversed(): # called from service "onSettingsChanged" to clear 
 
 def lang(language_id):
 	return getLangString(language_id)
-
 
 def sleep(time):  # Modified `sleep` command that honors a user exit request
 	while time > 0 and not monitor.abortRequested():

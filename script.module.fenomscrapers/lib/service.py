@@ -31,6 +31,7 @@ class CheckSettingsFile:
 class SettingsMonitor(control.monitor_class):
 	def __init__ (self):
 		control.monitor_class.__init__(self)
+		control.checkDefaultUndesirables()
 		control.setUndesirables()
 		window.setProperty('fenomscrapers.debug.reversed', control.setting('debug.reversed'))
 		xbmc.log('[ script.module.fenomscrapers ]  Settings Monitor Service Starting...', LOGINFO)
