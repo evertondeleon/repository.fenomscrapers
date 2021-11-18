@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-13-2021)
+# modified by Venom for Fenomscrapers (updated 11-17-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -13,12 +13,14 @@ from fenomscrapers.modules import source_utils
 
 
 class source:
+	priority = 29
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 29
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = []
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

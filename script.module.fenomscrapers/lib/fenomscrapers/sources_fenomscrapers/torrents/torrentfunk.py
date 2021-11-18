@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-14-2021)
+# created by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,16 +12,17 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 8
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 8
 		self.language = ['en']
 		self.domains = ['torrentfunk.com', 'torrentfunk2.com']
 		self.base_link = 'https://www.torrentfunk.com'
 		self.search_link = '/all/torrents/%s.html?v=&smi=&sma=&i=100&sort=size&o=desc'
 		self.min_seeders = 0
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		self.sources = []

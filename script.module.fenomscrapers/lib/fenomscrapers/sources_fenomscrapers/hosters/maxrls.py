@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-13-2021)
+# modified by Venom for Fenomscrapers (updated 11-17-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -13,14 +13,16 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 21
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 21
 		self.language = ['en']
 		self.domains = ['max-rls.com']
 		self.base_link = 'http://max-rls.com'
 		self.search_link = '/?s=%s&submit=Find'
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

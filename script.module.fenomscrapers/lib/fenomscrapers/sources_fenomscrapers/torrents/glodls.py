@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-14-2021)
+# modified by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,8 +12,12 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 3
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 3
 		self.language = ['en']
 		self.domains = ['glodls.to', 'gtdb.to']
 		self.base_link = 'https://glodls.to/'
@@ -22,9 +26,6 @@ class source:
 		self.tvsearch_pack = 'search_results.php?search={0}&cat=41,72&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc' # cat=72 timeout
 		# cat=1 is (Movies:all) ; cat=41 is (TV:all) ; cat=71 is (Videos:all) ; cat=72 is (Packs:all)
 		self.min_seeders = 0 # to many items with no value but cached links
-		self.pack_capable = False
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-14-2021)
+# modified by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -15,8 +15,13 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 1
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
+
 	def __init__(self):
-		self.priority = 1
 		self.language = ['en']
 		self.base_link = 'https://torrentapi.org' # just to satisfy scraper_test
 		self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&ranked=0&limit=100&format=json_extended' # string query
@@ -24,9 +29,6 @@ class source:
 		self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&ranked=0&limit=100&format=json_extended'
 		self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
 		self.min_seeders = 0
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	def _get_token(self):
 		try:

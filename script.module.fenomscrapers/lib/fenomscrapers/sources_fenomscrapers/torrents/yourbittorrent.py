@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-14-2021)
+# created by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,17 +12,18 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 9
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 9
 		self.language = ['en']
 		self.domain = ['yourbittorrent2.com', 'yourbittorrent.com']
 		self.base_link = 'https://yourbittorrent2.com'
 		# self.search_link = '?q=%s&page=1&v=&c=&sort=size&o=desc'
 		self.search_link = '?q=%s'
 		self.min_seeders = 0  # to many items with no value but cached links
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		self.sources = []

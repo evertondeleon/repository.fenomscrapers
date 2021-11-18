@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-14-2021)
+# modified by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,17 +12,18 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 8
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 8
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = ['1337x.to', '1337x.st', '1337x.ws', '1337x.eu', '1337x.se', '1337x.is'] # all are behind cloudflare except .to
 		self.base_link = 'https://1337x.to'
 		self.tvsearch = 'https://1337x.to/sort-category-search/%s/TV/size/desc/1/'
 		self.moviesearch = 'https://1337x.to/sort-category-search/%s/Movies/size/desc/1/'
 		self.min_seeders = 1
-		self.pack_capable = False
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		self.sources = []

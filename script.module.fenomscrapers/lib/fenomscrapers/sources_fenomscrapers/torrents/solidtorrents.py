@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-14-2021)
+# created by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,8 +12,12 @@ from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
 class source:
+	priority = 1
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 1
 		self.language = ['en']
 		self.domains = ['solidtorrents.net']
 		self.base_link = 'https://solidtorrents.net'
@@ -21,9 +25,6 @@ class source:
 		# self.search_link = '/api/v1/search?q=%s&category=video&sort=seeders'
 		self.search_link = '/api/v1/search?q=%s&category=all&sort=seeders'
 		self.min_seeders = 0
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		self.sources = []

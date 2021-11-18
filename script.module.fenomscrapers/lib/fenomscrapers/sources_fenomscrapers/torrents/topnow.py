@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-14-2021)
+# created by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -11,16 +11,17 @@ from fenomscrapers.modules import source_utils
 
 
 class source:
+	priority = 5
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 5
 		self.language = ['en']
 		self.domains = ['topnow.se']
 		self.base_link = 'http://topnow.se'
 		self.search_link = '/index.php?search=%s'
 		self.show_link = '/index.php?show=%s'
-		self.pack_capable = False
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

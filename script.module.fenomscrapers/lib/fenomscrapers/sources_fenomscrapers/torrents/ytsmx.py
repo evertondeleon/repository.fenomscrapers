@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-14-2021)
+# created by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -11,16 +11,17 @@ from fenomscrapers.modules import source_utils
 
 
 class source:
+	priority = 2
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = False
+
 	def __init__(self):
-		self.priority = 2
 		self.language = ['en']
 		self.domains = ['yts.mx']
 		self.base_link = 'https://yts.mx'
 		self.search_link = '/api/v2/list_movies.json?query_term=%s' #accepts imdb_id as query_term
 		self.min_seeders = 0
-		self.pack_capable = False
-		self.movie = True
-		self.tvshow = False
 
 	def sources(self, data, hostDict):
 		sources = []

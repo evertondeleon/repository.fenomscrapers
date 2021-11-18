@@ -22,7 +22,7 @@ def sources(specified_folders=None, ret_all=False):
 				if ret_all or enabledCheck(module_name):
 					try:
 						module = loader.find_module(module_name).load_module(module_name)
-						append((module_name, module.source()))
+						append((module_name, module.source))
 					except Exception as e:
 						if debug:
 							from fenomscrapers.modules import log_utils

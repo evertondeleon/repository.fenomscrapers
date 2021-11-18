@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-14-2021)
+# created by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,6 +12,11 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 7
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
 		self.priority = 7
 		self.language = ['en']
@@ -19,9 +24,6 @@ class source:
 		self.base_link = 'https://torlock.com'
 		self.search_link = '/all/torrents/%s.html?'
 		self.min_seeders = 0
-		self.pack_capable = False
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		self.sources = []

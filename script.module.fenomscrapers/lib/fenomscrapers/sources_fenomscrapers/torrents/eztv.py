@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-14-2021)
+# modified by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,17 +12,18 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 6
+	pack_capable = False
+	hasMovies = False
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 6
 		self.language = ['en']
 		self.domains = ['eztv.re', 'eztv.tf', 'eztv.yt']
 		self.base_link = 'https://eztv.re'
 		# eztv has api but it sucks. Site query returns more results vs. api (eztv db seems to be missing the imdb_id for many so they are dopped)
 		self.search_link = '/search/%s'
 		self.min_seeders = 0
-		self.pack_capable = False
-		self.movie = False
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-14-2021)
+# created by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,16 +12,17 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 3
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 3
 		self.language = ['en']
 		self.domain = ['7torrents.cc'] # 7torr.com is a mirror of btscene
 		self.base_link = 'https://www.7torrents.cc'
 		self.search_link = '/search?query=%s&sort=seeders'
 		self.min_seeders = 1
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		self.sources = []
@@ -96,7 +97,6 @@ class source:
 													'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('7torrents')
-
 
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []

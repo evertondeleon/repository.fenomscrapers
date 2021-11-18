@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-14-2021)
+# modified by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,16 +12,17 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 3
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 3
 		self.language = ['en']
 		self.domains = ['btscene.nl'] # 7torr.com is a mirror
 		self.base_link = 'http://btscene.nl/'
 		self.search_link = 'search?q=%s'
 		self.min_seeders = 1
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		self.sources = []

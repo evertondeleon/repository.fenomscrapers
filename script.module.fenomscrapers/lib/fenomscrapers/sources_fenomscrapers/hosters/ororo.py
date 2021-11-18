@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 11-14-2021)
+# (updated 11-17-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -14,8 +14,13 @@ from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
 class source:
+	priority = 25
+	pack_capable = False
+	hasMovies = False
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 25
+		# self.priority = 25
 		self.language = ['en']
 		self.domains = ['ororo.tv']
 		self.base_link = 'https://ororo.tv'
@@ -29,8 +34,6 @@ class source:
 		self.headers = {
 			'Authorization': self._get_auth(),
 			'User-Agent': 'Placenta for Kodi'}
-		self.movie = False
-		self.tvshow = True
 
 	def _get_auth(self):
 		user_info = '%s:%s' % (self.user, self.password)

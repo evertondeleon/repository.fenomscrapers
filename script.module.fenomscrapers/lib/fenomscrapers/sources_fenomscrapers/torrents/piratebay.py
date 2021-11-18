@@ -14,16 +14,17 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 2
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 2
 		self.language = ['en']
 		self.domain = ['apibay.org']
 		self.base_link = 'https://apibay.org'
 		self.search_link = '/q.php?q=%s&cat=0'
 		self.min_seeders = 0
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

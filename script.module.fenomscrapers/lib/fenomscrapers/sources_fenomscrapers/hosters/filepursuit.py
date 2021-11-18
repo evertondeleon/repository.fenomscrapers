@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 11-14-2021)
+# (updated 11-17-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -13,13 +13,15 @@ from fenomscrapers.modules import source_utils
 
 
 class source:
+	priority = 23
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 23
 		self.language = ['en']
 		self.base_link = 'https://filepursuit.p.rapidapi.com' # 'https://rapidapi.com/azharxes/api/filepursuit' to obtain key
 		self.search_link = '/?type=video&q=%s'
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

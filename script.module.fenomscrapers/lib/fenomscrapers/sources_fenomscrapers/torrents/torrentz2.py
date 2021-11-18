@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-14-2021)
+# created by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -12,16 +12,17 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 4
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 4
 		self.language = ['en']
 		self.domains = ['torrentzeu.org']
 		self.base_link = 'https://torrentzeu.org'
 		self.search_link = '/kick.php?q=%s'
 		self.min_seeders = 0
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

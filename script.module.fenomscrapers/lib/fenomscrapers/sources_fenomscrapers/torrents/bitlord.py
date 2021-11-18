@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-14-2021)
+# created by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -14,17 +14,18 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 2
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 2
 		self.language = ['en']
 		self.domain = ['bitlordsearch.com']
 		self.base_link = 'http://www.bitlordsearch.com'
 		self.search_link = '/search?q=%s'
 		self.api_search_link = '/get_list'
 		self.min_seeders = 0
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

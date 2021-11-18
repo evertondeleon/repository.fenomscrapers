@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-14-2021)
+# modified by Venom for Fenomscrapers (updated 11-17-2021)
 """
 	Fenomscrapers Project
 """
@@ -13,8 +13,12 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 4
+	pack_capable = True
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 4
 		self.language = ['en']
 		self.domains = ['kick4ss.com', 'thekat.info', 'kickass.cm', 'kickass.ws', 'kickasst.net',
 								'kickasshydra.dev', 'kickasshydra.net', 'kathydra.com', 'kickass.onl',
@@ -23,9 +27,6 @@ class source:
 		self.moviesearch = '/usearch/{0}%20category:movies/?field=size&sorder=desc'
 		self.tvsearch = '/usearch/{0}%20category:tv/?field=size&sorder=desc'
 		self.min_seeders = 0
-		self.pack_capable = True
-		self.movie = True
-		self.tvshow = True
 
 	@property
 	def base_link(self):

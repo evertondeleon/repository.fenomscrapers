@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 11-14-2021)
+# (updated 11-17-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -12,8 +12,12 @@ from fenomscrapers.modules import source_utils
 
 
 class source:
+	priority = 21
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 21
 		self.language = ['en']
 		self.domain = 'furk.net/'
 		self.base_link = 'https://www.furk.net'
@@ -22,8 +26,6 @@ class source:
 		self.tfile_link = "/api/file/get?api_key=%s&t_files=1&id=%s"
 		self.login_link = "/api/login/login?login=%s&pwd=%s"
 		self.files = []
-		self.movie = True
-		self.tvshow = True
 
 	def get_api(self):
 		try:

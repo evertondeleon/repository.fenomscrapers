@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 11-14-2021)
+# (updated 11-17-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -17,14 +17,16 @@ SEARCH_PARAMS.update(SORT)
 
 
 class source:
+	priority = 21
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 21
 		self.language = ['en']
 		self.domain = 'easynews.com'
 		self.base_link = 'https://members.easynews.com'
 		self.search_link = '/2.0/search/solr-search/advanced'
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

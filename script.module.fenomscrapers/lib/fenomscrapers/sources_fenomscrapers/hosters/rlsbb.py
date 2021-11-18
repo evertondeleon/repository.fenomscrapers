@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-13-2021) # site seems dead yet again
+# modified by Venom for Fenomscrapers (updated 11-17-2021) # site seems dead yet again
 '''
 	Fenomscrapers Project
 '''
@@ -11,15 +11,17 @@ from fenomscrapers.modules import source_utils
 
 
 class source:
+	priority = 26
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 26
 		self.language = ['en']
 		self.domains = ['proxybb.com', 'rlsbb.ru', 'rlsbb.to']
 		self.base_new = 'http://proxybb.com/'
 		self.base_old = 'http://old3.proxybb.com/'
 		self.search_link = 'http://search.proxybb.com/?s=%s' #may use in future but adds a request to do so.
-		self.movie = True
-		self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []

@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers  (updated 11-13-2021)
+# modified by Venom for Fenomscrapers  (updated 11-17-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -16,8 +16,12 @@ from fenomscrapers.modules import workers
 
 
 class source:
+	priority = 24
+	pack_capable = False
+	hasMovies = True
+	hasEpisodes = True
+
 	def __init__(self):
-		self.priority = 24
 		self.language = ['en']
 		self.domains = ['rmz.cr', 'rapidmoviez.site']
 		self.base_link = 'http://rmz.cr/'
@@ -25,8 +29,6 @@ class source:
 		# self.base_link = 'http://rapidmoviez.cr/' # cloudflare IUAM challenge failure
 		self.scraper = cfscrape.create_scraper()
 		self.headers = {'User-Agent': client.agent()}
-		self.movie = True
-		self.tvshow = True
 
 	def search(self, title, year):
 		try:
