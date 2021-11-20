@@ -556,8 +556,8 @@ msgid "BITCQ (Pack capable)"
 msgstr "BITCQ (Pack geschikt)"
 
 msgctxt "#32138"
-msgid ""
-msgstr ""
+msgid "BITSEARCH (Pack capable)"
+msgstr "BITSEARCH (Pack geschikt)"
 
 msgctxt "#32139"
 msgid ""

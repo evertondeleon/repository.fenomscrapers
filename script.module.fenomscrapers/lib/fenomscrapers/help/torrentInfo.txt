@@ -13,6 +13,7 @@ ytsmx (priority=2) uses imdb_id query, movies only site
 single request html parsed sites(medium speed, priority=3-5):
 --------------------------------------------
 7torrents (priority=3) uses 7torrents.cc(12/2/20) as 7torr.com is mirror of btscene
+bitsearch (priority=3) added 11-19-21
 bt4g (priority=3)
 btcq (priority=3) new as of 11-02-21
 btdb (priority=3) proxy change 1-13-21 for v2 challenge, dead site as of 7-02-21 and now removed

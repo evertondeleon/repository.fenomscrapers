@@ -1,4 +1,9 @@
 
+[B][COLOR red]Update - v2.0.3 - Nov. 19, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed typo in SCENERLS hoster causing scrape failures in addons.[/I]
+[COLOR yellow]--[/COLOR][I] Added BITSEARCH torrent scraper.[/I]
+
+
 [B][COLOR red]Update - v2.0.2 - Nov. 17, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Changed import method and status checking across all scrapers.[/I]
 

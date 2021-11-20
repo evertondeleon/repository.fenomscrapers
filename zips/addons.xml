@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.2" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.3" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -27,8 +27,9 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.0.2 - Nov. 17, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Changed import method and status checking across all scrapers.[/I]
+[B][COLOR red]Update - v2.0.3 - Nov. 19, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed typo in SCENERLS hoster causing scrape failures in addons.[/I]
+[COLOR yellow]--[/COLOR][I] Added BITSEARCH torrent scraper.[/I]
 		</news>
 	</extension>
 </addon>

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021)
+# modified by Venom for Fenomscrapers (updated 11-19-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -14,7 +14,7 @@ from fenomscrapers.modules import source_utils
 class source:
 	priority = 21
 	pack_capable = False
-	hasMovie = True
+	hasMovies = True
 	hasEpisodes = True
 
 	def __init__(self):

@@ -20,7 +20,6 @@ class source:
 	hasMovies = True
 	hasEpisodes = True
 
-
 	def __init__(self):
 		self.language = ['en']
 		self.base_link = 'https://torrentapi.org' # just to satisfy scraper_test

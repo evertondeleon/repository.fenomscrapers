@@ -63,6 +63,7 @@
 		<setting id="provider.7torrents" type="bool" label="32102" default="false" />
 		<setting id="provider.bitcq" type="bool" label="32137" default="true" />
 		<setting id="provider.bitlord" type="bool" label="32103" default="true" />
+		<setting id="provider.bitsearch" type="bool" label="32138" default="false" />
 		<setting id="provider.bt4g" type="bool" label="32132" default="false" />
 		<setting id="provider.btscene" type="bool" label="32104" default="false" />
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
