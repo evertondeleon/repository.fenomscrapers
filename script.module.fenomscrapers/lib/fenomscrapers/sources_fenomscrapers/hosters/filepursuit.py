@@ -44,7 +44,7 @@ class source:
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url)
 
-			r = client.request(url, headers=headers)
+			r = client.request(url, headers=headers, timeout='5')
 			if not r: return sources
 			r = jsloads(r)
 			if 'not_found' in r['status']: return sources

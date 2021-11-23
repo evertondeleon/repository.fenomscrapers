@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 11-22-2021)
 """
 	Fenomscrapers Project
 """
@@ -47,7 +47,7 @@ class source:
 				url = self.search_link % data['imdb']
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			result = scraper.get(url).text
+			result = scraper.get(url, timeout=5).text
 			if not result: return sources
 			rows = client.parseDOM(result, 'div', attrs={'class': 'tgxtablerow txlight'})
 			if not rows: return sources
@@ -131,7 +131,7 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link))
 		try:
-			result = self.scraper.get(link).text
+			result = self.scraper.get(link, timeout=5).text
 			if not result: return
 			rows = client.parseDOM(result, 'div', attrs={'class': 'tgxtablerow txlight'})
 			if not rows: return

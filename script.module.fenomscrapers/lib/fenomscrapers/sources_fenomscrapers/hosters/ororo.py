@@ -20,7 +20,6 @@ class source:
 	hasEpisodes = True
 
 	def __init__(self):
-		# self.priority = 25
 		self.language = ['en']
 		self.domains = ['ororo.tv']
 		self.base_link = 'https://ororo.tv'

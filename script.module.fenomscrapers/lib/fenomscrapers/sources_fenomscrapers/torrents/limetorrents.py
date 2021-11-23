@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021)
+# modified by Venom for Fenomscrapers (updated 11-22-2021)
 """
 	Fenomscrapers Project
 """
@@ -68,7 +68,7 @@ class source:
 		# log_utils.log('link = %s' % link)
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = self.scraper.get(link, headers=headers).text
+			r = self.scraper.get(link, headers=headers, timeout=5).text
 			if not r or '<table' not in r: return
 			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			rows = client.parseDOM(table, 'tr')
@@ -153,7 +153,7 @@ class source:
 		# log_utils.log('link = %s' % str(link))
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = self.scraper.get(link, headers=headers).text
+			r = self.scraper.get(link, headers=headers, timeout=5).text
 			if not r or '<table' not in r: return
 			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			rows = client.parseDOM(table, 'tr')

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021)
+# modified by Venom for Fenomscrapers (updated 11-22-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -17,13 +17,10 @@ class source:
 	hasEpisodes = True
 
 	def __init__(self):
-		# self.priority = 29
 		self.language = ['en']
 		self.domains = ['300mbfilms.io', '300mbfilms.co']
 		self.base_link = 'https://www.300mbfilms.io'
 		self.search_link = '/?s=%s'
-		# self.movie = True
-		# self.tvshow = True
 
 	def sources(self, data, hostDict):
 		sources = []
@@ -41,7 +38,7 @@ class source:
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url)
-			r = client.request(url)
+			r = client.request(url, timeout='5')
 			if not r: return sources
 			posts = client.parseDOM(r, 'h2')
 			urls = []
@@ -91,21 +88,21 @@ class source:
 		urls = []
 		try:
 			if not url: return
-			r = client.request(url[0])
+			r = client.request(url[0], timeout=5)
 			r = client.parseDOM(r, 'div', attrs={'class': 'entry'})
 			r = client.parseDOM(r, 'a', ret='href')
 			if 'money' not in str(r): return urls
 			r1 = [i for i in r if 'money' in i][0]
-			r = client.request(r1)
+			r = client.request(r1, timeout=5)
 			r = client.parseDOM(r, 'div', attrs={'id': 'post-\d+'})[0]
 
 			if 'enter the password' in r:
 				plink= client.parseDOM(r, 'form', ret='action')[0]
 				post = {'post_password': '300mbfilms', 'Submit': 'Submit'}
-				send_post = client.request(plink, post=post, output='cookie')
-				link = client.request(r1, cookie=send_post)
+				send_post = client.request(plink, post=post, output='cookie', timeout=5)
+				link = client.request(r1, cookie=send_post, timeout=5)
 			else:
-				link = client.request(r1)
+				link = client.request(r1, timeout=5)
 			if '<strong>Single' not in link: return urls
 			link = re.findall(r'<strong>Single(.+?)</tr', link, re.DOTALL | re.I)[0]
 			link = client.parseDOM(link, 'a', ret='href')

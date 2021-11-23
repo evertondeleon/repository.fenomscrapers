@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021)
+# modified by Venom for Fenomscrapers (updated 11-22-2021)
 """
 	Fenomscrapers Project
 """
 
-from json import loads as jsloads
 import re
-from time import sleep
+# from time import sleep
 from urllib.parse import unquote_plus
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import cfscrape
@@ -23,20 +22,21 @@ class source:
 	def __init__(self):
 		self.language = ['en']
 		self.base_link = 'https://torrentapi.org' # just to satisfy scraper_test
-		self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&ranked=0&limit=100&format=json_extended' # string query
+		self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&ranked=0&limit=100&format=json_extended' # string query (NOT USED)
 		self.tvshowsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&search_string={2}&ranked=0&limit=100&format=json_extended' # imdb_id + string query
 		self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&ranked=0&limit=100&format=json_extended'
-		self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
+		self.getToken_url = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
 		self.min_seeders = 0
 
 	def _get_token(self):
+		token = '3qk6aj27ws'
 		try:
-			token = self.scraper.get(self.token).content
-			if not token: return '3qk6aj27ws'
-			token = jsloads(token)["token"]
-			return token
+			token = self.scraper.get(self.getToken_url).json()
+			token = token['token']
 		except:
 			source_utils.scraper_error('TORRENTAPI')
+		# sleep(2.1)
+		return token
 
 	def sources(self, data, hostDict):
 		sources = []
@@ -59,11 +59,12 @@ class source:
 				search_link = self.tvshowsearch.format(self.key, data['imdb'], hdlr)
 			else:
 				search_link = self.msearch.format(self.key, data['imdb'])
-			sleep(2.1)
 			# log_utils.log('search_link = %s' % str(search_link))
-			rjson = self.scraper.get(search_link).content
-			if not rjson or 'torrent_results' not in str(rjson): return sources
-			files = jsloads(rjson)['torrent_results']
+			rjson = self.scraper.get(search_link, timeout=5)
+			if rjson.status_code == 200: rjson = rjson.json()
+			else: return sources
+			if 'torrent_results' not in rjson: return sources
+			files = rjson['torrent_results']
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
@@ -116,10 +117,11 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 			search_link = self.tvshowsearch.format(self.key, data['imdb'], 'S%s' % self.season_xx)
-			sleep(2.1)
-			rjson = self.scraper.get(search_link).content
-			if not rjson or 'torrent_results' not in str(rjson): return sources
-			files = jsloads(rjson)['torrent_results']
+			rjson = self.scraper.get(search_link, timeout=5)
+			if rjson.status_code == 200: rjson = rjson.json()
+			else: return sources
+			if 'torrent_results' not in rjson: return sources
+			files = rjson['torrent_results']
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources

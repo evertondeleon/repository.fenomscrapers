@@ -1,4 +1,11 @@
 
+[B][COLOR red]Update - v2.0.4 - Nov. 23, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] SOLIDTORRENTS and BITCQ have been set to disabled by default due to considerable timeout issues of late.[/I]
+[COLOR yellow]--[/COLOR][I] Removed sleep state from TORRENTAPI since is still fails to solve rnadom query error responses.[/I]
+[COLOR yellow]--[/COLOR][I] Added timeout value to cfscrape calls.[/I]
+[COLOR yellow]--[/COLOR][I] Added rounding of file size to 2 decimal places in return dict.[/I]
+
+
 [B][COLOR red]Update - v2.0.3 - Nov. 19, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed typo in SCENERLS hoster causing scrape failures in addons.[/I]
 [COLOR yellow]--[/COLOR][I] Added BITSEARCH torrent scraper.[/I]

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021) # site seems dead yet again
+# modified by Venom for Fenomscrapers (updated 11-22-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -28,7 +28,7 @@ class source:
 		if not data: return sources
 		append = sources.append
 		try:
-			scraper = cfscrape.create_scraper(delay=5)
+			scraper = cfscrape.create_scraper()
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -47,7 +47,7 @@ class source:
 
 			url = '%s%s' % (self.base_link, query)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-			r = scraper.get(url).text
+			r = scraper.get(url, timeout=5).text
 			if not r or 'nothing was found' in r:
 				if 'tvshowtitle' in data:
 					season = re.search(r'S(.*?)E', hdlr).group(1)
@@ -55,7 +55,7 @@ class source:
 					query = re.sub(r'\s', '-', query)
 					query = query + "-S" + season
 					url = '%s%s' % (self.base_link, query)
-					r = scraper.get(url).text
+					r = scraper.get(url, timeout=5).text
 					isSeasonQuery = True
 				else: return sources 
 			if not r or 'nothing was found' in r: return sources
@@ -127,7 +127,7 @@ class source:
 						except: dsize = 0
 						info = ' | '.join(info)
 
-						append({'provider': 'rlsbb','source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
+						append({'provider': 'rlsbb', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
 										'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 						count += 1
 			except:

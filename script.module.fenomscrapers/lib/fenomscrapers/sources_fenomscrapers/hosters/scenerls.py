@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-19-2021)
+# modified by Venom for Fenomscrapers (updated 11-22-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -43,7 +43,7 @@ class source:
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
 
-			r = scraper.get(url).text
+			r = scraper.get(url, timeout=5).text
 			posts = client.parseDOM(r, 'div', attrs={'class': 'post'})
 			if not posts: return sources
 		except:

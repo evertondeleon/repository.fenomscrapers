@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021)
+# modified by Venom for Fenomscrapers (updated 11-22-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -29,7 +29,7 @@ class source:
 		if not data: return sources
 		append = sources.append
 		try:
-			scraper = cfscrape.create_scraper(delay=5)
+			scraper = cfscrape.create_scraper()
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
@@ -40,8 +40,8 @@ class source:
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = ('%s%s' % (self.base_link, self.search_link % quote_plus(query))).replace('%3A+', '+')
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-			result = scraper.get(url).text
+			# log_utils.log('url = %s' % url)
+			result = scraper.get(url, timeout=5).text
 
 			if not result or "Sorry, but you are looking for something that isn't here" in str(result): return sources
 			posts = client.parseDOM(result, "div", attrs={"class": "post"})

@@ -1,12 +1,12 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers  (updated 11-17-2021)
+# modified by Venom for Fenomscrapers  (updated 11-22-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
 import time
-from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
+from urllib.parse import urljoin, quote_plus
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
@@ -33,7 +33,7 @@ class source:
 	def search(self, title, year):
 		try:
 			url = urljoin(self.base_link, self.search_link % (quote_plus(title)))
-			r = self.scraper.get(url, headers=self.headers).text
+			r = self.scraper.get(url, headers=self.headers, timeout=10).text
 			if not r: return None
 			r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0] # switch to client.parseDOM() to rid import
 			r = dom_parser.parse_dom(r.content, 'li')
@@ -63,7 +63,7 @@ class source:
 			# log_utils.log('url = %s' % url)
 			if not url: return self.sources
 
-			result = self.scraper.get(url, headers=self.headers).text
+			result = self.scraper.get(url, headers=self.headers, timeout=10).text
 			if not result: return self.sources
 			r_pack = None
 			if 'tvshowtitle' in data:
@@ -101,7 +101,7 @@ class source:
 
 	def get_sources(self, name, url):
 		try:
-			r = self.scraper.get(url, headers=self.headers).text
+			r = self.scraper.get(url, headers=self.headers, timeout=10).text
 
 			name = client.replaceHTMLCodes(name)
 			if name.startswith('['): name = name.split(']')[1]
