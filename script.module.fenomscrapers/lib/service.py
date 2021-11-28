@@ -50,7 +50,7 @@ class AddonCheckUpdate:
 			import re
 			import requests
 			repo_xml = requests.get('https://raw.githubusercontent.com/mr-kodi/repository.fenomscrapers/master/zips/addons.xml')
-			if not repo_xml.status_code == 200:
+			if repo_xml.status_code != 200:
 				return xbmc.log('[ script.module.fenomscrapers ]  Could not connect to remote repo XML: status code = %s' % repo_xml.status_code, LOGINFO)
 			repo_version = re.search(r'<addon id=\"script.module.fenomscrapers\".*version=\"(\d*.\d*.\d*)\"', repo_xml.text, re.I).group(1)
 			local_version = control.addonVersion()[:5] # 5 char max so pre-releases do try to compare more chars than github version

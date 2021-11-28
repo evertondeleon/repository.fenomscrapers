@@ -21,10 +21,9 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domain = 'easynews.com'
+		self.domain = ['easynews.com']
 		self.base_link = 'https://members.easynews.com'
 		self.search_link = '/2.0/search/solr-search/advanced'
 
@@ -44,10 +43,9 @@ class source:
 			years = [str(year), str(int(year)+1), str(int(year)-1)] if 'tvshowtitle' not in data else None
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
-			query = self._query(data)
-			url, params = self._translate_search(query)
-			headers = {'Authorization': auth}
-			results = requests.get(url, params=params, headers=headers, timeout=15).json()
+			url, params = self._translate_search(self._query(data))
+			results = requests.get(url, params=params, headers={'Authorization': auth}, timeout=10).json()
+
 			down_url = results.get('downURL')
 			dl_farm = results.get('dlFarm')
 			dl_port = results.get('dlPort')
@@ -81,12 +79,10 @@ class source:
 				name_info = source_utils.info_from_name(name_chk, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 
-				file_dl = stream_url + '|Authorization=%s' % (quote(auth))
-
+				file_dl = '%s%s' % (stream_url, '|Authorization=%s' % quote(auth))
 				quality, info = source_utils.get_release_quality(name_info, file_dl)
 				try:
-					size = float(int(item['rawSize']))
-					dsize, isize = source_utils.convert_size(size, to='GB')
+					dsize, isize = source_utils.convert_size(float(int(item['rawSize'])), to='GB')
 					if isize: info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
@@ -101,17 +97,17 @@ class source:
 		return url
 
 	def _get_auth(self):
+		auth = None
 		try:
-			auth = None
 			username = getSetting('easynews.user')
 			password = getSetting('easynews.password')
 			if username == '' or password == '': return auth
 			user_info = '%s:%s' % (username, password)
 			user_info = user_info.encode('utf-8')
-			auth = 'Basic ' + b64encode(user_info).decode('utf-8')
-			return auth
+			auth = '%s%s' % ('Basic ', b64encode(user_info).decode('utf-8'))
 		except:
 			source_utils.scraper_error('EASYNEWS')
+		return auth
 
 	def _query(self, data):
 		if 'tvshowtitle' not in data:
@@ -132,5 +128,5 @@ class source:
 		params['safeO'] = 1 # 1 is the moderation (adult filter) ON, 0 is OFF.
 		# params['gps'] = params['sbj'] = query # gps stands for "group search" and does so by keywords, sbj=subject and can limit results, use gps only
 		params['gps'] = query
-		url = self.base_link + self.search_link
+		url = '%s%s' % (self.base_link, self.search_link)
 		return url, params

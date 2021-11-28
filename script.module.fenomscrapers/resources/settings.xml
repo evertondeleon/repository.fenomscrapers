@@ -76,14 +76,13 @@
 		<setting id="provider.magnetdl" type="bool" label="32114" default="true" />
 		<setting id="provider.nyaa" type="bool" label="32116" default="false" />
 		<setting id="provider.piratebay" type="bool" label="32117" default="true" />
-		<setting id="provider.solidtorrents" type="bool" label="32119" default="false" />
 		<setting id="provider.topnow" type="bool" label="32120" default="false" />
 		<setting id="provider.torlock" type="bool" label="32121" default="false" />
 		<setting id="provider.torrentapi" type="bool" label="32122" default="true" />
 		<setting id="provider.torrentdownload" type="bool" label="32123" default="true" />
 		<setting id="provider.torrentfunk" type="bool" label="32124" default="false" />
 		<setting id="provider.torrentgalaxy" type="bool" label="32125" default="false" />
-		<setting id="provider.torrentparadise" type="bool" label="32135" default="true" />
+		<setting id="provider.torrentio" type="bool" label="32139" default="true" />
 		<setting id="provider.torrentproject2" type="bool" label="32136" default="false" />
 		<setting id="provider.torrentz2" type="bool" label="32130" default="false" />
 		<setting id="provider.yourbittorrent" type="bool" label="32126" default="false" />

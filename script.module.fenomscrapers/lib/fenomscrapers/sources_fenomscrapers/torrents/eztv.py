@@ -21,7 +21,7 @@ class source:
 		self.language = ['en']
 		self.domains = ['eztv.re', 'eztv.tf', 'eztv.yt']
 		self.base_link = 'https://eztv.re'
-		# eztv has api but it sucks. Site query returns more results vs. api (eztv db seems to be missing the imdb_id for many so they are dopped)
+		# eztv has api but it sucks. Site query returns more results vs. api (eztv db seems to be missing the imdb_id for many so they are dropped)
 		self.search_link = '/search/%s'
 		self.min_seeders = 0
 

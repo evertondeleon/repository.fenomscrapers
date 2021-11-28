@@ -10,7 +10,6 @@ from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
-
 class source:
 	priority = 4
 	pack_capable = True
@@ -19,11 +18,10 @@ class source:
 
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['torrentzeu.org']
-		self.base_link = 'https://torrentzeu.org'
+		self.domains = ('torrentz2.club', 'torrentzeu.org')
+		self.base_link = 'https://torrentz2.club'
 		self.search_link = '/kick.php?q=%s'
 		self.min_seeders = 0
-
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
@@ -43,11 +41,8 @@ class source:
 
 			r = client.request(url, timeout='5')
 			if not r: return sources
-			if any(value in r for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')):
-				return sources
-			table = client.parseDOM(r, 'table', attrs={'id': 'table'})
-			table_body = client.parseDOM(table, 'tbody')
-			rows = client.parseDOM(table_body, 'tr')
+			if any(value in r for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')): return sources
+			rows = client.parseDOM(r, 'tr')
 		except:
 			source_utils.scraper_error('TORRENTZ2')
 			return sources
@@ -59,8 +54,7 @@ class source:
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
-				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(url.split('&dn=')[1])
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -124,15 +118,12 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % str(link))
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
-			if any(value in r for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')):
-				return sources
-			table = client.parseDOM(r, 'table', attrs={'id': 'table'})
-			table_body = client.parseDOM(table, 'tbody')
-			rows = client.parseDOM(table_body, 'tr')
+			if any(value in r for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')): return
+			rows = client.parseDOM(r, 'tr')
 		except:
 			source_utils.scraper_error('TORRENTZ2')
 			return
@@ -144,8 +135,7 @@ class source:
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
-				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(url.split('&dn=')[1])
 				if not self.search_series:
 					if not self.bypass_filter:
 						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):

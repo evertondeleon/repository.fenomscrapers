@@ -1,4 +1,11 @@
 
+[B][COLOR red]Update - v2.0.5 - Nov. 28, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Removed SOLIDTORRENTS scraper due to it being a mirror of the new BITSEARCH scraper.[/I]
+[COLOR yellow]--[/COLOR][I] Removed TORRENTPARADISE scraper due to dead search query now javascript.[/I]
+[COLOR yellow]--[/COLOR][I] Added new TORRENTIO scraper.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed bogus logging error with TORRENTAPI.[/I]
+
+
 [B][COLOR red]Update - v2.0.4 - Nov. 23, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] SOLIDTORRENTS and BITCQ have been set to disabled by default due to considerable timeout issues of late.[/I]
 [COLOR yellow]--[/COLOR][I] Removed sleep state from TORRENTAPI since is still fails to solve rnadom query error responses.[/I]

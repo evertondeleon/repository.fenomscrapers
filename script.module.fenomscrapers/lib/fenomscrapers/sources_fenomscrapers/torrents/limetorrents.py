@@ -20,7 +20,7 @@ class source:
 
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['limetorrents.pro', 'limetorrents.info', 'limetorrents.co', 'limetor.com', 'limetorrents.asia']
+		self.domains = ('limetorrents.pro', 'limetorrents.info', 'limetorrents.co', 'limetor.com', 'limetorrents.asia')
 		self.base_link = 'https://www.limetorrents.pro'
 		# self.base_link = 'https://limetorrents.proxyninja.org' # if ever needed
 		self.tvsearch = '/search/tv/{0}/1/'

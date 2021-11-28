@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.4" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.5" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
-		<import addon="script.module.myaccounts" version="1.0.0" />
+		<import addon="script.module.myaccounts" version="2.0.0" />
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="lib/default.py">
 		<provides>executable</provides>
@@ -27,11 +27,11 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.0.4 - Nov. 23, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] SOLIDTORRENTS and BITCQ have been set to disabled by default due to considerable timeout issues of late.[/I]
-[COLOR yellow]--[/COLOR][I] Removed sleep state from TORRENTAPI since is still fails to solve rnadom query error responses.[/I]
-[COLOR yellow]--[/COLOR][I] Added timeout value to cfscrape calls.[/I]
-[COLOR yellow]--[/COLOR][I] Added rounding of file size to 2 decimal places in return dict.[/I]
+[B][COLOR red]Update - v2.0.5 - Nov. 28, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Removed SOLIDTORRENTS scraper due to it being a mirror of the new BITSEARCH scraper.[/I]
+[COLOR yellow]--[/COLOR][I] Removed TORRENTPARADISE scraper due to dead search query now javascript.[/I]
+[COLOR yellow]--[/COLOR][I] Added new TORRENTIO scraper.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed bogus logging error with TORRENTAPI.[/I]
 		</news>
 	</extension>
 </addon>

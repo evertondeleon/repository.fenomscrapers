@@ -33,8 +33,7 @@ class source:
 		try:
 			token = self.scraper.get(self.getToken_url).json()
 			token = token['token']
-		except:
-			source_utils.scraper_error('TORRENTAPI')
+		except: pass
 		# sleep(2.1)
 		return token
 

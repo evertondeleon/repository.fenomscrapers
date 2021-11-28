@@ -560,8 +560,8 @@ msgid "BITSEARCH (Pack capable)"
 msgstr "BITSEARCH (Pack geschikt)"
 
 msgctxt "#32139"
-msgid ""
-msgstr ""
+msgid "TORRENTIO (Pack capable)"
+msgstr "TORRENTIO (Pack geschikt)"
 
 msgctxt "#32140"
 msgid ""

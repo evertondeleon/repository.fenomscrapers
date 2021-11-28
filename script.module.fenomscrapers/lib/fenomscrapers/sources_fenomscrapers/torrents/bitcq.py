@@ -37,13 +37,12 @@ class source:
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', '%s %s' % (title, hdlr))
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 			r = client.request(url, timeout='5')
 			if not r: return sources
 			if any(value in str(r) for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')):
 				return sources
-			table = client.parseDOM(r, 'tbody')
-			rows = client.parseDOM(table, 'tr')
+			rows = client.parseDOM(r, 'tr')
 		except:
 			source_utils.scraper_error('BITCQ')
 			return sources
@@ -121,13 +120,12 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % str(link))
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
 			if any(value in str(r) for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')): return
-			table = client.parseDOM(r, 'tbody')
-			rows = client.parseDOM(table, 'tr')
+			rows = client.parseDOM(r, 'tr')
 		except:
 			source_utils.scraper_error('BITCQ')
 			return
