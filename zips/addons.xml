@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.5" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.6" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -27,11 +27,11 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.0.5 - Nov. 28, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Removed SOLIDTORRENTS scraper due to it being a mirror of the new BITSEARCH scraper.[/I]
-[COLOR yellow]--[/COLOR][I] Removed TORRENTPARADISE scraper due to dead search query now javascript.[/I]
-[COLOR yellow]--[/COLOR][I] Added new TORRENTIO scraper.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed bogus logging error with TORRENTAPI.[/I]
+[B][COLOR red]Update - v2.0.6 - Dec. 09, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed issue where "Hindi" only audio tracks were not respecting setting to remove.[/I]
+[COLOR yellow]--[/COLOR][I] Expanded the list of abreviated language codes for better detection of single foreign audio tracks for removal.[/I]
+[COLOR yellow]--[/COLOR][I] Added [B]"casstudio.tv"[/B] to list of undesirables due to group uploads of incomplete pack files.[/I]
+[COLOR yellow]--[/COLOR][I] Added [B]"pa.web.dl"[/B] to list of undesirables due to group uploads of single Russian only language tracks.[/I]
 		</news>
 	</extension>
 </addon>

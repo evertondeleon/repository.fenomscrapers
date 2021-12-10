@@ -16,10 +16,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
-		self.domains = ['zooqle.com', 'zooqle.unblocked.win', 'zooqle.unblocked.llc', 'zooqle.unblocked.krd']
 		self.base_link = 'https://zooqle.com'
 		self.search_link = '/search?pg=1&q=%s'
 		self.min_seeders = 1

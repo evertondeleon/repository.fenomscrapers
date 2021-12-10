@@ -15,7 +15,6 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
 		self.domains = ['300mbfilms.io', '300mbfilms.co']

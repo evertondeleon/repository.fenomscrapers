@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 11-17-2021)
+# (updated 12-01-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -9,7 +9,7 @@ import re
 import requests
 from urllib.parse import quote
 from fenomscrapers.modules.control import setting as getSetting
-from fenomscrapers.modules import source_utils
+from fenomscrapers.modules import source_utils, log_utils
 
 SORT = {'s1': 'relevance', 's1d': '-', 's2': 'dsize', 's2d': '-', 's3': 'dtime', 's3d': '-'}
 SEARCH_PARAMS = {'st': 'adv', 'sb': 1, 'fex': 'm4v,3gp,mov,divx,xvid,wmv,avi,mpg,mpeg,mp4,mkv,avc,flv,webm', 'fty[]': 'VIDEO', 'spamf': 1, 'u': '1', 'gx': 1, 'pno': 1, 'sS': 3}
@@ -35,17 +35,27 @@ class source:
 		if not auth: return sources
 		try:
 			title_chk = getSetting('easynews.title.chk') == 'true'
-			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-			aliases = data['aliases']
-			episode_title = data['title'] if 'tvshowtitle' in data else None
+			content_type = 'tvshow' if 'tvshowtitle' in data else 'movie'
 			year = data['year']
-			years = [str(year), str(int(year)+1), str(int(year)-1)] if 'tvshowtitle' not in data else None
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
+			aliases = data['aliases']
+			if content_type == 'tvshow':
+				title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+				episode_title = None
+				years = None
+				season = int(data.get('season'))
+				episode = int(data.get('episode'))
+				hdlr = 'S%02dE%02d' % (season, episode)
+				query = '%s %s' % (title, hdlr)
+			else:
+				title = data['title'].replace('&', 'and')
+				episode_title = data['title']
+				years = [str(int(year)-1), str(year), str(int(year)+1)]
+				hdlr = year
+				query = '"%s" %s' % (title, ','.join(years))
+			# log_utils.log('query = %s' % query)
 
-			url, params = self._translate_search(self._query(data))
-			results = requests.get(url, params=params, headers={'Authorization': auth}, timeout=10).json()
-
+			url, params = self._translate_search(query)
+			results = requests.get(url, params=params, headers={'Authorization': auth}, timeout=20).json()
 			down_url = results.get('downURL')
 			dl_farm = results.get('dlFarm')
 			dl_port = results.get('dlPort')
@@ -56,17 +66,13 @@ class source:
 		for item in files:
 			try:
 				post_hash, post_title, ext, duration = item['0'], item['10'], item['11'], item['14']
-				checks = [False] * 5
-				if 'alangs' in item and item['alangs'] and 'eng' not in item['alangs']: checks[1] = True
-				if re.match(r'^\d+s', duration) or re.match('^[0-5]m', duration): checks[2] = True
-				if 'passwd' in item and item['passwd']: checks[3] = True
-				if 'virus' in item and item['virus']: checks[4] = True
-				if 'type' in item and item['type'].upper() != 'VIDEO': checks[5] = True
-				if any(checks): continue
-
+				if 'alangs' in item and item['alangs'] and 'eng' not in item['alangs']: continue
+				if re.match(r'^\d+s', duration) or re.match('^[0-5]m', duration): continue
+				if 'virus' in item and item['virus']: continue
+				if 'type' in item and item['type'].upper() != 'VIDEO': continue
 				stream_url = down_url + quote('/%s/%s/%s%s/%s%s' % (dl_farm, dl_port, post_hash, ext, post_title, ext))
 				name = source_utils.clean_name(post_title)
-				# log_utils.log('name = %s' % name, __name__, log_utils.LOGDEBUG)
+				# log_utils.log('name = %s' % name)
 				name_chk = name
 				if 'tvshowtitle' in data:
 					name_chk = re.sub(r'S\d+([.-])E\d+', hdlr, name_chk, 1, re.I)
@@ -93,9 +99,6 @@ class source:
 				source_utils.scraper_error('EASYNEWS')
 		return sources
 
-	def resolve(self, url):
-		return url
-
 	def _get_auth(self):
 		auth = None
 		try:
@@ -109,24 +112,14 @@ class source:
 			source_utils.scraper_error('EASYNEWS')
 		return auth
 
-	def _query(self, data):
-		if 'tvshowtitle' not in data:
-			title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', data.get('title'))
-			year = int(data.get('year'))
-			years = '%s,%s,%s' % (str(year - 1), year, str(year + 1))
-			query = '"%s" %s' % (title, years)
-		else:
-			title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', data.get('tvshowtitle'))
-			season = int(data.get('season'))
-			episode = int(data.get('episode'))
-			query = '%s S%02dE%02d' % (title, season, episode)
-		return query
-
 	def _translate_search(self, query):
 		params = SEARCH_PARAMS
-		params['pby'] = 350
+		params['pby'] = 350 # Results per Page
 		params['safeO'] = 1 # 1 is the moderation (adult filter) ON, 0 is OFF.
 		# params['gps'] = params['sbj'] = query # gps stands for "group search" and does so by keywords, sbj=subject and can limit results, use gps only
 		params['gps'] = query
 		url = '%s%s' % (self.base_link, self.search_link)
 		return url, params
+
+	def resolve(self, url):
+		return url

@@ -18,10 +18,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domain = ['bitlordsearch.com']
 		self.base_link = 'http://www.bitlordsearch.com'
 		self.search_link = '/search?q=%s'
 		self.api_search_link = '/get_list'

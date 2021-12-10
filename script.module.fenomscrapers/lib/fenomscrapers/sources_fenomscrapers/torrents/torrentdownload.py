@@ -16,10 +16,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['torrentdownload.info']
 		self.base_link = 'https://www.torrentdownload.info'
 		self.search_link = '/search?q=%s'
 		self.min_seeders = 1

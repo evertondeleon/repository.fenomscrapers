@@ -16,10 +16,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['torrentproject2.com']
 		self.base_link = 'https://torrentproject2.com'
 		self.search_link = '/?t=%s&orderby=seeders'
 		self.min_seeders = 1
@@ -58,7 +56,7 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = '%s%s' % (self.base_link, link)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 			result = client.request(url, timeout='5')
 			if result is None: return
 			hash = re.search(r'<a\s*title\s*=\s*["\']hash:(.+?)\s*torrent', result, re.I).group(1)

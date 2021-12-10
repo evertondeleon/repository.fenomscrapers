@@ -15,10 +15,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['bitsearch.to']
 		self.base_link = 'https://bitsearch.to'
 		# self.search_link = '/search?q=%s&category=1&subcat=2&sort=seeders'
 		self.search_link = '/search?q=%s&category=1&subcat=2&sort=size'

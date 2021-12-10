@@ -17,11 +17,9 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['magnetdl.com', 'torrentquest.com'] # torrentquest is mirror of magnetdl
-		self.base_link = 'https://www.magnetdl.com'
+		self.base_link = 'https://www.magnetdl.com' # torrentquest is mirror of magnetdl
 		self.search_link = '/{0}/{1}'
 		self.min_seeders = 0
 

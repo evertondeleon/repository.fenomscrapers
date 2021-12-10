@@ -20,7 +20,6 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
 		self.domains = ['rmz.cr', 'rapidmoviez.site']
@@ -113,9 +112,8 @@ class source:
 			if l == []: return
 			s = ''
 			for i in l: s += i.content
-
 			urls = re.findall(r'''((?:http|ftp|https)://[\w_-]+(?:(?:\.[\w_-]+)+)[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])''', i.content, flags=re.M | re.S)
-			urls = [i for i in urls if not i.endswith(('.rar', '.zip', '.iso', '.idx', '.sub', '.srt'))]
+
 			for link in urls:
 				url = client.replaceHTMLCodes(str(link))
 				if url in str(self.sources): continue

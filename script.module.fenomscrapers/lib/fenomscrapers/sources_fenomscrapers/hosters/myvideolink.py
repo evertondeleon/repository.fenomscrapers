@@ -15,7 +15,6 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
 		self.domains = ['new.myvideolinks.net']
@@ -98,7 +97,6 @@ class source:
 				for link in links:
 					try:
 						url = client.replaceHTMLCodes(str(link))
-						if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
 						if url in str(sources): continue
 
 						valid, host = source_utils.is_host_valid(url, hostDict)

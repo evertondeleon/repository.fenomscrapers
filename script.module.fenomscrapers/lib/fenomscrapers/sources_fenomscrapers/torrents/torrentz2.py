@@ -15,13 +15,12 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ('torrentz2.club', 'torrentzeu.org')
 		self.base_link = 'https://torrentz2.club'
 		self.search_link = '/kick.php?q=%s'
 		self.min_seeders = 0
+
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources

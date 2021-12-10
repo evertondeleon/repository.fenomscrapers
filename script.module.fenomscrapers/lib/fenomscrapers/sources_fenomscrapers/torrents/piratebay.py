@@ -18,10 +18,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domain = ['apibay.org']
 		self.base_link = 'https://apibay.org'
 		self.search_link = '/q.php?q=%s&cat=0'
 		self.min_seeders = 0

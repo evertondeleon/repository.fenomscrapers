@@ -17,14 +17,11 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['torrentgalaxy.to', 'torrentgalaxy.mx', 'torrentgalaxy.su']
 		self.base_link = 'https://torrentgalaxy.to'
 		self.search_link = '/torrents.php?search=%s&sort=seeders&order=desc'
 		self.min_seeders = 0
-
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
@@ -63,8 +60,7 @@ class source:
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
-				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(url.split('&dn=')[1])
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -147,8 +143,7 @@ class source:
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
-				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(url.split('&dn=')[1])
 				if not self.search_series:
 					if not self.bypass_filter:
 						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):

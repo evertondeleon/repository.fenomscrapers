@@ -16,10 +16,8 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['isohunt2.nz']
 		self.base_link = 'https://isohunt.nz'
 		self.search_link = '/torrent/?ihq=%s&fiht=2&age=0&Torrent_sort=seeders&Torrent_page=0'
 		self.min_seeders = 0
@@ -73,8 +71,7 @@ class source:
 				url = re.search(r'(magnet:.*)', link).group(1).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(unquote_plus(url)) # many links dbl quoted so we must unquote again
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				name = unquote_plus(url.split('&dn=')[1])
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(unquote_plus(url.split('&dn=')[1]))
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 				if source_utils.remove_lang(name_info): continue

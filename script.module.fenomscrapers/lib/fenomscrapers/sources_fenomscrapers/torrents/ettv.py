@@ -16,10 +16,8 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domain = ['ettvcentral.com', 'ettvdl.com']
 		self.base_link = 'https://www.ettvcentral.com'
 		self.search_link = '/torrents-search.php?search=%s'
 		self.min_seeders = 1

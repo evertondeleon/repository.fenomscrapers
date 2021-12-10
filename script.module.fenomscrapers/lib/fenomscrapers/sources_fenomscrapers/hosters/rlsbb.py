@@ -15,7 +15,6 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
 		self.domains = ['proxybb.com', 'rlsbb.ru', 'rlsbb.to']
@@ -112,7 +111,6 @@ class source:
 
 						url = client.replaceHTMLCodes(str(i))
 						if url in str(sources): continue
-						if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
 
 						valid, host = source_utils.is_host_valid(url, hostDict)
 						if not valid: continue

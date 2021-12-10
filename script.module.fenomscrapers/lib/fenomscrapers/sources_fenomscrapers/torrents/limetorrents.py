@@ -13,14 +13,12 @@ from fenomscrapers.modules import workers
 
 
 class source:
-	priority = 3
+	priority = 5
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ('limetorrents.pro', 'limetorrents.info', 'limetorrents.co', 'limetor.com', 'limetorrents.asia')
 		self.base_link = 'https://www.limetorrents.pro'
 		# self.base_link = 'https://limetorrents.proxyninja.org' # if ever needed
 		self.tvsearch = '/search/tv/{0}/1/'
@@ -44,10 +42,8 @@ class source:
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
-			if 'tvshowtitle' in data:
-				url = self.tvsearch.format(quote_plus(query))
-			else:
-				url = self.moviesearch.format(quote_plus(query))
+			if 'tvshowtitle' in data: url = self.tvsearch.format(quote_plus(query))
+			else: url = self.moviesearch.format(quote_plus(query))
 			urls.append(url)
 
 			url2 = url.replace('/1/', '/2/')
@@ -68,7 +64,11 @@ class source:
 		# log_utils.log('link = %s' % link)
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = self.scraper.get(link, headers=headers, timeout=5).text
+			r = self.scraper.get(link, headers=headers, timeout=10).text
+			if '503 Service Temporarily Unavailable' in r:
+				from fenomscrapers.modules import log_utils
+				log_utils.log('LIMETORRENTS (Single request failure): 503 Service Temporarily Unavailable')
+				return
 			if not r or '<table' not in r: return
 			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			rows = client.parseDOM(table, 'tr')
@@ -76,11 +76,13 @@ class source:
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			return
+
+		from fenomscrapers.modules import log_utils
+		start = time()
 		for row in rows:
 			try:
 				data = client.parseDOM(row, 'a', ret='href')[0]
 				if '/search/' in data: continue
-				# data = re.sub(r'\s', '', data).strip()
 				hash = re.search(r'/torrent/(.+?).torrent', data, re.I).group(1)
 				name = re.search(r'title\s*=\s*(.+?)$', data, re.I).group(1)
 				name = source_utils.clean_name(name)
@@ -150,10 +152,14 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link))
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = self.scraper.get(link, headers=headers, timeout=5).text
+			r = self.scraper.get(link, headers=headers, timeout=60).text
+			if '503 Service Temporarily Unavailable' in r:
+				from fenomscrapers.modules import log_utils
+				req_type = 'SHOW' if self.search_series else 'SEASON'
+				log_utils.log('LIMETORRENTS (%s Pack request failure): 503 Service Temporarily Unavailable' % req_type)
+				return
 			if not r or '<table' not in r: return
 			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			rows = client.parseDOM(table, 'tr')
@@ -165,9 +171,7 @@ class source:
 			try:
 				data = client.parseDOM(row, 'a', ret='href')[0]
 				if '/search/' in data: continue
-				data = re.sub(r'\s', '', data).strip()
 				hash = re.search(r'/torrent/(.+?).torrent', data, re.I).group(1)
-
 				name = re.search(r'title\s*=\s*(.+?)$', data, re.I).group(1)
 				name = source_utils.clean_name(name)
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)

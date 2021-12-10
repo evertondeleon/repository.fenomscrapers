@@ -16,10 +16,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['bt4g.org']
 		self.base_link = 'https://bt4g.org'
 		self.search_link = '/movie/search/%s/byseeders/1' # site option "video" adds "/movie/" to url
 		self.min_seeders = 0

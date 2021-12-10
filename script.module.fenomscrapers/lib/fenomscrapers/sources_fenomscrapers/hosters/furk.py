@@ -16,7 +16,6 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
 		self.domain = 'furk.net/'
@@ -94,8 +93,8 @@ class source:
 					source = 'direct SINGLE'
 					if int(i['files_num_video']) > 3:
 						source = ' direct PACK (x%02d)' % int(i['files_num_video'])
-					file_name = i['name']
-					name = source_utils.clean_name(file_name)
+
+					name = source_utils.clean_name(i['name'])
 					name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 
 					file_id = i['id']

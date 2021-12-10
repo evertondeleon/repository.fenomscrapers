@@ -9,7 +9,6 @@ import re
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
-
 class source:
 	priority = 1
 	pack_capable = True
@@ -17,7 +16,6 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.domain = ['torrentio.strem.fun']
 		self.base_link = 'https://torrentio.strem.fun'
 		self.movieSearch_link = '/language=english/stream/movie/%s.json'
 		self.tvSearch_link = '/language=english/stream/series/%s:%s:%s.json'
@@ -47,13 +45,14 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTIO')
 			return sources
+
+		_INFO = re.compile(r'👤.*')
 		for file in files:
 			try:
 				hash = file['infoHash']
 				file_title = file['title'].split('\n')
 				name = source_utils.clean_name(file_title[0])
-				r = re.compile(r'👤.*')
-				file_info = [x for x in file_title if r.match(x)][0]
+				file_info = [x for x in file_title if _INFO.match(x)][0]
 
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
@@ -103,13 +102,14 @@ class source:
 			source_utils.scraper_error('TORRENTIO')
 			return sources
 
+		_INFO = re.compile(r'👤.*')
 		for file in files:
 			try:
 				hash = file['infoHash']
 				file_title = file['title'].split('\n')
 				name = source_utils.clean_name(file_title[0])
-				r = re.compile(r'👤.*')
-				file_info = [x for x in file_title if r.match(x)][0]
+				file_info = [x for x in file_title if _INFO.match(x)][0]
+
 				if not search_series:
 					if not bypass_filter:
 						if not source_utils.filter_season_pack(title, aliases, year, season, name):

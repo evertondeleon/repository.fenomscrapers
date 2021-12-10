@@ -16,10 +16,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domain = ['yourbittorrent2.com', 'yourbittorrent.com']
 		self.base_link = 'https://yourbittorrent2.com'
 		# self.search_link = '?q=%s&page=1&v=&c=&sort=size&o=desc'
 		self.search_link = '?q=%s'

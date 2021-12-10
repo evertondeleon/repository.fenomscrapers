@@ -16,10 +16,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domain = ['bitcq.com']
 		self.base_link = 'https://bitcq.com'
 		self.search_link = '/search?q=%s&category[]=1'
 		self.min_seeders = 0

@@ -15,10 +15,8 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['topnow.se']
 		self.base_link = 'http://topnow.se'
 		self.search_link = '/index.php?search=%s'
 		self.show_link = '/index.php?show=%s'
@@ -62,8 +60,7 @@ class source:
 				url = url.split('&tr=')[0].replace(' ', '.')
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				release_name = url.split('&dn=')[1]
-				release_name = source_utils.clean_name(release_name)
+				release_name = source_utils.clean_name(url.split('&dn=')[1])
 				name_info = source_utils.info_from_name(release_name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 

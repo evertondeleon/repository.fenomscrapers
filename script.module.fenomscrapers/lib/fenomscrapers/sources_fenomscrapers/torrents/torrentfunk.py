@@ -16,10 +16,8 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['torrentfunk.com', 'torrentfunk2.com']
 		self.base_link = 'https://www.torrentfunk.com'
 		self.search_link = '/all/torrents/%s.html?v=&smi=&sma=&i=100&sort=size&o=desc'
 		self.min_seeders = 0

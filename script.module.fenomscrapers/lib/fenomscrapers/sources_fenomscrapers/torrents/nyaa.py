@@ -16,10 +16,8 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['nyaa.si']
 		self.base_link = 'https://nyaa.si'
 		self.search_link = '/?f=0&c=0_0&q=%s'
 		self.min_seeders = 1

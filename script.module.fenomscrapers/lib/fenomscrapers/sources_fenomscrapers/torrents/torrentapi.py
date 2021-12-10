@@ -5,7 +5,6 @@
 """
 
 import re
-# from time import sleep
 from urllib.parse import unquote_plus
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import cfscrape
@@ -34,7 +33,6 @@ class source:
 			token = self.scraper.get(self.getToken_url).json()
 			token = token['token']
 		except: pass
-		# sleep(2.1)
 		return token
 
 	def sources(self, data, hostDict):

@@ -16,11 +16,9 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domain = ['7torrents.cc'] # 7torr.com is a mirror of btscene
-		self.base_link = 'https://www.7torrents.cc'
+		self.base_link = 'https://www.7torrents.cc' # 7torr.com is a mirror of btscene, do not use
 		self.search_link = '/search?query=%s&sort=seeders'
 		self.min_seeders = 1
 

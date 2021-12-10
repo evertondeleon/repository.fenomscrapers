@@ -16,11 +16,9 @@ class source:
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['idope.org'] # "idope.se" is v2 challange now and different html to parse
-		self.base_link = 'http://idope.org'
+		self.base_link = 'http://idope.org' # "idope.se" is v2 challange now and different html to parse
 		self.search_link = '/search?q=%s'
 		self.min_seeders = 1
 

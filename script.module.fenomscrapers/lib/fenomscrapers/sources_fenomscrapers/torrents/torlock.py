@@ -16,11 +16,9 @@ class source:
 	pack_capable = False
 	hasMovies = True
 	hasEpisodes = True
-
 	def __init__(self):
 		self.priority = 7
 		self.language = ['en']
-		self.domain = ['torlock.com', 'torlock.unblockit.pro', 'torlock.cc']
 		self.base_link = 'https://torlock.com'
 		self.search_link = '/all/torrents/%s.html?'
 		self.min_seeders = 0
