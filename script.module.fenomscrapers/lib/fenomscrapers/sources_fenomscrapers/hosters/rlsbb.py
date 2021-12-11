@@ -28,7 +28,6 @@ class source:
 		append = sources.append
 		try:
 			scraper = cfscrape.create_scraper()
-
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']

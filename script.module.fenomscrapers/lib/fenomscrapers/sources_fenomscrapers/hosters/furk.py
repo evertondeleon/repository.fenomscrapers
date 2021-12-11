@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 11-17-2021)
+# (updated 12-10-2021) increased timeout=20
 '''
 	Fenomscrapers Project
 '''
@@ -33,10 +33,8 @@ class source:
 			api_key = getSetting('furk.api')
 			if api_key == '':
 				if user_name == '' or user_pass == '': return
-				s = requests.Session()
 				link = (self.base_link + self.login_link % (user_name, user_pass))
-				p = s.post(link)
-				p = jsloads(p.text)
+				p = requests.post(link, timeout=20).json()
 				if p['status'] == 'ok':
 					api_key = p['api_key']
 					setSetting('furk.api', api_key)
@@ -74,11 +72,8 @@ class source:
 				seasEpList = self._seas_ep_query_list(season, episode)
 				query = '@name+%s+@files+%s+|+%s+|+%s+|+%s+|+%s' % (title, seasEpList[0], seasEpList[1], seasEpList[2], seasEpList[3], seasEpList[4])
 
-			s = requests.Session()
 			link = self.base_link + self.search_link % (api_key, query, match, moderated, search_in)
-
-			p = s.get(link)
-			p = jsloads(p.text)
+			p = requests.get(link, timeout=20).json()
 			if p.get('status') != 'ok': return
 
 			files = p.get('files')
@@ -136,9 +131,7 @@ class source:
 			if self.content_type == 'episode': self.filtering_list = self._seas_ep_resolve_list(url.get('season'), url.get('episode'))
 
 			link = (self.base_link + self.tfile_link % (api_key, file_id))
-			s = requests.Session()
-			p = s.get(link)
-			p = jsloads(p.text)
+			p = requests.get(link, timeout=20).json()
 			if p['status'] != 'ok' or p['found_files'] != '1': return
 
 			files = p['files'][0]

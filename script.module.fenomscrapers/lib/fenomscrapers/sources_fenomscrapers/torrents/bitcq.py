@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-10-2021) increased timeout=7
 """
 	Fenomscrapers Project
 """
@@ -36,7 +36,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', '%s %s' % (title, hdlr))
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url)
-			r = client.request(url, timeout='5')
+			r = client.request(url, timeout='7')
 			if not r: return sources
 			if any(value in str(r) for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')):
 				return sources
@@ -120,7 +120,7 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link))
 		try:
-			r = client.request(link, timeout='5')
+			r = client.request(link, timeout='7')
 			if not r: return
 			if any(value in str(r) for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')): return
 			rows = client.parseDOM(r, 'tr')

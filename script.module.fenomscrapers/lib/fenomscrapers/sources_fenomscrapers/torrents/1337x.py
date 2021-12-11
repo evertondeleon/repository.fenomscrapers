@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021)
+# modified by Venom for Fenomscrapers (updated 12-10-2021) increased timeout=7
 """
 	Fenomscrapers Project
 """
@@ -68,7 +68,7 @@ class source:
 	def get_items(self, url):
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = client.request(url, headers=headers, timeout='10')
+			r = client.request(url, headers=headers, timeout='7')
 			if not r or '<tbody' not in r: return
 			table = client.parseDOM(r, 'tbody')[0]
 			rows = client.parseDOM(table, 'tr')
@@ -103,7 +103,7 @@ class source:
 			quality, info = source_utils.get_release_quality(item[1], item[2])
 			if item[3] != '0': info.insert(0, item[3])
 			info = ' | '.join(info)
-			data = client.request(item[2], timeout='10')
+			data = client.request(item[2], timeout='7')
 			data = client.parseDOM(data, 'a', ret='href')
 			if not data: return
 			url = [i for i in data if 'magnet:' in i][0]

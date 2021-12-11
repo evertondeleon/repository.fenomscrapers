@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-10-2021) increased timeout=7
 """
 	Fenomscrapers Project
 """
@@ -39,7 +39,7 @@ class source:
 			url = self.search_link % quote_plus(query)
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			r = client.request(url, timeout='5')
+			r = client.request(url, timeout='7')
 			if not r or 'did not match any documents' in r: return sources
 			r = r.replace('&nbsp;', ' ')
 			r = client.parseDOM(r, 'div', attrs={'class': 'col s12'})
@@ -121,7 +121,7 @@ class source:
 
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link))
-		r = client.request(link, timeout='5')
+		r = client.request(link, timeout='7')
 		if not r or 'did not match any documents' in r: return
 		r = r.replace('&nbsp;', ' ')
 		r = client.parseDOM(r, 'div', attrs={'class': 'col s12'})

@@ -1,4 +1,4 @@
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.6" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.7" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -25,11 +25,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.0.6 - Dec. 09, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Fixed issue where "Hindi" only audio tracks were not respecting setting to remove.[/I]
-[COLOR yellow]--[/COLOR][I] Expanded the list of abreviated language codes for better detection of single foreign audio tracks for removal.[/I]
-[COLOR yellow]--[/COLOR][I] Added [B]"casstudio.tv"[/B] to list of undesirables due to group uploads of incomplete pack files.[/I]
-[COLOR yellow]--[/COLOR][I] Added [B]"pa.web.dl"[/B] to list of undesirables due to group uploads of single Russian only language tracks.[/I]
+[B][COLOR red]Update - v2.0.7 - Dec. 10, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fix for [[B]"undesirables.choice"[/B] setting becoming corrupt.  Note this will reset the list back to default.[/I]
+[COLOR yellow]--[/COLOR][I] Few small tweaks to scraper timeout values.[/I]
+[COLOR yellow]--[/COLOR][I] Added [B]"good.people"[/B] to list of undesirables.[/I]
 		</news>
 	</extension>
 </addon>

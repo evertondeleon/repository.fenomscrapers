@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-22-2021)
+# modified by Venom for Fenomscrapers (updated 12-10-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -87,21 +87,21 @@ class source:
 		urls = []
 		try:
 			if not url: return
-			r = client.request(url[0], timeout=5)
+			r = client.request(url[0], timeout='5')
 			r = client.parseDOM(r, 'div', attrs={'class': 'entry'})
 			r = client.parseDOM(r, 'a', ret='href')
 			if 'money' not in str(r): return urls
 			r1 = [i for i in r if 'money' in i][0]
-			r = client.request(r1, timeout=5)
+			r = client.request(r1, timeout='5')
+			if not r: return
 			r = client.parseDOM(r, 'div', attrs={'id': 'post-\d+'})[0]
-
 			if 'enter the password' in r:
 				plink= client.parseDOM(r, 'form', ret='action')[0]
 				post = {'post_password': '300mbfilms', 'Submit': 'Submit'}
-				send_post = client.request(plink, post=post, output='cookie', timeout=5)
-				link = client.request(r1, cookie=send_post, timeout=5)
+				send_post = client.request(plink, post=post, output='cookie', timeout='5')
+				link = client.request(r1, cookie=send_post, timeout='5')
 			else:
-				link = client.request(r1, timeout=5)
+				link = client.request(r1, timeout='5')
 			if '<strong>Single' not in link: return urls
 			link = re.findall(r'<strong>Single(.+?)</tr', link, re.DOTALL | re.I)[0]
 			link = client.parseDOM(link, 'a', ret='href')

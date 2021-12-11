@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-22-2021)
+# created by Venom for Fenomscrapers (updated 12-10-2021) increased timeout=7
 """
 	Fenomscrapers Project
 """
@@ -28,7 +28,6 @@ class source:
 		append = sources.append
 		try:
 			scraper = cfscrape.create_scraper()
-
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
@@ -44,7 +43,7 @@ class source:
 				url = self.search_link % data['imdb']
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			result = scraper.get(url, timeout=5).text
+			result = scraper.get(url, timeout=7).text
 			if not result: return sources
 			rows = client.parseDOM(result, 'div', attrs={'class': 'tgxtablerow txlight'})
 			if not rows: return sources
@@ -127,7 +126,7 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link))
 		try:
-			result = self.scraper.get(link, timeout=5).text
+			result = self.scraper.get(link, timeout=7).text
 			if not result: return
 			rows = client.parseDOM(result, 'div', attrs={'class': 'tgxtablerow txlight'})
 			if not rows: return

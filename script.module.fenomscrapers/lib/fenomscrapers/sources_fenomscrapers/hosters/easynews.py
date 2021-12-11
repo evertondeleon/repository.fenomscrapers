@@ -9,7 +9,7 @@ import re
 import requests
 from urllib.parse import quote
 from fenomscrapers.modules.control import setting as getSetting
-from fenomscrapers.modules import source_utils, log_utils
+from fenomscrapers.modules import source_utils
 
 SORT = {'s1': 'relevance', 's1d': '-', 's2': 'dsize', 's2d': '-', 's3': 'dtime', 's3d': '-'}
 SEARCH_PARAMS = {'st': 'adv', 'sb': 1, 'fex': 'm4v,3gp,mov,divx,xvid,wmv,avi,mpg,mpeg,mp4,mkv,avc,flv,webm', 'fty[]': 'VIDEO', 'spamf': 1, 'u': '1', 'gx': 1, 'pno': 1, 'sS': 3}
@@ -72,7 +72,6 @@ class source:
 				if 'type' in item and item['type'].upper() != 'VIDEO': continue
 				stream_url = down_url + quote('/%s/%s/%s%s/%s%s' % (dl_farm, dl_port, post_hash, ext, post_title, ext))
 				name = source_utils.clean_name(post_title)
-				# log_utils.log('name = %s' % name)
 				name_chk = name
 				if 'tvshowtitle' in data:
 					name_chk = re.sub(r'S\d+([.-])E\d+', hdlr, name_chk, 1, re.I)

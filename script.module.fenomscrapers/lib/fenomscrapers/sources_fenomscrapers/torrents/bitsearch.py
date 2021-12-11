@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (11-19-2021)
+# created by Venom for Fenomscrapers (12-10-2021) increased timeout=7
 """
 	Fenomscrapers Project
 """

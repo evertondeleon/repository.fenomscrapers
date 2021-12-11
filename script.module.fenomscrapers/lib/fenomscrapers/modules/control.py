@@ -99,15 +99,21 @@ def setUndesirables():
 		log_utils.error()
 
 def checkDefaultUndesirables():
-	from fenomscrapers.modules.source_utils import UNDESIRABLES
-	default_undesirables = homeWindow.getProperty('fenom.default.undesirables')
-	if not default_undesirables: return
-	default_undesirables = list(default_undesirables.split(','))
-	new_undesirables = [i for i in UNDESIRABLES if not i in default_undesirables]
-	if not new_undesirables: return
-	chosen = setting('undesirables.choice').replace(' ', '').split(',')
-	chosen += new_undesirables
-	setSetting('undesirables.choice', ','.join(chosen))
+	try:
+		from fenomscrapers.modules.source_utils import UNDESIRABLES
+		default_undesirables = homeWindow.getProperty('fenom.default.undesirables')
+		if not default_undesirables: return
+		default_undesirables = list(default_undesirables.split(','))
+		new_undesirables = [i for i in UNDESIRABLES if not i in default_undesirables]
+		if not new_undesirables: return
+		chosen_setting = setting('undesirables.choice')
+		if not chosen_setting: return
+		chosen = chosen_setting.replace(' ', '').split(',')
+		chosen += new_undesirables
+		setSetting('undesirables.choice', ','.join(chosen))
+	except:
+		from fenomscrapers.modules import log_utils
+		log_utils.error()
 
 def refresh_debugReversed(): # called from service "onSettingsChanged" to clear fenomscrapers.log if setting to reverse has been changed
 	if homeWindow.getProperty('fenomscrapers.debug.reversed') != setting('debug.reversed'):
