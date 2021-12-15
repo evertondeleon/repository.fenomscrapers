@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -46,11 +46,12 @@ class source:
 			url2 = self.search_link % quote_plus(query2)
 			url2 = '%s%s' % (self.base_link, url2)
 			urls.append(url2)
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls)
 		except:
 			source_utils.scraper_error('NYYAA')
 			return sources
 
+		undesirables = source_utils.get_undesirables()
 		for url in urls:
 			try:
 				r = client.request(url, timeout='5')
@@ -69,11 +70,11 @@ class source:
 						url = unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 						url = source_utils.strip_non_ascii_and_unprintable(url)
 						hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-						name = url.split('&dn=')[1]
-						name = source_utils.clean_name(name)
+						name = source_utils.clean_name(url.split('&dn=')[1])
 
 						if hdlr not in name and hdlr2 not in name: continue
 						if source_utils.remove_lang(name): continue
+						if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 						if hdlr in name:
 							t = name.split(hdlr)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
@@ -99,6 +100,3 @@ class source:
 				source_utils.scraper_error('NYAA')
 				return sources
 		return sources
-
-	def resolve(self, url):
-		return url

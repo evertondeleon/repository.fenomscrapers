@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -38,7 +38,7 @@ class source:
 			if 'tvshowtitle' in data: url = self.show_link % query.replace(' ', '-')
 			else: url = self.search_link % quote_plus(query)
 			url = '%s%s' % (self.base_link, url)
-			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 			r = client.request(url, timeout='5')
 			if not r: return sources
 			r = r.replace('\r', '').replace('\n', '').replace('\t', '')
@@ -47,6 +47,8 @@ class source:
 		except:
 			source_utils.scraper_error('TOPNOW')
 			return sources
+
+		undesirables = source_utils.get_undesirables()
 		for i in r:
 			try:
 				if 'magnet:' not in i: continue
@@ -63,6 +65,7 @@ class source:
 				release_name = source_utils.clean_name(url.split('&dn=')[1])
 				name_info = source_utils.info_from_name(release_name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				seeders = 0 # seeders not available on topnow
 				quality, info = source_utils.get_release_quality(name_info, url)
@@ -78,6 +81,3 @@ class source:
 			except:
 				source_utils.scraper_error('TOPNOW')
 		return sources
-
-	def resolve(self, url):
-		return url

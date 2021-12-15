@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021)
+# modified by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -33,6 +33,7 @@ class source:
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.year = data['year']
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
+			self.undesirables = source_utils.get_undesirables()
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -40,7 +41,7 @@ class source:
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			urls.append(url)
 			urls.append(url + '&p=2')
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('urls = %s' % urls)
 			threads = []
 			append = threads.append
 			for url in urls:
@@ -67,12 +68,12 @@ class source:
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(url.split('&dn=')[1])
 
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
@@ -110,6 +111,7 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
+			self.undesirables = source_utils.get_undesirables()
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
@@ -132,7 +134,6 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
 			r = client.request(link, timeout='5')
 			if not r or '<table' not in r: return
@@ -148,25 +149,23 @@ class source:
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(url.split('&dn=')[1])
 
 				if not self.search_series:
 					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-							continue
+						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
 					package = 'season'
 
 				elif self.search_series:
 					if not self.bypass_filter:
 						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
 						if not valid: continue
-					else:
-						last_season = self.total_seasons
+					else: last_season = self.total_seasons
 					package = 'show'
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
+				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 				try:
 					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'seeds is-hidden-sm-mobile'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -186,6 +185,3 @@ class source:
 				self.sources_append(item)
 			except:
 				source_utils.scraper_error('BTSCENE')
-
-	def resolve(self, url):
-		return url

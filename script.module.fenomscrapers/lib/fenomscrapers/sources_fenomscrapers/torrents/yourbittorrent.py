@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -34,6 +34,7 @@ class source:
 			self.year = data['year']
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
+			self.undesirables = source_utils.get_undesirables()
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -66,13 +67,13 @@ class source:
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 			if source_utils.remove_lang(name_info): return
+			if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): return
 
 			if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-			if url in str(self.sources): return
 			try:
 				seeders = int(re.search(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -109,6 +110,7 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
+			self.undesirables = source_utils.get_undesirables()
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
@@ -151,7 +153,7 @@ class source:
 
 	def get_pack_sources(self, url):
 		try:
-			# log_utils.log('url = %s' % str(url), __name__, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % str(url))
 			result = client.request(url, timeout='5')
 			if not result: return
 			if '<kbd>' not in result: return
@@ -161,23 +163,21 @@ class source:
 			name = source_utils.clean_name(unquote_plus(name))
 			if not self.search_series:
 				if not self.bypass_filter:
-					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-						return
+					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): return
 				package = 'season'
 
 			elif self.search_series:
 				if not self.bypass_filter:
 					valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
 					if not valid: return
-				else:
-					last_season = self.total_seasons
+				else: last_season = self.total_seasons
 				package = 'show'
 
 			name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 			if source_utils.remove_lang(name_info): return
+			if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): return
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-			if url in str(self.sources): return
 			try:
 				seeders = int(re.search(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -198,6 +198,3 @@ class source:
 			self.sources_append(item)
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
-
-	def resolve(self, url):
-		return url

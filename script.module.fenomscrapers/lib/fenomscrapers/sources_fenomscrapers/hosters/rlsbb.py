@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-22-2021)
+# modified by Venom for Fenomscrapers (updated 12-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -67,6 +67,7 @@ class source:
 		release_title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title).replace(' ', '.')
 		count = 0
 
+		undesirables = source_utils.get_undesirables()
 		for post in posts:
 			if count >= 300: break # to limit large link list and slow scrape time
 			items = []
@@ -107,6 +108,8 @@ class source:
 
 						name = source_utils.strip_non_ascii_and_unprintable(client.replaceHTMLCodes(name))
 						name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+						if source_utils.remove_lang(name_info): continue
+						if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 						url = client.replaceHTMLCodes(str(i))
 						if url in str(sources): continue
@@ -130,6 +133,3 @@ class source:
 			except:
 				source_utils.scraper_error('RLSBB')
 		return sources
-
-	def resolve(self, url):
-		return url

@@ -200,8 +200,8 @@ msgid "Define Extra Undesirables (Comma Separated)"
 msgstr "Definieer Extra Ongewenste (Komma Gescheiden)"
 
 msgctxt "#32049"
-msgid ""
-msgstr ""
+msgid "Remove Extra Undesirables"
+msgstr "Verwijder Extra Ongewenste"
 
 msgctxt "#32050"
 msgid "General"

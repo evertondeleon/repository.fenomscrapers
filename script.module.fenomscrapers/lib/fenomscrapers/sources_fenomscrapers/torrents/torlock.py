@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -9,6 +9,7 @@ from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
+_LINKS = re.compile(r'<a\s*href\s*=\s*(/torrent/.+?)>', re.DOTALL | re.I)
 
 
 class source:
@@ -34,6 +35,7 @@ class source:
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.year = data['year']
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
+			self.undesirables = source_utils.get_undesirables()
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -43,7 +45,7 @@ class source:
 
 			r = client.request(url, timeout='10')
 			if not r: return self.sources
-			links = re.findall(r'<a\s*href\s*=\s*(/torrent/.+?)>', r, re.DOTALL | re.I)
+			links = _LINKS.findall(r)
 			threads = []
 			append = threads.append
 			for link in links:
@@ -64,14 +66,13 @@ class source:
 
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr=')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
-			if url in str(self.sources): return
 			hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
-			name = url.split('&dn=')[1]
-			name = source_utils.clean_name(name)
+			name = source_utils.clean_name(url.split('&dn=')[1])
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 			if source_utils.remove_lang(name_info): return
+			if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): return
 
 			if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
@@ -93,6 +94,3 @@ class source:
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('TORLOCK')
-
-	def resolve(self, url):
-		return url

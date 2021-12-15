@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -9,6 +9,7 @@ from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
+_LINKS = re.compile(r'<a\s*href\s*=\s*["\'](.+?torrent.html)["\']', re.I)
 
 
 class source:
@@ -33,15 +34,16 @@ class source:
 			self.year = data['year']
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
+			self.undesirables = source_utils.get_undesirables()
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = ('%s%s' % (self.base_link, self.search_link % quote_plus(query))).replace('+', '-')
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
-			links = re.findall(r'<a\s*href\s*=\s*["\'](.+?torrent.html)["\']', r, re.I)
+			links = _LINKS.findall(r)
 			threads = []
 			append = threads.append
 			for link in links:
@@ -56,7 +58,6 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = '%s%s' % (self.base_link, link)
-			# log_utils.log('url = %s' % url)
 			result = client.request(url, timeout='5')
 			if result is None: return
 			hash = re.search(r'<a\s*title\s*=\s*["\']hash:(.+?)\s*torrent', result, re.I).group(1)
@@ -66,13 +67,13 @@ class source:
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 			if source_utils.remove_lang(name_info): return
+			if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): return
 
 			if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-			if url in str(self.sources): return
 			try:
 				seeders = int(re.search(r'["\']tseeders["\']>\s*([0-9]+|[0-9]+,[0-9]+)\s*<', result, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -108,6 +109,7 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
+			self.undesirables = source_utils.get_undesirables()
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
@@ -140,7 +142,7 @@ class source:
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
-			links = re.findall(r'<a\s*href\s*=\s*["\'](.+?torrent.html)["\']', r, re.I)
+			links = _LINKS.findall(r)
 			for link in links:
 				url = '%s%s' % (self.base_link, link)
 				self.items_append((url))
@@ -150,7 +152,6 @@ class source:
 
 	def get_pack_sources(self, url):
 		try:
-			# log_utils.log('url = %s' % str(url))
 			result = client.request(url, timeout='5')
 			if not result: return
 			hash = re.search(r'<a\s*title\s*=\s*["\']hash:(.+?)\s*torrent', result, re.I).group(1)
@@ -159,23 +160,21 @@ class source:
 			name = source_utils.clean_name(unquote_plus(name))
 			if not self.search_series:
 				if not self.bypass_filter:
-					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-						return
+					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): return
 				package = 'season'
 
 			elif self.search_series:
 				if not self.bypass_filter:
 					valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
 					if not valid: return
-				else:
-					last_season = self.total_seasons
+				else: last_season = self.total_seasons
 				package = 'show'
 
 			name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 			if source_utils.remove_lang(name_info): return
+			if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): return
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-			if url in str(self.sources): return
 			try:
 				seeders = int(re.search(r'["\']tseeders["\']>\s*([0-9]+|[0-9]+,[0-9]+)\s*<', result, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
@@ -195,6 +194,3 @@ class source:
 			self.sources_append(item)
 		except:
 			source_utils.scraper_error('TORRENTPROJECT2')
-
-	def resolve(self, url):
-		return url

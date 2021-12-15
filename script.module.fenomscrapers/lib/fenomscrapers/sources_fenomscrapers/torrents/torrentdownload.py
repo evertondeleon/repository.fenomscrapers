@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -9,6 +9,8 @@ from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
+_TABLE = re.compile(r'<table\s*class\s*=\s*["\']table2["\']\s*cellspacing\s*=\s*["\']\d+["\']>(.*?)</table>', re.I)
+_DATA = re.compile(r'<a\s*href\s*=\s*["\'](.+?)["\']>.*?<td class\s*=\s*["\']tdnormal["\']>((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class\s*=\s*["\']tdseed["\']>([0-9]+|[0-9]+,[0-9]+)</td>', re.I)
 
 
 class source:
@@ -33,6 +35,7 @@ class source:
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.year = data['year']
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
+			self.undesirables = source_utils.get_undesirables()
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -59,15 +62,16 @@ class source:
 			if not r: return
 			r = re.sub(r'\n', '', r)
 			r = re.sub(r'\t', '', r)
-			posts = re.compile(r'<table\s*class\s*=\s*["\']table2["\']\s*cellspacing\s*=\s*["\']\d+["\']>(.*?)</table>', re.I).findall(r)
+			posts = _TABLE.findall(r)
 			posts = client.parseDOM(posts, 'tr')
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOAD')
 			return
+
 		for post in posts:
 			try:
 				if '<th' in post: continue
-				links = re.compile(r'<a\s*href\s*=\s*["\'](.+?)["\']>.*?<td class\s*=\s*["\']tdnormal["\']>((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class\s*=\s*["\']tdseed["\']>([0-9]+|[0-9]+,[0-9]+)</td>', re.I).findall(post)
+				links = _DATA.findall(post)
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
@@ -78,6 +82,7 @@ class source:
 					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 					name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 					if source_utils.remove_lang(name_info): continue
+					if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 
 					url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
@@ -117,6 +122,7 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
+			self.undesirables = source_utils.get_undesirables()
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
@@ -139,21 +145,22 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link))
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
 			r = re.sub(r'\n', '', r)
 			r = re.sub(r'\t', '', r)
-			posts = re.compile(r'<table\s*class\s*=\s*["\']table2["\']\s*cellspacing\s*=\s*["\']\d+["\']>(.*?)</table>', re.I).findall(r)
+			posts = _TABLE.findall(r)
 			posts = client.parseDOM(posts, 'tr')
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOAD')
 			return
+
 		for post in posts:
 			try:
 				if '<th' in post: continue
-				links = re.compile(r'<a\s*href\s*=\s*["\'](.+?)["\']>.*?<td class\s*=\s*["\']tdnormal["\']>((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class\s*=\s*["\']tdseed["\']>([0-9]+|[0-9]+,[0-9]+)</td>', re.I).findall(post)
+				links = _DATA.findall(post)
+
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
@@ -163,20 +170,19 @@ class source:
 
 					if not self.search_series:
 						if not self.bypass_filter:
-							if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-								continue
+							if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
 						package = 'season'
 
 					elif self.search_series:
 						if not self.bypass_filter:
 							valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
 							if not valid: continue
-						else:
-							last_season = self.total_seasons
+						else: last_season = self.total_seasons
 						package = 'show'
 
 					name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 					if source_utils.remove_lang(name_info): continue
+					if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 
 					url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 					try:
@@ -198,6 +204,3 @@ class source:
 					self.sources_append(item)
 			except:
 				source_utils.scraper_error('TORRENTDOWNLOAD')
-
-	def resolve(self, url):
-		return url

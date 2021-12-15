@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-10-2021) increased timeout=20
+# (updated 12-14-2021) increased timeout=20
 '''
 	Fenomscrapers Project
 '''
@@ -75,13 +75,13 @@ class source:
 			link = self.base_link + self.search_link % (api_key, query, match, moderated, search_in)
 			p = requests.get(link, timeout=20).json()
 			if p.get('status') != 'ok': return
-
 			files = p.get('files')
 			if not files: return sources
 		except:
 			source_utils.scraper_error('FURK')
 			return sources
 
+		undesirables = source_utils.get_undesirables()
 		for i in files:
 			try:
 				if i['is_ready'] == '1' and i['type'] == 'video':
@@ -91,6 +91,8 @@ class source:
 
 					name = source_utils.clean_name(i['name'])
 					name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+					if source_utils.remove_lang(name_info): continue
+					if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 					file_id = i['id']
 					file_dl = i['url_dl']

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -40,12 +40,11 @@ class source:
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
-			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 			api_url = '%s%s' % (self.base_link, self.api_search_link)
 			headers = cache.get(self._get_token_and_cookies, 1)
 			if not headers: return sources
 			headers.update({'Referer': url})
-
 			query_data = {
 				'query': query,
 				'offset': 0,
@@ -56,7 +55,6 @@ class source:
 				'filters[category]': 3 if 'tvshowtitle' not in data else 4,
 				'filters[adult]': False,
 				'filters[risky]': False}
-
 			rjson = client.request(api_url, post=query_data, headers=headers, timeout='5')
 			if not rjson: return sources
 			files = jsloads(rjson)
@@ -65,12 +63,15 @@ class source:
 		except:
 			source_utils.scraper_error('BITLORD')
 			return sources
+
+		undesirables = source_utils.get_undesirables()
 		for file in files.get('content'):
 			try:
 				name = source_utils.clean_name(file.get('name'))
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				url = unquote_plus(file.get('magnet')).replace('&amp;', '&').replace(' ', '.')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
@@ -116,6 +117,7 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
+			self.undesirables = source_utils.get_undesirables()
 			self.headers = cache.get(self._get_token_and_cookies, 1)
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
@@ -160,10 +162,10 @@ class source:
 		except:
 			source_utils.scraper_error('BITLORD')
 			return
+
 		for file in files.get('content'):
 			try:
 				name = source_utils.clean_name(file.get('name'))
-
 				url = unquote_plus(file.get('magnet')).replace('&amp;', '&').replace(' ', '.')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
@@ -172,20 +174,19 @@ class source:
 
 				if not self.search_series:
 					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-							continue
+						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
 					package = 'season'
 
 				elif self.search_series:
 					if not self.bypass_filter:
 						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
 						if not valid: continue
-					else:
-						last_season = self.total_seasons
+					else: last_season = self.total_seasons
 					package = 'show'
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
+				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 				try:
 					seeders = file.get('seeds')
 					if self.min_seeders > seeders: continue
@@ -221,6 +222,3 @@ class source:
 		except:
 			source_utils.scraper_error('BITLORD')
 			return headers
-
-	def resolve(self, url):
-		return url

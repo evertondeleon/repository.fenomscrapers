@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers  (updated 11-22-2021)
+# modified by Venom for Fenomscrapers  (updated 12-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -82,8 +82,9 @@ class source:
 				# r_pack = [(i.content, urljoin(self.base_link, i.attrs['href'])) for i in r_pack if i and i.content != 'Watch']
 				# r += [(i[0], i[1]) for i in r_pack if 'S%02d' % int(data['season']) in i[0].upper()]
 				# r += [(i[0], i[1]) for i in r_pack if 'SEASON %02d' % int(data['season']) in i[0].upper()]
-
 			# log_utils.log('r = %s' % r)
+
+			self.undesirables = source_utils.get_undesirables()
 			threads = []
 			append = threads.append
 			for i in r:
@@ -106,7 +107,8 @@ class source:
 			if name.startswith('['): name = name.split(']')[1]
 			name = name.strip().replace(' ', '.')
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-			if source_utils.remove_lang(name_info): return self.sources
+			if source_utils.remove_lang(name_info): return
+			if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): return
 
 			l = dom_parser.parse_dom(r, 'pre', {'class': 'links'})
 			if l == []: return
@@ -133,6 +135,3 @@ class source:
 													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('RAPIDMOVIEZ')
-
-	def resolve(self, url):
-		return url

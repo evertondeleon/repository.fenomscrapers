@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-22-2021)
+# modified by Venom for Fenomscrapers (updated 12-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -60,12 +60,16 @@ class source:
 			except:
 				source_utils.scraper_error('SCENERLS')
 				return sources
+
+		undesirables = source_utils.get_undesirables()
 		for item in items:
 			try:
 				name = client.replaceHTMLCodes(item[0])
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
+
 				# check year for reboot/remake show issues if year is available-crap shoot
 				# if 'tvshowtitle' in data:
 					# if re.search(r'([1-3][0-9]{3})', name):
@@ -90,6 +94,3 @@ class source:
 			except:
 				source_utils.scraper_error('SCENERLS')
 		return sources
-
-	def resolve(self, url):
-		return url

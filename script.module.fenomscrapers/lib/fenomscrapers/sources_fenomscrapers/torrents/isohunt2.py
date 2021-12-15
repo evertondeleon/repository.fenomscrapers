@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -9,6 +9,7 @@ from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
+_DATA = re.compile(r'<a\s*href\s*=\s*["\'](/torrent_details/.+?)["\']><span>(.+?)</span>.*?<td\s*class\s*=\s*["\']size-row["\']>(.+?)</td><td\s*class\s*=\s*["\']sn["\']>([0-9]+)</td>')
 
 
 class source:
@@ -41,6 +42,7 @@ class source:
 
 			result = client.request(url, timeout='5')
 			if not result or '<tbody' not in result: return
+			self.undesirables = source_utils.get_undesirables()
 			table = client.parseDOM(result, 'tbody')[0]
 			rows = client.parseDOM(table, 'tr')
 			threads = []
@@ -57,7 +59,7 @@ class source:
 	def get_sources(self, row):
 		row = re.sub(r'\n', '', row)
 		row = re.sub(r'\t', '', row)
-		data = re.compile(r'<a\s*href\s*=\s*["\'](/torrent_details/.+?)["\']><span>(.+?)</span>.*?<td\s*class\s*=\s*["\']size-row["\']>(.+?)</td><td\s*class\s*=\s*["\']sn["\']>([0-9]+)</td>').findall(row)
+		data = _DATA.findall(row)
 		if not data: return
 		for items in data:
 			try:
@@ -75,6 +77,7 @@ class source:
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
@@ -96,6 +99,3 @@ class source:
 													'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('ISOHUNT2')
-
-	def resolve(self, url):
-		return url

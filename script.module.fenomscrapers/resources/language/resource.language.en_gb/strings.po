@@ -200,7 +200,7 @@ msgid "Define Extra Undesirables (Comma Separated)"
 msgstr ""
 
 msgctxt "#32049"
-msgid ""
+msgid "Remove Extra Undesirables"
 msgstr ""
 
 msgctxt "#32050"
@@ -564,5 +564,9 @@ msgid "TORRENTIO (Pack capable)"
 msgstr ""
 
 msgctxt "#32140"
+msgid "Clear ALL Extra Undesirables"
+msgstr ""
+
+msgctxt "#32141"
 msgid ""
 msgstr ""

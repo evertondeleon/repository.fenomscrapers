@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (11-28-2021)
+# created by Venom for Fenomscrapers (12-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -8,6 +8,7 @@ from json import loads as jsloads
 import re
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
+
 
 class source:
 	priority = 1
@@ -37,7 +38,6 @@ class source:
 			if 'tvshowtitle' in data: url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, data['season'], data['episode']))
 			else: url = '%s%s' % (self.base_link, self.movieSearch_link % imdb)
 			# log_utils.log('url = %s' % url)
-
 			rjson = client.request(url, timeout='5')
 			if not rjson or rjson == 'null' or any(value in rjson for value in ('521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance')):
 				return sources
@@ -47,6 +47,7 @@ class source:
 			return sources
 
 		_INFO = re.compile(r'👤.*')
+		undesirables = source_utils.get_undesirables()
 		for file in files:
 			try:
 				hash = file['infoHash']
@@ -57,6 +58,7 @@ class source:
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name) 
 
@@ -103,6 +105,7 @@ class source:
 			return sources
 
 		_INFO = re.compile(r'👤.*')
+		undesirables = source_utils.get_undesirables()
 		for file in files:
 			try:
 				hash = file['infoHash']
@@ -112,20 +115,19 @@ class source:
 
 				if not search_series:
 					if not bypass_filter:
-						if not source_utils.filter_season_pack(title, aliases, year, season, name):
-							continue
+						if not source_utils.filter_season_pack(title, aliases, year, season, name): continue
 					package = 'season'
 
 				elif search_series:
 					if not bypass_filter:
 						valid, last_season = source_utils.filter_show_pack(title, aliases, imdb, year, season, name, total_seasons)
 						if not valid: continue
-					else:
-						last_season = total_seasons
+					else: last_season = total_seasons
 					package = 'show'
 
 				name_info = source_utils.info_from_name(name, title, year, season=season, pack=package)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 				try:
@@ -148,6 +150,3 @@ class source:
 			except:
 				source_utils.scraper_error('TORRENTIO')
 		return sources
-
-	def resolve(self, url):
-		return url

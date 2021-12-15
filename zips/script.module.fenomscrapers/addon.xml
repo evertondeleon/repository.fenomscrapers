@@ -1,4 +1,4 @@
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.7" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.8" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -25,10 +25,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.0.7 - Dec. 10, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Fix for [[B]"undesirables.choice"[/B] setting becoming corrupt.  Note this will reset the list back to default.[/I]
-[COLOR yellow]--[/COLOR][I] Few small tweaks to scraper timeout values.[/I]
-[COLOR yellow]--[/COLOR][I] Added [B]"good.people"[/B] to list of undesirables.[/I]
+[B][COLOR red]Update - v2.0.8 - Dec. 15, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] The Undesirables list has been re-written and converted to utilize an sqlite3 database.  There is also now an additional setting option to allowing clearing of custom entries added to the database.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed torrentz2 url and search query change.[/I]
+[COLOR yellow]--[/COLOR][I] Few scraper performance tweaks.[/I]
 		</news>
 	</extension>
 </addon>

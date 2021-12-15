@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 11-17-2021)
+# (updated 12-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -51,6 +51,8 @@ class source:
 		except:
 			source_utils.scraper_error('FILEPURSUIT')
 			return sources
+
+		undesirables = source_utils.get_undesirables()
 		for item in results:
 			try:
 				url = item['file_link']
@@ -63,6 +65,7 @@ class source:
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				# link_header = client.request(url, output='headers', timeout='5') # to slow to check validity of links
 				# if not any(value in str(link_header) for value in ('stream', 'video/mkv')): continue
@@ -79,6 +82,3 @@ class source:
 			except:
 				source_utils.scraper_error('FILEPURSUIT')
 		return sources
-
-	def resolve(self, url):
-		return url

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021)
+# modified by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -9,6 +9,7 @@ from urllib.parse import quote_plus, unquote
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
+_ROWS = re.compile(r'<tr\s*name\s*=\s*["\']hover["\']\s*class\s*=\s*["\']forum_header_border["\']>(.+?)</tr>', re.DOTALL | re.I)
 
 
 class source:
@@ -50,11 +51,13 @@ class source:
 			except:
 				source_utils.scraper_error('EZTV')
 				return sources
-			rows = re.findall(r'<tr\s*name\s*=\s*["\']hover["\']\s*class\s*=\s*["\']forum_header_border["\']>(.+?)</tr>', table, re.DOTALL | re.I)
+			rows = _ROWS.findall(table)
 			if not rows: return sources
 		except:
 			source_utils.scraper_error('EZTV')
 			return sources
+
+		undesirables = source_utils.get_undesirables()
 		for row in rows:
 			try:
 				try:
@@ -70,6 +73,7 @@ class source:
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 				try:
 					seeders = int(re.search(r'<font\s*color\s*=\s*["\'].+?["\']>(\d+|\d+\,\d+)</font>', columns[5], re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -87,6 +91,3 @@ class source:
 			except:
 				source_utils.scraper_error('EZTV')
 		return sources
-
-	def resolve(self, url):
-		return url

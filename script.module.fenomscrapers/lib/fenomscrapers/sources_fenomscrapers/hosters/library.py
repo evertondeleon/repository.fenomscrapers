@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-17-2021)
+# modified by Venom for Fenomscrapers (updated 12-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -120,6 +120,3 @@ class source:
 		except:
 			source_utils.scraper_error('LIBRARY')
 			return sources
-
-	def resolve(self, url):
-		return url

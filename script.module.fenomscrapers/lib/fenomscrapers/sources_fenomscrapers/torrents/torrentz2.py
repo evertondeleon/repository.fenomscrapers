@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 11-17-2021)
+# created by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -10,6 +10,7 @@ from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
+
 class source:
 	priority = 4
 	pack_capable = True
@@ -17,8 +18,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://torrentz2.club'
-		self.search_link = '/kick.php?q=%s'
+		self.base_link = 'https://torrentzeu.org'
+		self.search_link = '/?q=%s'
 		self.min_seeders = 0
 
 	def sources(self, data, hostDict):
@@ -45,6 +46,8 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTZ2')
 			return sources
+
+		undesirables = source_utils.get_undesirables()
 		for row in rows:
 			try:
 				if 'magnet:' not in row: continue
@@ -57,18 +60,20 @@ class source:
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 				try:
-					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) # keep an eye on this, looks like they gaffed their col's (seeders and size)
+					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) # keep an eye on this, looks like they gaffed their col's (seeders and size)-they fixed size now
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' ')).group(0)
+					# size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' ')).group(0)
+					size = client.parseDOM(row, 'td', attrs={'data-title': '(?i)Size'})[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -95,6 +100,7 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
+			self.undesirables = source_utils.get_undesirables()
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
@@ -117,7 +123,6 @@ class source:
 			return self.sources
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % str(link))
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
@@ -137,28 +142,28 @@ class source:
 				name = source_utils.clean_name(url.split('&dn=')[1])
 				if not self.search_series:
 					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-							continue
+						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
 					package = 'season'
 
 				elif self.search_series:
 					if not self.bypass_filter:
 						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
 						if not valid: continue
-					else:
-						last_season = self.total_seasons
+					else: last_season = self.total_seasons
 					package = 'show'
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
+				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 				try:
-					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) # keep an eye on this, looks like they gaffed their col's (seeders and size)
+					seeders = int(re.search(r'<td\s*data-title\s*=\s*["\']Last Updated["\']>(.*?)<', row, re.I).group(1)) # keep an eye on this, looks like they gaffed their col's (seeders and size)-they fixed size now
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' ')).group(0)
+					# size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' ')).group(0)
+					size = client.parseDOM(row, 'td', attrs={'data-title': '(?i)Size'})[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -170,6 +175,3 @@ class source:
 				self.sources_append(item)
 			except:
 				source_utils.scraper_error('TORRENTZ2')
-
-	def resolve(self, url):
-		return url

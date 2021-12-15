@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-22-2021)
+# modified by Venom for Fenomscrapers (updated 12-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -48,6 +48,8 @@ class source:
 		except:
 			source_utils.scraper_error('MAXRLS')
 			return sources
+
+		undesirables = source_utils.get_undesirables()
 		for post in posts:
 			try:
 				post_title = client.parseDOM(post, "h2", attrs={"class": "postTitle"})
@@ -64,6 +66,7 @@ class source:
 					if title not in name: continue # IMDB and Links: can be in name so check for title match
 					name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 					if source_utils.remove_lang(name_info): continue
+					if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 					links = client.parseDOM(i, "a", ret="href")
 					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', i).group(0)
@@ -85,6 +88,3 @@ class source:
 			except:
 				source_utils.scraper_error('MAXRLS')
 		return sources
-
-	def resolve(self, url):
-		return url

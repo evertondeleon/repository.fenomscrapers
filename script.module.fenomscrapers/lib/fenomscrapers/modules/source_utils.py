@@ -6,6 +6,7 @@
 import re
 from string import printable
 from fenomscrapers.modules import cleantitle
+from fenomscrapers.modules.undesirables import Undesirables
 from fenomscrapers.modules.control import homeWindow, setting as getSetting, setSetting
 
 
@@ -73,19 +74,10 @@ unwanted_tags = ('tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.w
 home_getProperty = homeWindow.getProperty
 
 def get_undesirables():
-	undesirables = home_getProperty('fenom.undesirables')
-	undesirables = list(set(undesirables.replace(' ', '').split(',')))
+	if not getSetting('filter.undesirables'): return []
+	try: undesirables = Undesirables().get_enabled()
+	except: undesirables = UNDESIRABLES
 	return undesirables
-
-def undesirablesSelect():
-	from fenomscrapers.modules.control import multiselectDialog
-	chosen = getSetting('undesirables.choice').replace(' ', '').split(',')
-	try: preselect = [UNDESIRABLES.index(i) for i in chosen]
-	except: preselect = [UNDESIRABLES.index(i) for i in UNDESIRABLES]
-	choices = multiselectDialog(UNDESIRABLES, preselect=preselect)
-	if not choices: return
-	choices = [UNDESIRABLES[i] for i in choices]
-	setSetting('undesirables.choice', ','.join(choices))
 
 def get_qual(term):
 	if any(i in term for i in SCR): return 'SCR'
@@ -163,10 +155,7 @@ def remove_lang(release_info):
 	try:
 		if any(value in release_info for value in DUBBED): return True
 		if any(value in release_info for value in SUBS): return True
-		if home_getProperty('fenom.filter.undesirables') == 'true':
-			undesirables = get_undesirables()
-			if any(value in release_info for value in undesirables): return True
-		if home_getProperty('fenom.filter.foreign.single.audio') == 'true':
+		if getSetting('filter.foreign.single.audio') == 'true':
 			if any(value in release_info for value in LANG) and not any(value in release_info for value in ('.eng.', '.en.', 'english')): return True
 			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ('.eng.', '.en.', 'english')): return True
 		if release_info.endswith('.srt.') and not any(value in release_info for value in ('with.srt', '.avi', '.mkv', '.mp4')): return True
@@ -176,8 +165,11 @@ def remove_lang(release_info):
 		log_utils.error()
 		return False
 
+def remove_undesirables(release_info, undesirables):
+	if any(value in release_info for value in undesirables): return True
+
 def single_checkPack(release_title, query):
-	range_pattern = r'%s%s' % (query.lower(), '[-]\d{2}([-,.[({]|$)')
+	range_pattern = '%s%s' % (query.lower(), r'[-]\d{2}([-,.[({]|$)')
 	if bool(re.search(range_pattern, release_title.lower())): return True
 	else: return False
 

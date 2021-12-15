@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-22-2021)
+# modified by Venom for Fenomscrapers (updated 12-14-2021)
 """
 	Fenomscrapers Project
 """
@@ -41,7 +41,7 @@ class source:
 		append = sources.append
 		try:
 			self.scraper = cfscrape.create_scraper()
-			self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
+			key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
@@ -53,9 +53,9 @@ class source:
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			if 'tvshowtitle' in data:
-				search_link = self.tvshowsearch.format(self.key, data['imdb'], hdlr)
+				search_link = self.tvshowsearch.format(key, data['imdb'], hdlr)
 			else:
-				search_link = self.msearch.format(self.key, data['imdb'])
+				search_link = self.msearch.format(key, data['imdb'])
 			# log_utils.log('search_link = %s' % str(search_link))
 			rjson = self.scraper.get(search_link, timeout=5)
 			if rjson.status_code == 200: rjson = rjson.json()
@@ -65,6 +65,8 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
+
+		undesirables = source_utils.get_undesirables()
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
@@ -74,6 +76,7 @@ class source:
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
@@ -104,16 +107,15 @@ class source:
 			return sources
 		try:
 			self.scraper = cfscrape.create_scraper()
-			self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
+			key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
 
-			self.bypass_filter = bypass_filter
+			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			aliases = data['aliases']
+			year = data['year']
+			season = data['season']
+			season_xx = season.zfill(2)
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
-			self.aliases = data['aliases']
-			self.year = data['year']
-			self.season_x = data['season']
-			self.season_xx = self.season_x.zfill(2)
-			search_link = self.tvshowsearch.format(self.key, data['imdb'], 'S%s' % self.season_xx)
+			search_link = self.tvshowsearch.format(key, data['imdb'], 'S%s' % season_xx)
 			rjson = self.scraper.get(search_link, timeout=5)
 			if rjson.status_code == 200: rjson = rjson.json()
 			else: return sources
@@ -122,19 +124,22 @@ class source:
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
+
+		undesirables = source_utils.get_undesirables()
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(unquote_plus(file["title"]))
 
-				if not self.bypass_filter:
-					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
+				if not bypass_filter:
+					if not source_utils.filter_season_pack(title, aliases, year, season, name):
 						continue
 				package = 'season'
 
-				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
+				name_info = source_utils.info_from_name(name, title, year, season=season, pack=package)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 				try:
 					seeders = int(file["seeders"])
 					if self.min_seeders > seeders: continue
@@ -152,6 +157,3 @@ class source:
 			except:
 				source_utils.scraper_error('TORRENTAPI')
 		return sources
-
-	def resolve(self, url):
-		return url

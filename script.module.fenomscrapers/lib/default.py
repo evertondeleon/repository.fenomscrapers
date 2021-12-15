@@ -91,8 +91,20 @@ elif action == 'cleanSettings':
 	control.clean_settings()
 
 elif action == 'undesirablesSelect':
-	from fenomscrapers.modules import source_utils
-	source_utils.undesirablesSelect()
+	from fenomscrapers.modules.undesirables import undesirablesSelect
+	undesirablesSelect()
+
+elif action == 'undesirablesInput':
+	from fenomscrapers.modules.undesirables import undesirablesInput
+	undesirablesInput()
+
+elif action == 'undesirablesUserRemove':
+	from fenomscrapers.modules.undesirables import undesirablesUserRemove
+	undesirablesUserRemove()
+
+elif action == 'undesirablesUserRemoveAll':
+	from fenomscrapers.modules.undesirables import undesirablesUserRemoveAll
+	undesirablesUserRemoveAll()
 
 elif action == 'tools_clearLogFile':
 	from fenomscrapers.modules import log_utils

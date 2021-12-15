@@ -31,9 +31,6 @@ class CheckSettingsFile:
 class SettingsMonitor(control.monitor_class):
 	def __init__ (self):
 		control.monitor_class.__init__(self)
-		control.setSetting('undesirables.choice', '')
-		control.checkDefaultUndesirables()
-		control.setUndesirables()
 		window.setProperty('fenomscrapers.debug.reversed', control.setting('debug.reversed'))
 		xbmc.log('[ script.module.fenomscrapers ]  Settings Monitor Service Starting...', LOGINFO)
 
@@ -41,7 +38,6 @@ class SettingsMonitor(control.monitor_class):
 		window.clearProperty('fenomscrapers_settings')
 		control.sleep(50)
 		refreshed = control.make_settings_dict()
-		control.setUndesirables()
 		control.refresh_debugReversed()
 
 class AddonCheckUpdate:
@@ -82,10 +78,23 @@ class SyncMyAccounts:
 		control.syncMyAccounts(silent=True)
 		return xbmc.log('[ script.module.fenomscrapers ]  Finished Sync "My Accounts" Service', LOGINFO)
 
+class CheckUndesirablesDatabase:
+	def run(self):
+		xbmc.log('[ script.module.fenomscrapers ]  "CheckUndesirablesDatabase" Service Starting...', LOGINFO)
+		from fenomscrapers.modules import undesirables
+		try:
+			old_database = undesirables.Undesirables().check_database()
+			if old_database: undesirables.add_new_default_keywords()
+		except:
+			import traceback
+			traceback.print_exc()
+		return xbmc.log('[ script.module.fenomscrapers ]  Finished "CheckUndesirablesDatabase" Service', LOGINFO)
+
 def main():
 	while not control.monitor.abortRequested():
 		xbmc.log('[ script.module.fenomscrapers ]  Service Started', LOGINFO)
 		CheckSettingsFile().run()
+		CheckUndesirablesDatabase().run()
 		SyncMyAccounts().run()
 		if control.setting('checkAddonUpdates') == 'true':
 			AddonCheckUpdate().run()

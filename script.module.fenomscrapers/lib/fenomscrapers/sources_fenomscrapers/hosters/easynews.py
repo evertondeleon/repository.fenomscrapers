@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-01-2021)
+# (updated 12-14-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -63,6 +63,8 @@ class source:
 		except:
 			source_utils.scraper_error('EASYNEWS')
 			return sources
+
+		undesirables = source_utils.get_undesirables()
 		for item in files:
 			try:
 				post_hash, post_title, ext, duration = item['0'], item['10'], item['11'], item['14']
@@ -83,6 +85,7 @@ class source:
 
 				name_info = source_utils.info_from_name(name_chk, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				file_dl = '%s%s' % (stream_url, '|Authorization=%s' % quote(auth))
 				quality, info = source_utils.get_release_quality(name_info, file_dl)
@@ -119,6 +122,3 @@ class source:
 		params['gps'] = query
 		url = '%s%s' % (self.base_link, self.search_link)
 		return url, params
-
-	def resolve(self, url):
-		return url
