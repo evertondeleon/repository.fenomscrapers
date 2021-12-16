@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-14-2021)
+# modified by Venom for Fenomscrapers (updated 12-15-2021)
 """
 	Fenomscrapers Project
 """
@@ -45,6 +45,7 @@ class source:
 			self.year = data['year']
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
 			self.undesirables = source_utils.get_undesirables()
+			self.check_foreign_audio = source_utils.check_foreign_audio()
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -72,8 +73,7 @@ class source:
 	def get_sources(self, url):
 		# log_utils.log('url = %s' % url)
 		try:
-			headers = {'User-Agent': client.agent()}
-			r = client.request(url, headers=headers, timeout='5')
+			r = client.request(url, timeout='7')
 			if not r: return
 			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
 		except:
@@ -90,7 +90,7 @@ class source:
 
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-				if source_utils.remove_lang(name_info): continue
+				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
@@ -129,6 +129,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 			self.undesirables = source_utils.get_undesirables()
+			self.check_foreign_audio = source_utils.check_foreign_audio()
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
@@ -152,8 +153,7 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			headers = {'User-Agent': client.agent()}
-			r = client.request(link, headers=headers, timeout='5')
+			r = client.request(link, timeout='7')
 			if not r: return
 			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
 		except:
@@ -180,7 +180,7 @@ class source:
 					package = 'show'
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
-				if source_utils.remove_lang(name_info): continue
+				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 				try:
 					seeders = int(re.search(r'<td\s*class\s*=\s*["\']green\s*center["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.I).group(1).replace(',', ''))

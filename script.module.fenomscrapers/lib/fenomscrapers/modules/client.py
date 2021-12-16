@@ -73,7 +73,6 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 
 		try: headers.update(headers)
 		except: headers = {}
-
 		if 'User-Agent' in headers: pass
 		elif mobile is not True: headers['User-Agent'] = cache.get(randomagent, 12)
 		else: headers['User-Agent'] = 'Apple-iPhone/701.341'
@@ -333,13 +332,11 @@ def cleanHTML(txt):
 	return _replaceHTMLCodes(_replaceHTMLCodes(txt))
 
 def randomagent():
-# (my pc) Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0
-# (Edge User-Agent) Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582
 	BR_VERS = [
-		['%s.0' % i for i in range(68, 85)],
-		['78.0.3904.108', '79.0.3945.88', '80.0.3987.149', '81.0.4044.113', '83.0.4103.116', '84.0.4147.105', '85.0.4183.121', '86.0.4240.193', '87.0.4280.88', '88.0.4324.190', '89.0.4389.72'],
+		['%s.0' % i for i in range(85, 95)],
+		['84.0.4147.135', '85.0.4183.102', '86.0.4240.198', '87.0.4280.141', '88.0.4324.182', '89.0.4389.72', '90.0.4430.93', '91.0.4472.123', '95.0.4638.74', '96.0.4664.104'],
 		['11.0']]
-	WIN_VERS = ['Windows NT 10.0', 'Windows NT 7.0', 'Windows NT 6.3', 'Windows NT 6.2', 'Windows NT 6.1', 'Windows NT 6.0', 'Windows NT 5.1']
+	WIN_VERS = ['Windows NT 11.0', 'Windows NT 10.0', 'Windows NT 8.1', 'Windows NT 8.0', 'Windows NT 7.0']
 	FEATURES = ['; WOW64', '; Win64; IA64', '; Win64; x64', '']
 	RAND_UAS = ['Mozilla/5.0 ({win_ver}{feature}; rv:{br_ver}) Gecko/20100101 Firefox/{br_ver}',
 				'Mozilla/5.0 ({win_ver}{feature}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{br_ver} Safari/537.36',
@@ -351,10 +348,7 @@ def randomagent():
 		br_ver=choice(BR_VERS[index]))
 
 def agent():
-	return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36' # works on glodls
-	# return 'Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko' # fails for glodls, (compatible, MSIE) removed
-	#return 'Mozilla/5.0 (Windows NT 6.2; Win64; x64; Trident/7.0; rv:11.0) like Gecko' # works on glodls
-
+	return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.123 Safari/537.36' # works on glodls
 
 class cfcookie:
 	def __init__(self):

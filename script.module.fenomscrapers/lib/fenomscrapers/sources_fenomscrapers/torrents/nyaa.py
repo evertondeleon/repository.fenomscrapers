@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-14-2021)
+# created by Venom for Fenomscrapers (updated 12-15-2021)
 """
 	Fenomscrapers Project
 """
@@ -52,12 +52,12 @@ class source:
 			return sources
 
 		undesirables = source_utils.get_undesirables()
+		check_foreign_audio = source_utils.check_foreign_audio()
 		for url in urls:
 			try:
 				r = client.request(url, timeout='5')
 				if not r or 'magnet' not in r: return sources
-				r = re.sub(r'\n', '', r)
-				r = re.sub(r'\t', '', r)
+				r = re.sub(r'[\n\t]', '', r)
 				tbody = client.parseDOM(r, 'tbody')
 				rows = client.parseDOM(tbody, 'tr')
 
@@ -73,7 +73,7 @@ class source:
 						name = source_utils.clean_name(url.split('&dn=')[1])
 
 						if hdlr not in name and hdlr2 not in name: continue
-						if source_utils.remove_lang(name): continue
+						if source_utils.remove_lang(name, check_foreign_audio): continue
 						if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 						if hdlr in name:

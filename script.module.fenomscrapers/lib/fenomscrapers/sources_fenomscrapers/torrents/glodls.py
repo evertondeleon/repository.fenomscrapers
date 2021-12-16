@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-14-2021)
+# modified by Venom for Fenomscrapers (updated 12-15-2021)
 """
 	Fenomscrapers Project
 """
@@ -9,7 +9,7 @@ from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
-
+_EPSTRINGS = re.compile(r'[.-]s\d{2}e\d{2}([.-]?)|[.-]s\d{2}([.-]?)|[.-]season[.-]?\d{1,2}[.-]?', re.I)
 
 class source:
 	priority = 3
@@ -37,6 +37,7 @@ class source:
 			year = data['year']
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -44,8 +45,7 @@ class source:
 			else: url = self.moviesearch.format(quote_plus(query))
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			headers = {'User-Agent': client.agent()}
-			result = client.request(url, headers=headers, timeout='5')
+			result = client.request(url, timeout='5')
 			if not result: return sources
 			rows = client.parseDOM(result, 'tr', attrs={'class': 't-row'})
 			if not rows: return sources
@@ -64,12 +64,14 @@ class source:
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
-				if source_utils.remove_lang(name_info): continue
+				if source_utils.remove_lang(name_info, check_foreign_audio): continue
 				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
-				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+				# if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					# # ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
+					# # if any(re.search(item, name.lower()) for item in ep_strings): continue
+					# if _EPSTRINGS.search(name): continue
+
 				try:
 					seeders = int(re.search(r'<td.*?<font\s*color\s*=\s*["\'].+?["\']><b>([0-9]+|[0-9]+,[0-9]+)</b>', row).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -105,6 +107,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 			self.undesirables = source_utils.get_undesirables()
+			self.check_foreign_audio = source_utils.check_foreign_audio()
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
@@ -129,8 +132,7 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			headers = {'User-Agent': client.randomagent()}
-			result = client.request(link, headers=headers, timeout='5')
+			result = client.request(link, timeout='5')
 			if not result: return
 			rows = client.parseDOM(result, 'tr', attrs={'class': 't-row'})
 			if not rows: return
@@ -161,7 +163,7 @@ class source:
 					package = 'show'
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
-				if source_utils.remove_lang(name_info): continue
+				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 				try:
 					seeders = int(re.search(r'<td.*?<font\s*color\s*=\s*["\'].+?["\']><b>([0-9]+|[0-9]+,[0-9]+)</b>', row).group(1).replace(',', ''))

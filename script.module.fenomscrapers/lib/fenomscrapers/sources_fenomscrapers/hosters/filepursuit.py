@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-14-2021)
+# (updated 12-15-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -53,6 +53,7 @@ class source:
 			return sources
 
 		undesirables = source_utils.get_undesirables()
+		check_foreign_audio = source_utils.check_foreign_audio()
 		for item in results:
 			try:
 				url = item['file_link']
@@ -64,7 +65,7 @@ class source:
 
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
-				if source_utils.remove_lang(name_info): continue
+				if source_utils.remove_lang(name_info, check_foreign_audio): continue
 				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				# link_header = client.request(url, output='headers', timeout='5') # to slow to check validity of links

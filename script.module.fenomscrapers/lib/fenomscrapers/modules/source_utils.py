@@ -25,6 +25,9 @@ ABV_LANG = ('.ara.', '.ces.', '.chi.', '.chs.', '.cze.', '.dan.', '.de.', '.deu.
 DUBBED = ('bengali.dub', 'dublado', 'dubbed', 'pldub')
 SUBS = ('subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs')
 
+ENG_CHECK = ('.eng.', '.en.', 'english')
+SRT_CHECK = ('with.srt', '.avi', '.mkv', '.mp4')
+
 UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'amedia', 'audiobook', 'baibako', 'bigsinema', 'bonus.disc', 'casstudio.tv', 'courage.bambey',
 				'.cbr', '.cbz', 'coldfilm', 'dilnix', 'dutchreleaseteam', 'e.book.collection', 'empire.minutemen', 'eniahd', '.exe', 'exkinoray', 'extras.only',
 				'gears.media', 'gearsmedia', 'good.people', 'gostfilm', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'hurtom', 'idea.film', 'ideafilm', 'jaskier', 'kapatejl6', 'kb.1080p',
@@ -74,10 +77,13 @@ unwanted_tags = ('tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.w
 home_getProperty = homeWindow.getProperty
 
 def get_undesirables():
-	if not getSetting('filter.undesirables'): return []
+	if not getSetting('filter.undesirables') == 'true': return []
 	try: undesirables = Undesirables().get_enabled()
 	except: undesirables = UNDESIRABLES
 	return undesirables
+
+def check_foreign_audio():
+	return getSetting('filter.foreign.single.audio') == 'true'
 
 def get_qual(term):
 	if any(i in term for i in SCR): return 'SCR'
@@ -150,15 +156,15 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 		log_utils.error()
 		return match
 
-def remove_lang(release_info):
+def remove_lang(release_info, check_foreign_audio):
 	if not release_info: return False
 	try:
 		if any(value in release_info for value in DUBBED): return True
 		if any(value in release_info for value in SUBS): return True
-		if getSetting('filter.foreign.single.audio') == 'true':
-			if any(value in release_info for value in LANG) and not any(value in release_info for value in ('.eng.', '.en.', 'english')): return True
-			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ('.eng.', '.en.', 'english')): return True
-		if release_info.endswith('.srt.') and not any(value in release_info for value in ('with.srt', '.avi', '.mkv', '.mp4')): return True
+		if check_foreign_audio:
+			if any(value in release_info for value in LANG) and not any(value in release_info for value in ENG_CHECK): return True
+			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ENG_CHECK): return True
+		if release_info.endswith('.srt.') and not any(value in release_info for value in SRT_CHECK): return True
 		return False
 	except:
 		from fenomscrapers.modules import log_utils

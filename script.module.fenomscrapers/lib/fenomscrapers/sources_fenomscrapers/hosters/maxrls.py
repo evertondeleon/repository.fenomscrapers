@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-14-2021)
+# modified by Venom for Fenomscrapers (updated 12-15-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -50,6 +50,7 @@ class source:
 			return sources
 
 		undesirables = source_utils.get_undesirables()
+		check_foreign_audio = source_utils.check_foreign_audio()
 		for post in posts:
 			try:
 				post_title = client.parseDOM(post, "h2", attrs={"class": "postTitle"})
@@ -65,7 +66,7 @@ class source:
 					name = re.sub(r'(<span.*?>)', '', name).replace('</span>', '')
 					if title not in name: continue # IMDB and Links: can be in name so check for title match
 					name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
-					if source_utils.remove_lang(name_info): continue
+					if source_utils.remove_lang(name_info, check_foreign_audio): continue
 					if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 					links = client.parseDOM(i, "a", ret="href")

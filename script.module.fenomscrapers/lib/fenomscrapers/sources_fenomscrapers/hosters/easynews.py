@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-14-2021)
+# (updated 12-15-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -65,6 +65,7 @@ class source:
 			return sources
 
 		undesirables = source_utils.get_undesirables()
+		check_foreign_audio = source_utils.check_foreign_audio()
 		for item in files:
 			try:
 				post_hash, post_title, ext, duration = item['0'], item['10'], item['11'], item['14']
@@ -84,7 +85,7 @@ class source:
 					if not source_utils.check_title(title, aliases, name_chk, hdlr, year, years): continue
 
 				name_info = source_utils.info_from_name(name_chk, title, year, hdlr, episode_title)
-				if source_utils.remove_lang(name_info): continue
+				if source_utils.remove_lang(name_info, check_foreign_audio): continue
 				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				file_dl = '%s%s' % (stream_url, '|Authorization=%s' % quote(auth))

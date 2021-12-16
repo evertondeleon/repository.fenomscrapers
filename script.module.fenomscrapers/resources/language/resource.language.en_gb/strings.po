@@ -340,19 +340,19 @@ msgid "-- Title Check Results"
 msgstr ""
 
 msgctxt "#32084"
-msgid ""
+msgid "No User Undesirables Set"
 msgstr ""
 
 msgctxt "#32085"
-msgid ""
+msgid "Select to Enable/Disable"
 msgstr ""
 
 msgctxt "#32086"
-msgid ""
+msgid "Select to Remove From List"
 msgstr ""
 
 msgctxt "#32087"
-msgid ""
+msgid "Success"
 msgstr ""
 
 msgctxt "#32088"

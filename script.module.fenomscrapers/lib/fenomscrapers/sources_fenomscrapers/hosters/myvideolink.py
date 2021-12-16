@@ -69,8 +69,7 @@ class source:
 					isSeasonList = False
 					if 'Season' in name or 'S%02d' % int(data['season']) in name:
 						isSeasonList = True
-					results = re.sub(r'\n', '', results)
-					results = re.sub(r'\t', '', results).replace('> <', '><')
+					results = re.sub(r'[\n\t]', '', results).replace('> <', '><')
 					test = re.findall(r'<p><b>(.*?)</ul>', results, re.DOTALL) # parsing this site for episodes is a bitch, fuck it this is close as I'm doing
 					for x in test:
 						test2 = re.search(r'(.*?)</b>', x).group(1)

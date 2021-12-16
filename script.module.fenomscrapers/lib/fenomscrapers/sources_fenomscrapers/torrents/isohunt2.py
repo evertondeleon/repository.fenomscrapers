@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-14-2021)
+# created by Venom for Fenomscrapers (updated 12-15-2021)
 """
 	Fenomscrapers Project
 """
@@ -43,6 +43,7 @@ class source:
 			result = client.request(url, timeout='5')
 			if not result or '<tbody' not in result: return
 			self.undesirables = source_utils.get_undesirables()
+			self.check_foreign_audio = source_utils.check_foreign_audio()
 			table = client.parseDOM(result, 'tbody')[0]
 			rows = client.parseDOM(table, 'tr')
 			threads = []
@@ -57,8 +58,7 @@ class source:
 			return self.sources
 
 	def get_sources(self, row):
-		row = re.sub(r'\n', '', row)
-		row = re.sub(r'\t', '', row)
+		row = re.sub(r'[\n\t]', '', row)
 		data = _DATA.findall(row)
 		if not data: return
 		for items in data:
@@ -76,7 +76,7 @@ class source:
 				name = source_utils.clean_name(unquote_plus(url.split('&dn=')[1]))
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-				if source_utils.remove_lang(name_info): continue
+				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)

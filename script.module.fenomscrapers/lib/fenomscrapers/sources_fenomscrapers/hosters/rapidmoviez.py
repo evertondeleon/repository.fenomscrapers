@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers  (updated 12-14-2021)
+# modified by Venom for Fenomscrapers  (updated 12-15-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -27,12 +27,11 @@ class source:
 		self.search_link = 'search/%s'
 		# self.base_link = 'http://rapidmoviez.cr/' # cloudflare IUAM challenge failure
 		self.scraper = cfscrape.create_scraper()
-		self.headers = {'User-Agent': client.agent()}
 
 	def search(self, title, year):
 		try:
 			url = urljoin(self.base_link, self.search_link % (quote_plus(title)))
-			r = self.scraper.get(url, headers=self.headers, timeout=10).text
+			r = self.scraper.get(url, timeout=10).text
 			if not r: return None
 			r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0] # switch to client.parseDOM() to rid import
 			r = dom_parser.parse_dom(r.content, 'li')
@@ -62,7 +61,7 @@ class source:
 			# log_utils.log('url = %s' % url)
 			if not url: return self.sources
 
-			result = self.scraper.get(url, headers=self.headers, timeout=10).text
+			result = self.scraper.get(url, timeout=10).text
 			if not result: return self.sources
 			r_pack = None
 			if 'tvshowtitle' in data:
@@ -85,6 +84,7 @@ class source:
 			# log_utils.log('r = %s' % r)
 
 			self.undesirables = source_utils.get_undesirables()
+			self.check_foreign_audio = source_utils.check_foreign_audio()
 			threads = []
 			append = threads.append
 			for i in r:
@@ -101,13 +101,12 @@ class source:
 
 	def get_sources(self, name, url):
 		try:
-			r = self.scraper.get(url, headers=self.headers, timeout=10).text
-
+			r = self.scraper.get(url, timeout=10).text
 			name = client.replaceHTMLCodes(name)
 			if name.startswith('['): name = name.split(']')[1]
 			name = name.strip().replace(' ', '.')
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-			if source_utils.remove_lang(name_info): return
+			if source_utils.remove_lang(name_info, self.check_foreign_audio): return
 			if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): return
 
 			l = dom_parser.parse_dom(r, 'pre', {'class': 'links'})

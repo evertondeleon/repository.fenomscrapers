@@ -1,4 +1,4 @@
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.8" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.9" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -25,10 +25,11 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.0.8 - Dec. 15, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] The Undesirables list has been re-written and converted to utilize an sqlite3 database.  There is also now an additional setting option to allowing clearing of custom entries added to the database.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed torrentz2 url and search query change.[/I]
-[COLOR yellow]--[/COLOR][I] Few scraper performance tweaks.[/I]
+[B][COLOR red]Update - v2.0.9 - Dec. 16, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed torrentz2 query change, again.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed performance issue with torrentdownloads index.[/I]
+[COLOR yellow]--[/COLOR][I] Added, updated, missing .po strings.[/I]
+[COLOR yellow]--[/COLOR][I] Moved "foreign_audio" settings check outside "for" loop in all scrapers.[/I]
 		</news>
 	</extension>
 </addon>

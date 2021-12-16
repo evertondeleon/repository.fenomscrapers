@@ -12,7 +12,6 @@
 		<setting id="checkAddonUpdates" type="bool" label="32010" default="false" />
 		<setting label="32001" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=updates)" />
 		<!-- Hidden -->
-        <setting id="undesirables.choice" type="text" default="" visible="false" />
         <!-- <setting id="folder5.tv_shows_directory" type="text" default="None" visible="false" /> -->
 	</category>
 
