@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-15-2021)
+# modified by Venom for Fenomscrapers (updated 12-20-2021)
 """
 	Fenomscrapers Project
 """
@@ -18,7 +18,7 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
-		self.base_link = 'https://zooqle.com'
+		self.base_link = "https://zooqle.com"
 		self.search_link = '/search?pg=1&q=%s'
 		self.min_seeders = 1
 
@@ -28,7 +28,7 @@ class source:
 		self.sources_append = self.sources.append
 		try:
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.year = data['year']
@@ -60,7 +60,7 @@ class source:
 		try:
 			# For some reason Zooqle returns 404 even though the response has a body.
 			# This is probably a bug on Zooqle's server and the error should just be ignored.
-			html = client.request(url, ignoreErrors=404, timeout='5')
+			html = client.request(url, ignoreErrors=404, timeout=5)
 			if not html: return
 			html = html.replace('&nbsp;', ' ')
 			try: table = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
@@ -75,8 +75,8 @@ class source:
 				try:
 					if 'magnet:' not in row: continue
 					url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
-					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-					url = source_utils.strip_non_ascii_and_unprintable(url)
+					url = unquote_plus(url).replace('&amp;', '&').split('&tr')[0].replace(' ', '.')
+					# url = source_utils.strip_non_ascii_and_unprintable(url)
 				except: continue
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				try:
@@ -97,7 +97,9 @@ class source:
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
+
 				try:
 					seeders = int(re.search(r'["\']Seeders:\s*([0-9]+|[0-9]+,[0-9]+)\s*\|', row, re.I).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
@@ -125,7 +127,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -160,7 +162,7 @@ class source:
 		try:
 			# For some reason Zooqle returns 404 even though the response has a body.
 			# This is probably a bug on Zooqle's server and the error should just be ignored.
-			html = client.request(link, ignoreErrors=404, timeout='5')
+			html = client.request(link, ignoreErrors=404, timeout=5)
 			if not html: return
 			html = html.replace('&nbsp;', ' ')
 			try: table = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
@@ -175,12 +177,12 @@ class source:
 				try:
 					if 'magnet:' not in row: continue
 					url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
-					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-					url = source_utils.strip_non_ascii_and_unprintable(url)
+					url = unquote_plus(url).replace('&amp;', '&').split('&tr')[0].replace(' ', '.')
+					# url = source_utils.strip_non_ascii_and_unprintable(url)
 				except: continue
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				try:
-					name = re.search(r'<a class\s*=\s*["\'].+?>(.+?)</a>', row, re.I).group(1)
+					name = re.search(r'<a\s*class\s*=\s*["\'].+?>(.+?)</a>', row, re.I).group(1)
 					name = source_utils.clean_name(unquote_plus(client.cleanHTML(name)))
 				except: continue
 

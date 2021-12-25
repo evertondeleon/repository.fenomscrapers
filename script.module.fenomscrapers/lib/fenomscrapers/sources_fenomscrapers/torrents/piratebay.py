@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-15-2021)
+# modified by Venom for Fenomscrapers (updated 12-16-2021)
 """
 	Fenomscrapers Project
 """
@@ -11,6 +11,7 @@ from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
+SERVER_ERROR = ('521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance')
 
 
 class source:
@@ -20,7 +21,7 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://apibay.org'
+		self.base_link = "https://apibay.org"
 		self.search_link = '/q.php?q=%s&cat=0'
 		self.min_seeders = 0
 
@@ -30,7 +31,7 @@ class source:
 		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -42,16 +43,15 @@ class source:
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
 
-			rjson = client.request(url, timeout='5')
-			if not rjson or any(value in rjson for value in ('521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance')):
-				return sources
+			rjson = client.request(url, timeout=5)
+			if not rjson or any(value in rjson for value in SERVER_ERROR): return sources
 			files = jsloads(rjson)
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('PIRATEBAY')
 			return sources
 
-		undesirables = source_utils.get_undesirables()
-		check_foreign_audio = source_utils.check_foreign_audio()
 		for file in files:
 			try:
 				hash = file['info_hash']
@@ -66,7 +66,9 @@ class source:
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
+
 				try:
 					seeders= int(file['seeders'])
 					if self.min_seeders > seeders: continue
@@ -94,7 +96,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -125,8 +127,8 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			rjson = client.request(link, timeout='5')
-			if not rjson or any(value in rjson for value in ('521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance')): return
+			rjson = client.request(link, timeout=5)
+			if not rjson or any(value in rjson for value in SERVER_ERROR): return
 			files = jsloads(rjson)
 		except:
 			source_utils.scraper_error('PIRATEBAY')

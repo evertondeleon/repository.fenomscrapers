@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-15-2021)
+# created by Venom for Fenomscrapers (updated 12-20-2021)
 """
 	Fenomscrapers Project
 """
@@ -18,8 +18,9 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://www.torrentfunk.com'
-		self.search_link = '/all/torrents/%s.html?v=&smi=&sma=&i=100&sort=size&o=desc'
+		self.base_link = "https://www.torrentfunk.com"
+		# self.search_link = '/all/torrents/%s.html?v=&smi=&sma=&i=100&sort=size&o=desc'
+		self.search_link = '/all/torrents/%s.html?v=&smi=&sma=&i=50&sort=size&o=desc'
 		self.min_seeders = 0
 
 	def sources(self, data, hostDict):
@@ -28,7 +29,7 @@ class source:
 		self.sources_append = self.sources.append
 		try:
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.year = data['year']
@@ -40,11 +41,13 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url)
-			r = client.request(url, timeout='5')
-			if not r: return self.sources
-			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
+			results = client.request(url, timeout=5)
+			if not results: return self.sources
+			table = client.parseDOM(results, 'table', attrs={'class': 'tmain'})[0]
 
-			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', r, re.DOTALL | re.I)
+			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', table, re.DOTALL | re.I)
+			links = links[:20] # limit because torrentfunk is slow and 2 requests
+
 			threads = []
 			append = threads.append
 			for link in links:
@@ -66,6 +69,7 @@ class source:
 			except: name = link[1].replace('&nbsp;', '.')
 			if '<span' in name: name = name.split('<span')[0].rstrip(' [')
 			name = source_utils.clean_name(name)
+
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 			if source_utils.remove_lang(name_info, self.check_foreign_audio): return
@@ -73,21 +77,23 @@ class source:
 
 			if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-				if any(re.search(item, name.lower()) for item in ep_strings): return
+				name_lower = name.lower()
+				if any(re.search(item, name_lower) for item in ep_strings): return
 
 			if not url.startswith('http'): link = '%s%s' % (self.base_link, url)
-			link = client.request(link, timeout='5')
-			if link is None: 	return
+			link = client.request(link, timeout=5)
+			if link is None: return
 			hash = re.search(r'Infohash.*?>(?!<)(.+?)</', link, re.I).group(1)
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
+
 			try:
-				seeders = int(re.search(r'Swarm.*?>(?!<)([0-9]+)</', link, re.I).group(1).replace(',', ''))
+				seeders = int(re.search(r'Swarm.+?>([0-9]+|[0-9]+,[0-9]+)</', link, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
 			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.search(r'<b>Size:</b>.*?((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(1)
+				size = re.search(r'Size:.*?>((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(1)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0
@@ -109,7 +115,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -147,10 +153,10 @@ class source:
 
 	def get_pack_items(self, url):
 		try:
-			r = client.request(url, timeout='5')
-			if not r: return
-			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
-			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', r, re.DOTALL | re.I)
+			results = client.request(url, timeout=5)
+			if not results: return
+			table = client.parseDOM(results, 'table', attrs={'class': 'tmain'})[0]
+			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', table, re.DOTALL | re.I)
 		except:
 			source_utils.scraper_error('TORRENTFUNK')
 			return
@@ -189,19 +195,19 @@ class source:
 
 	def get_pack_sources(self, items):
 		try:
-			link = client.request(items[2], timeout='5')
+			link = client.request(items[2], timeout=5)
 			if link is None: return
 			hash = re.search(r'Infohash.*?>(?!<)(.+?)</', link, re.I).group(1)
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, items[0])
 			try:
-				seeders = int(re.search(r'Swarm.*?>(?!<)([0-9]+)</', link, re.I).group(1).replace(',', ''))
+				seeders = int(re.search(r'Swarm.+?>([0-9]+|[0-9]+,[0-9]+)</', link, re.I).group(1).replace(',', ''))
 				if self.min_seeders > seeders: return
 			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(items[1], url)
 			try:
-				size = re.search(r'<b>Size:</b>.*?((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(1)
+				size = re.search(r'Size:.*?>((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link).group(1)
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except: dsize = 0

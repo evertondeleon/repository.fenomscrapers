@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-15-2021) increased timeout=7
+# created by Venom for Fenomscrapers (updated 12-20-2021) increased timeout=7
 """
 	Fenomscrapers Project
 """
@@ -19,7 +19,7 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://torrentgalaxy.to'
+		self.base_link = "https://torrentgalaxy.to"
 		self.search_link = '/torrents.php?search=%s&sort=seeders&order=desc'
 		self.min_seeders = 0
 
@@ -30,7 +30,7 @@ class source:
 		try:
 			scraper = cfscrape.create_scraper()
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -48,21 +48,23 @@ class source:
 			if not result: return sources
 			rows = client.parseDOM(result, 'div', attrs={'class': 'tgxtablerow txlight'})
 			if not rows: return sources
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('TORRENTGALAXY')
 			return sources
 
-		undesirables = source_utils.get_undesirables()
-		check_foreign_audio = source_utils.check_foreign_audio()
 		for row in rows:
 			try:
-				if 'magnet' not in row: continue
-				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
-				url = unquote_plus(url).split('&tr')[0].replace(' ', '.')
-				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+				if 'magnet:' not in row: continue
+				columns = re.findall(r'<div.*?>(.+?)</div>', row, re.DOTALL)
 
+				url = unquote_plus(columns[4]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
+				# url = source_utils.strip_non_ascii_and_unprintable(url)
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1])
+
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info, check_foreign_audio): continue
@@ -70,15 +72,17 @@ class source:
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
+
 				try:
-					seeders = int(re.search(r'<span\s*title\s*=\s*["\']Seeders/Leechers["\']>\[<font\s*color\s*=\s*["\']green["\']><b>(.*?)<', row, re.I).group(1))
+					seeders = int(re.search(r'Seeders.*?<b>(.*?)<', columns[10], re.I).group(1))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'<span\s*class\s*=\s*["\']badge\s*badge-secondary["\']\s*style\s*=\s*["\']border-radius:4px;["\']>(.*?)</span>', row, re.I).group(1)
+					size = re.search(r'>(.*?)<', columns[7]).group(1).replace(',', '')
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -100,7 +104,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -141,10 +145,12 @@ class source:
 
 		for row in rows:
 			try:
-				if 'magnet' not in row: continue
-				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
-				url = unquote_plus(url).split('&tr')[0].replace(' ', '.')
-				url = source_utils.strip_non_ascii_and_unprintable(url)
+				if 'magnet:' not in row: continue
+				columns = re.findall(r'<div.*?>(.+?)</div>', row, re.DOTALL)
+
+				url = unquote_plus(columns[4]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
+				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
 				name = source_utils.clean_name(url.split('&dn=')[1])
@@ -163,14 +169,15 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
+
 				try:
-					seeders = int(re.search(r'<span\s*title\s*=\s*["\']Seeders/Leechers["\']>\[<font\s*color\s*=\s*["\']green["\']><b>(.*?)<', row, re.I).group(1))
+					seeders = int(re.search(r'Seeders.*?<b>(.*?)<', columns[10], re.I).group(1))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'<span\s*class\s*=\s*["\']badge\s*badge-secondary["\']\s*style\s*=\s*["\']border-radius:4px;["\']>(.*?)</span>', row, re.I).group(1)
+					size = re.search(r'>(.*?)<', columns[7]).group(1).replace(',', '')
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

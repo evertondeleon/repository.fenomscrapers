@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-15-2021)
+# created by Venom for Fenomscrapers (updated 12-20-2021)
 """
 	Fenomscrapers Project
 """
@@ -20,7 +20,7 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'http://www.bitlordsearch.com'
+		self.base_link = "http://www.bitlordsearch.com"
 		self.search_link = '/search?q=%s'
 		self.api_search_link = '/get_list'
 		self.min_seeders = 0
@@ -31,7 +31,7 @@ class source:
 		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -55,17 +55,16 @@ class source:
 				'filters[category]': 3 if 'tvshowtitle' not in data else 4,
 				'filters[adult]': False,
 				'filters[risky]': False}
-			rjson = client.request(api_url, post=query_data, headers=headers, timeout='5')
-			if not rjson: return sources
-			files = jsloads(rjson)
-			error = files.get('error')
-			if error: return sources
+			results = client.request(api_url, post=query_data, headers=headers, timeout=5)
+			if not results: return sources
+			files = jsloads(results)
+			if files.get('error'): return sources
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('BITLORD')
 			return sources
 
-		undesirables = source_utils.get_undesirables()
-		check_foreign_audio = source_utils.check_foreign_audio()
 		for file in files.get('content'):
 			try:
 				name = source_utils.clean_name(file.get('name'))
@@ -77,12 +76,14 @@ class source:
 				url = unquote_plus(file.get('magnet')).replace('&amp;', '&').replace(' ', '.')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
-				url = source_utils.strip_non_ascii_and_unprintable(url)
+				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
+
 				try:
 					seeders = file.get('seeds')
 					if self.min_seeders > seeders: continue
@@ -97,8 +98,8 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				append({'provider': 'bitlord', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				append({'provider': 'bitlord', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+								'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('BITLORD')
 		return sources
@@ -112,7 +113,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -156,11 +157,10 @@ class source:
 				'filters[adult]': False,
 				'filters[risky]': False}
 			api_url = '%s%s' % (self.base_link, self.api_search_link)
-			rjson = client.request(api_url, post=query_data, headers=self.headers, timeout='5')
+			rjson = client.request(api_url, post=query_data, headers=self.headers, timeout=5)
 			if not rjson: return
 			files = jsloads(rjson)
-			error = files.get('error')
-			if error: return
+			if files.get('error'): return
 		except:
 			source_utils.scraper_error('BITLORD')
 			return
@@ -171,7 +171,7 @@ class source:
 				url = unquote_plus(file.get('magnet')).replace('&amp;', '&').replace(' ', '.')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
-				url = source_utils.strip_non_ascii_and_unprintable(url)
+				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
 				if not self.search_series:
@@ -189,6 +189,7 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
+
 				try:
 					seeders = file.get('seeds')
 					if self.min_seeders > seeders: continue
@@ -214,7 +215,7 @@ class source:
 		headers = None
 		try:
 			# returned from client (result, response_code, response_headers, headers, cookie)
-			post = client.request(self.base_link, output='extended', timeout='10')
+			post = client.request(self.base_link, output='extended', timeout=10)
 			if not post: return headers
 			token_id = re.findall(r'token\: (.*)\n', post[0])[0]
 			token = ''.join(re.findall(token_id + r" ?\+?\= ?'(.*)'", post[0]))

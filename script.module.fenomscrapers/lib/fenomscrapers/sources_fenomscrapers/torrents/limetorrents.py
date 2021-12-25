@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-15-2021)
+# modified by Venom for Fenomscrapers (updated 12-16-2021)
 """
 	Fenomscrapers Project
 """
@@ -19,8 +19,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://www.limetorrents.pro'
-		# self.base_link = 'https://limetorrents.proxyninja.org' # if ever needed
+		self.base_link = "https://www.limetorrents.pro"
+		# self.base_link = "https://limetorrents.proxyninja.org" # if ever needed
 		self.tvsearch = '/search/tv/{0}/1/'
 		self.moviesearch = '/search/movies/{0}/1/'
 		self.min_seeders = 0
@@ -33,7 +33,7 @@ class source:
 			self.scraper = cfscrape.create_scraper()
 
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.year = data['year']
@@ -65,13 +65,13 @@ class source:
 	def get_sources(self, link):
 		# log_utils.log('link = %s' % link)
 		try:
-			r = self.scraper.get(link, timeout=10).text
-			if '503 Service Temporarily Unavailable' in r:
+			results = self.scraper.get(link, timeout=10).text
+			if '503 Service Temporarily Unavailable' in results:
 				from fenomscrapers.modules import log_utils
 				log_utils.log('LIMETORRENTS (Single request failure): 503 Service Temporarily Unavailable')
 				return
-			if not r or '<table' not in r: return
-			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
+			if not results or '<table' not in results: return
+			table = client.parseDOM(results, 'table', attrs={'class': 'table2'})[0]
 			rows = client.parseDOM(table, 'tr')
 			if not rows: return
 		except:
@@ -80,10 +80,11 @@ class source:
 
 		for row in rows:
 			try:
-				data = client.parseDOM(row, 'a', ret='href')[0]
-				if '/search/' in data: continue
-				hash = re.search(r'/torrent/(.+?).torrent', data, re.I).group(1)
-				name = re.search(r'title\s*=\s*(.+?)$', data, re.I).group(1)
+				if '<th' in row: continue
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
+
+				hash = re.search(r'/torrent/(.+?).torrent', columns[0], re.I).group(1)
+				name = re.search(r'title\s*=\s*(.+?)["\']', columns[0], re.I).group(1)
 				name = source_utils.clean_name(name)
 
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
@@ -91,20 +92,20 @@ class source:
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 
-				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
+
+				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 				try:
-					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
+					seeders = int(columns[3].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[2])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
@@ -124,7 +125,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -155,27 +156,29 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			r = self.scraper.get(link, timeout=10).text
-			if '503 Service Temporarily Unavailable' in r:
+			results = self.scraper.get(link, timeout=10).text
+			if '503 Service Temporarily Unavailable' in results:
 				from fenomscrapers.modules import log_utils
 				req_type = 'SHOW' if self.search_series else 'SEASON'
 				log_utils.log('LIMETORRENTS (%s Pack request failure): 503 Service Temporarily Unavailable' % req_type)
 				return
-			if not r or '<table' not in r: return
-			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
+			if not results or '<table' not in results: return
+			table = client.parseDOM(results, 'table', attrs={'class': 'table2'})[0]
 			rows = client.parseDOM(table, 'tr')
 			if not rows: return
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			return
+
 		for row in rows:
 			try:
-				data = client.parseDOM(row, 'a', ret='href')[0]
-				if '/search/' in data: continue
-				hash = re.search(r'/torrent/(.+?).torrent', data, re.I).group(1)
-				name = re.search(r'title\s*=\s*(.+?)$', data, re.I).group(1)
+				if '<th' in row: continue
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
+
+				hash = re.search(r'/torrent/(.+?).torrent', columns[0], re.I).group(1)
+				name = re.search(r'title\s*=\s*(.+?)["\']', columns[0], re.I).group(1)
 				name = source_utils.clean_name(name)
-				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
+
 				if not self.search_series:
 					if not self.bypass_filter:
 						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
@@ -191,15 +194,16 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
+
+				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 				try:
-					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
+					seeders = int(columns[3].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[2])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)

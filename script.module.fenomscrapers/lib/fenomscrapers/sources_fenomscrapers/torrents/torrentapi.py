@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-15-2021)
+# modified by Venom for Fenomscrapers (updated 12-16-2021)
 """
 	Fenomscrapers Project
 """
@@ -20,7 +20,7 @@ class source:
 
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://torrentapi.org' # just to satisfy scraper_test
+		self.base_link = "https://torrentapi.org" # just to satisfy scraper_test
 		self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&ranked=0&limit=100&format=json_extended' # string query (NOT USED)
 		self.tvshowsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&search_string={2}&ranked=0&limit=100&format=json_extended' # imdb_id + string query
 		self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&ranked=0&limit=100&format=json_extended'
@@ -44,7 +44,7 @@ class source:
 			key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -62,12 +62,12 @@ class source:
 			else: return sources
 			if 'torrent_results' not in rjson: return sources
 			files = rjson['torrent_results']
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
 
-		undesirables = source_utils.get_undesirables()
-		check_foreign_audio = source_utils.check_foreign_audio()
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
@@ -81,7 +81,9 @@ class source:
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
+
 				try:
 					seeders = int(file["seeders"])
 					if self.min_seeders > seeders: continue
@@ -110,7 +112,7 @@ class source:
 			self.scraper = cfscrape.create_scraper()
 			key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
 
-			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			year = data['year']
 			season = data['season']
@@ -122,12 +124,12 @@ class source:
 			else: return sources
 			if 'torrent_results' not in rjson: return sources
 			files = rjson['torrent_results']
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
 
-		undesirables = source_utils.get_undesirables()
-		check_foreign_audio = source_utils.check_foreign_audio()
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
@@ -135,8 +137,7 @@ class source:
 				name = source_utils.clean_name(unquote_plus(file["title"]))
 
 				if not bypass_filter:
-					if not source_utils.filter_season_pack(title, aliases, year, season, name):
-						continue
+					if not source_utils.filter_season_pack(title, aliases, year, season, name): continue
 				package = 'season'
 
 				name_info = source_utils.info_from_name(name, title, year, season=season, pack=package)

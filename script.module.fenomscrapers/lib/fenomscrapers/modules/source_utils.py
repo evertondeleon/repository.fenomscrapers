@@ -10,9 +10,9 @@ from fenomscrapers.modules.undesirables import Undesirables
 from fenomscrapers.modules.control import homeWindow, setting as getSetting, setSetting
 
 
-RES_4K = ('.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '216op', '2160i', 'hd2160', '2160hd') # some idiots use "uhd.1080p" in their uploads, "uhd" now removed
-RES_1080 = ('1080p', '1o8op', '1080i', 'hd1080', '1080hd') # some idots using letter "o" vs. a zero
-RES_720 = ('720p', '72op', '720i', 'hd720', '720hd')
+RES_4K = ('2160', '.4k', 'ultrahd', 'ultra.hd', '216o', '.uhd.')
+RES_1080 = ('1080', '1o8o', '108o', '1o80', '.fhd.')
+RES_720 = ('720', '72o')
 SCR = ('dvdscr', 'screener', '.scr.', '.r5', '.r6')
 CAM = ('1xbet', 'betwin', '.cam.', 'camrip', 'cam.rip', 'dvdcam', 'dvd.cam', 'dvdts', 'hdcam', '.hd.cam', '.hctc', '.hc.tc', '.hdtc',
 				'.hd.tc', 'hdts', '.hd.ts', 'hqcam', '.hg.cam', '.ts.', '.tc.', 'tsrip', 'telecine', 'telesync', 'tele.sync')
@@ -56,22 +56,28 @@ season_ordinal2_dict = {'1': '1st', '2': '2nd', '3': '3rd', '4': '4th', '5': '5t
 			'11': '11th', '12': '12th', '13': '13th', '14': '14th', '15': '15th', '16': '16th', '17': '17th', '18': '18th', '19': '19th',
 			'20': '20th', '21': '21st', '22': '22nd', '23': '23rd', '24': '24th', '25': '25th'}
 
-unwanted_tags = ('tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.ws', 'www.tamilrockers.pl', 'www.tamilrockerrs.pl',
+unwanted_tags = ('tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.ws', 'www.tamilrockers.pl',
+			'www-tamilrockers-cl', 'www.tamilrockers.cl', 'www.tamilrockers.li',
+			'www.tamilrockerrs.pl',
+			'www.tamilmv.bid', 'www.tamilmv.biz', 'www.1tamilmv.org',
+			'gktorrent-bz', 'gktorrent-com',
 			'www.torrenting.com', 'www.torrenting.org', 'www-torrenting-com', 'www-torrenting-org',
-			'+katmoviehd.pw+', 'katmoviehd-pw',
-			'www.torrent9.nz', 'torrent9-cz-.-', 'torrent9.cz.].', 'torrent9-cz-]-',
-			'agusiq-torrents-pl', 'oxtorrent-com',
+			'katmoviehd.pw', 'katmoviehd-pw',
+			'www.torrent9.nz', 'www-torrent9-uno', 'torrent9-cz', 'torrent9.cz',
+			'agusiq-torrents-pl',
+			'oxtorrent-bz', 'oxtorrent-com', 'oxtorrent.com', 'oxtorrent-sh', 'oxtorrent-vc',
 			'www.movcr.tv', 'movcr-com', 'www.movcr.to',
-			'(imax)', '.imax.',
+			'(imax)', 'imax',
 			'xtorrenty.org', 'nastoletni.wilkoak', 'www.scenetime.com', 'kst-vn',
-			'www.2movierulz.ac', 'www.2movierulz.ms',
-			'www.3movierulz.com', 'www.3movierulz.tv', 'www.3movierulz.ws', 'www.3movierulz.ms', 'www.8movierulz.ws',
+			'www.movierulz.vc', 'www-movierulz-ht', 'www.2movierulz.ac', 'www.2movierulz.ms',
+			'www.3movierulz.com', 'www.3movierulz.tv', 'www.3movierulz.ws', 'www.3movierulz.ms',
+			'www.7movierulz.pw', 'www.8movierulz.ws',
 			'mkvcinemas.live',
-			'www.bludv.tv', 'ramin.djawadi', 'extramovies.casa',
-			'+13.+', 'taht.oyunlar', 'crazy4tv.com', 'karibu', '989pa.com',
-			'best-torrents-net', '1-3-3-8.com', 'ssrmovies.club', 'www.tamilmv.bid', 'www.1tamilmv.org',
-			'va:', 'oxtorrent-sh', 'zgxybbs-fdns-uk', 'www.tamilblasters.mx',
-			'www.1tamilmv.work', 'www.7movierulz.pw', 'www.xbay.me', 'www-tamilrockers-cl', 'www.tamilrockers.cl', 'www.tamilrockers.li',
+			'www.bludv.tv', 'ramin.djawadi', 'extramovies.casa', 'extramovies.wiki',
+			'13+', '18+', 'taht.oyunlar', 'crazy4tv.com', 'karibu', '989pa.com',
+			'best-torrents-net', '1-3-3-8.com', 'ssrmovies.club',
+			'va:', 'zgxybbs-fdns-uk', 'www.tamilblasters.mx',
+			'www.1tamilmv.work', 'www.xbay.me',
 			'crazy4tv-com', '(es)')
 
 home_getProperty = homeWindow.getProperty
@@ -88,9 +94,10 @@ def check_foreign_audio():
 def get_qual(term):
 	if any(i in term for i in SCR): return 'SCR'
 	elif any(i in term for i in CAM): return 'CAM'
-	elif any(i in term for i in RES_4K): return '4K'
-	elif any(i in term for i in RES_1080): return '1080p'
 	elif any(i in term for i in RES_720): return '720p'
+	elif any(i in term for i in RES_1080): return '1080p'
+	elif any(i in term for i in RES_4K): return '4K'
+	elif '.hd.' in term: return '720p'
 	else: return 'SD'
 
 def get_release_quality(release_info, release_link=None):
@@ -127,7 +134,7 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 	if aliases:
 		for item in aliases:
 			try:
-				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
+				alias = item.replace('&', 'and').replace(year, '')
 				if years: # for movies only, scraper to pass None for episodes
 					for i in years: alias = alias.replace(i, '')
 				if alias in title_list: continue
@@ -137,19 +144,20 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 				log_utils.error()
 	try:
 		match = True
-		title = title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
-		title_list_append(title)
-		release_title = release_title_format(release_title) # converts to .lower()
-		h = hdlr.lower()
-		t = release_title.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
+		title = title.replace('&', 'and')
+		if title not in title_list: title_list_append(title)
+
+		release_title = re.sub(r'([(])(?=((19|20)[0-9]{2})).*?([)])', '\\2', release_title) #remove parenthesis only if surrounding a 4 digit date
+		t = re.split(r'%s' % hdlr, release_title, 1, re.I)[0].replace(year, '').replace('&', 'and')
+
 		if years:
 			for i in years: t = t.split(i)[0]
-		t = t.split('2160p')[0].split('4k')[0].split('1080p')[0].split('720p')[0]
+		t = re.split(r'2160p|216op|4k|1080p|1o8op|108op|1o80p|720p|72op|480p|48op', t, 1, re.I)[0]
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list): match = False
 		if years: # for movies only, scraper to pass None for episodes
-				if not any(value in release_title for value in years): match = False
+			if not any(value in release_title for value in years): match = False
 		else: 
-			if h not in release_title: match = False
+			if not re.search(r'%s' % hdlr, release_title, re.I): match = False
 		return match
 	except:
 		from fenomscrapers.modules import log_utils
@@ -174,11 +182,6 @@ def remove_lang(release_info, check_foreign_audio):
 def remove_undesirables(release_info, undesirables):
 	if any(value in release_info for value in undesirables): return True
 
-def single_checkPack(release_title, query):
-	range_pattern = '%s%s' % (query.lower(), r'[-]\d{2}([-,.[({]|$)')
-	if bool(re.search(range_pattern, release_title.lower())): return True
-	else: return False
-
 def filter_season_pack(show_title, aliases, year, season, release_title):
 	aliases = aliases_to_array(aliases)
 	title_list = []
@@ -194,7 +197,7 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 				log_utils.error()
 	try:
 		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
-		title_list_append(show_title)
+		if show_title not in title_list: title_list_append(show_title)
 
 		season_fill = season.zfill(2)
 		season_check = '.s%s.' % season
@@ -264,7 +267,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 				log_utils.error()
 	try:
 		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
-		title_list_append(show_title)
+		if show_title not in title_list: title_list_append(show_title)
 
 		split_list = ('.all.seasons', 'seasons', 'season', 'the.complete', 'complete', 'all.torrent', 'total.series', 'tv.series', 'series', 'edited', 's1', 's01', year)#s1 or s01 used so show pack only kept that begin with 1
 		release_title = release_title_format(release_title)
@@ -531,15 +534,14 @@ def release_title_format(release_title):
 
 def clean_name(release_title):
 	try:
+		release_title = re.sub(r'【.*?】', '', release_title)
+		release_title = strip_non_ascii_and_unprintable(release_title).lstrip('+.-:/ ').replace(' ', '.')
 		releasetitle_startswith = release_title.lower().startswith
 		if releasetitle_startswith('rifftrax'): return release_title # removed by "undesirables" anyway so exit
-		release_title = strip_non_ascii_and_unprintable(release_title).lstrip('/ ').replace(' ', '.')
 		for i in unwanted_tags:
 			if releasetitle_startswith(i):
-				i_startswith = i.startswith
-				pattern = r'\%s' % i if i_startswith('[') or i_startswith('+') else r'%s' % i
-				release_title = re.sub(r'^%s' % pattern, '', release_title, 1, re.I)
-		release_title = release_title.lstrip('.-:/')
+				release_title = re.sub(r'^%s' % i.replace('+', '\+'), '', release_title, 1, re.I)
+		release_title = release_title.lstrip('+.-:/ ')
 		release_title = re.sub(r'^\[.*?]', '', release_title, 1, re.I)
 		release_title = release_title.lstrip('.-[](){}:/')
 		return release_title

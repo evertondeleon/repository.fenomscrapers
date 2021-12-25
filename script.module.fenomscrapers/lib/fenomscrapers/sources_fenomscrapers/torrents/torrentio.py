@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-15-2021)
+# created by Venom for Fenomscrapers (updated 12-19-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -8,7 +8,7 @@ from json import loads as jsloads
 import re
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
-
+SERVER_ERROR = ('521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance', 'null')
 
 class source:
 	priority = 1
@@ -17,10 +17,14 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://torrentio.strem.fun'
-		self.movieSearch_link = '/language=english/stream/movie/%s.json'
-		self.tvSearch_link = '/language=english/stream/series/%s:%s:%s.json'
+		self.base_link = "https://torrentio.strem.fun"
+		# self.movieSearch_link = '/language=english/stream/movie/%s.json'
+		# self.tvSearch_link = '/language=english/stream/series/%s:%s:%s.json'
+		self.movieSearch_link = '/providers=yts,eztv,rarbg,1337x,thepiratebay,kickasstorrents,torrentgalaxy|language=english/stream/movie/%s.json'
+		self.tvSearch_link = '/providers=yts,eztv,rarbg,1337x,thepiratebay,kickasstorrents,torrentgalaxy|language=english/stream/series/%s:%s:%s.json'
 		self.min_seeders = 0
+# Currently supports YTS(+), EZTV(+), RARBG(+), 1337x(+), ThePirateBay(+), KickassTorrents(+), TorrentGalaxy(+), HorribleSubs(+), NyaaSi(+), NyaaPantsu(+), Rutor(+), Comando(+), ComoEuBaixo(+), Lapumia(+), OndeBaixa(+), Torrent9(+).
+
 
 	def sources(self, data, hostDict):
 		sources = []
@@ -28,7 +32,7 @@ class source:
 		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -38,23 +42,29 @@ class source:
 			if 'tvshowtitle' in data: url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, data['season'], data['episode']))
 			else: url = '%s%s' % (self.base_link, self.movieSearch_link % imdb)
 			# log_utils.log('url = %s' % url)
-			rjson = client.request(url, timeout='5')
-			if not rjson or rjson == 'null' or any(value in rjson for value in ('521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance')):
-				return sources
-			files = jsloads(rjson)['streams']
+			results = client.request(url, timeout=5)
+			if not results or any(value in results for value in SERVER_ERROR): return sources
+			files = jsloads(results)['streams']
+			_INFO = re.compile(r'👤.*')
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('TORRENTIO')
 			return sources
 
-		_INFO = re.compile(r'👤.*')
-		undesirables = source_utils.get_undesirables()
-		check_foreign_audio = source_utils.check_foreign_audio()
 		for file in files:
 			try:
 				hash = file['infoHash']
 				file_title = file['title'].split('\n')
-				name = source_utils.clean_name(file_title[0])
 				file_info = [x for x in file_title if _INFO.match(x)][0]
+				# try:
+					# index = file_title.index(file_info)
+					# if index == 1: combo = file_title[0].replace(' ', '.')
+					# else: combo = ''.join(file_title[0:2]).replace(' ', '.')
+					# if '🇷🇺' in file_title[index+1] and not any(value in combo for value in ('.en.', '.eng.', 'english')): continue
+				# except: pass
+
+				name = source_utils.clean_name(file_title[0])
 
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
@@ -62,10 +72,10 @@ class source:
 				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name) 
-
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
 
 				try:
 					seeders = int(re.search(r'(\d+)', file_info).group(1))
@@ -91,29 +101,35 @@ class source:
 		if not data: return sources
 		sources_append = sources.append
 		try:
-			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			imdb = data['imdb']
 			year = data['year']
 			season = data['season']
 			url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, data['season'], data['episode']))
-			rjson = client.request(url, timeout='5')
-			if not rjson or rjson == 'null' or any(value in rjson for value in ('521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance')):
-				return sources
-			files = jsloads(rjson)['streams']
+			results = client.request(url, timeout=5)
+			if not results or any(value in results for value in SERVER_ERROR): return sources
+			files = jsloads(results)['streams']
+			_INFO = re.compile(r'👤.*')
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('TORRENTIO')
 			return sources
 
-		_INFO = re.compile(r'👤.*')
-		undesirables = source_utils.get_undesirables()
-		check_foreign_audio = source_utils.check_foreign_audio()
 		for file in files:
 			try:
 				hash = file['infoHash']
 				file_title = file['title'].split('\n')
-				name = source_utils.clean_name(file_title[0])
 				file_info = [x for x in file_title if _INFO.match(x)][0]
+				# try:
+					# index = file_title.index(file_info)
+					# if index == 1: combo = file_title[0].replace(' ', '.')
+					# else: combo = ''.join(file_title[0:2]).replace(' ', '.')
+					# if '🇷🇺' in file_title[index+1] and not any(value in combo for value in ('.en.', '.eng.', 'english')): continue
+				# except: pass
+
+				name = source_utils.clean_name(file_title[0])
 
 				if not search_series:
 					if not bypass_filter:

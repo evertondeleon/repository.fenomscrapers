@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-15-2021)
+# created by Venom for Fenomscrapers (updated 12-20-2021)
 """
 	Fenomscrapers Project
 """
@@ -9,6 +9,7 @@ from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
+SERVER_ERROR = ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')
 
 
 class source:
@@ -18,7 +19,7 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://bitcq.com'
+		self.base_link = "https://bitcq.com"
 		self.search_link = '/search?q=%s&category[]=1'
 		self.min_seeders = 0
 
@@ -28,7 +29,7 @@ class source:
 		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -36,23 +37,23 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', '%s %s' % (title, hdlr))
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url)
-			r = client.request(url, timeout='7')
-			if not r: return sources
-			if any(value in str(r) for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')):
-				return sources
-			rows = client.parseDOM(r, 'tr')
+			results = client.request(url, timeout=7)
+			if not results or any(value in str(results) for value in SERVER_ERROR): return sources
+			rows = client.parseDOM(results, 'tr')
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('BITCQ')
 			return sources
 
-		undesirables = source_utils.get_undesirables()
-		check_foreign_audio = source_utils.check_foreign_audio()
 		for row in rows:
 			try:
-				if 'magnet' not in row: continue
-				url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
-				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				url = source_utils.strip_non_ascii_and_unprintable(url)
+				if 'magnet:' not in row: continue
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
+
+				url = unquote_plus(columns[0]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
+				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1])
 
@@ -63,17 +64,17 @@ class source:
 
 				if not episode_title: # filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.search(r'<td>(\d+)<', row).group(1))
+					seeders = int(columns[4].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[3])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
@@ -82,7 +83,6 @@ class source:
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('BITCQ')
-				return sources
 		return sources
 
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -93,7 +93,7 @@ class source:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -124,20 +124,20 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			r = client.request(link, timeout='7')
-			if not r: return
-			if any(value in str(r) for value in ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')): return
-			rows = client.parseDOM(r, 'tr')
+			results = client.request(link, timeout=7)
+			if not results or any(value in str(results) for value in SERVER_ERROR): return
+			rows = client.parseDOM(results, 'tr')
 		except:
 			source_utils.scraper_error('BITCQ')
 			return
-
 		for row in rows:
 			try:
-				if 'magnet' not in row: continue
-				url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
-				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				url = source_utils.strip_non_ascii_and_unprintable(url)
+				if 'magnet:' not in row: continue
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
+
+				url = unquote_plus(columns[0]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
+				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1])
 
@@ -156,15 +156,15 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
+
 				try:
-					seeders = int(re.search(r'<td>(\d+)<', row).group(1))
+					seeders = int(columns[4].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[3])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)

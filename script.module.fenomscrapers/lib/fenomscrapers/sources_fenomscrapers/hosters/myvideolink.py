@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-14-2021)
+# modified by Venom for Fenomscrapers (updated 12-16-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -27,7 +27,7 @@ class source:
 		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -36,7 +36,7 @@ class source:
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
-			r = client.request(url, timeout='5')
+			r = client.request(url, timeout=5)
 			if not r or 'Error 404' in r: return sources
 			r = client.parseDOM(r, 'div', attrs={'id': 'content'})
 			r1= client.parseDOM(r, 'h2')
@@ -62,7 +62,7 @@ class source:
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 
 				link = post[0]
-				results = client.request(link, timeout='5')
+				results = client.request(link, timeout=5)
 				results = client.parseDOM(results, 'div', attrs={'class': 'entry-content cf'})[0]
 
 				if 'tvshowtitle' in data:

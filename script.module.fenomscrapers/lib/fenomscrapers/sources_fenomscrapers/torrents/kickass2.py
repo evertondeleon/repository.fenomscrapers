@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-15-2021)
+# modified by Venom for Fenomscrapers (updated 12-16-2021)
 """
 	Fenomscrapers Project
 """
@@ -33,13 +33,25 @@ class source:
 			self._base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
 		return self._base_link
 
+	def __get_base_url(self, fallback):
+		for domain in self.domains:
+			try:
+				url = 'https://%s' % domain
+				result = client.request(url, limit=1, timeout=5)
+				try: result = re.search('r<title>(.+?)</title>', result, re.I).group(1)
+				except: result = None
+				if result and 'Kickass' in result: return url
+			except:
+				source_utils.scraper_error('KICKASS2')
+		return fallback
+
 	def sources(self, data, hostDict):
 		self.sources = []
 		if not data: return self.sources
 		self.sources_append = self.sources.append
 		try:
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.year = data['year']
@@ -73,20 +85,20 @@ class source:
 	def get_sources(self, url):
 		# log_utils.log('url = %s' % url)
 		try:
-			r = client.request(url, timeout='7')
-			if not r: return
-			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
+			results = client.request(url, timeout=7)
+			if not results: return
+			rows = client.parseDOM(results, 'tr', attrs={'id': 'torrent_latest_torrents'})
 		except:
 			source_utils.scraper_error('KICKASS2')
 			return
-		for post in posts:
+		for row in rows:
 			try:
-				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
-				link = ref.split('url=')[1]
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
 
-				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				url = unquote_plus(columns[0]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				name = source_utils.clean_name(unquote_plus(url.split('&dn=')[1]))
+				name = source_utils.clean_name(unquote_plus(url.split('&dn=')[1])) # some links on kickass dbl encoded
 
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
@@ -95,16 +107,17 @@ class source:
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
+
 				try:
-					seeders = int(re.search(r'<td\s*class\s*=\s*["\']green\s*center["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.I).group(1).replace(',', ''))
+					seeders = int(columns[3].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[1].split('<')[0])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
@@ -122,7 +135,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -153,19 +166,20 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			r = client.request(link, timeout='7')
-			if not r: return
-			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
+			results = client.request(link, timeout=7)
+			if not results: return
+			rows = client.parseDOM(results, 'tr', attrs={'id': 'torrent_latest_torrents'})
 		except:
 			source_utils.scraper_error('KICKASS2')
 			return
-		for post in posts:
+		for row in rows:
 			try:
-				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
-				link = ref.split('url=')[1]
-				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
+
+				url = unquote_plus(columns[0]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				name = source_utils.clean_name(unquote_plus(url.split('&dn=')[1]))
+				name = source_utils.clean_name(unquote_plus(url.split('&dn=')[1])) # some links on kickass dbl encoded
 
 				if not self.search_series:
 					if not self.bypass_filter:
@@ -183,14 +197,13 @@ class source:
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 				try:
-					seeders = int(re.search(r'<td\s*class\s*=\s*["\']green\s*center["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.I).group(1).replace(',', ''))
+					seeders = int(columns[3].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[1].split('<')[0])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
@@ -200,15 +213,3 @@ class source:
 				self.sources_append(item)
 			except:
 				source_utils.scraper_error('KICKASS2')
-
-	def __get_base_url(self, fallback):
-		for domain in self.domains:
-			try:
-				url = 'https://%s' % domain
-				result = client.request(url, limit=1, timeout='5')
-				try: result = re.search('r<title>(.+?)</title>', result, re.I).group(1)
-				except: result = None
-				if result and 'Kickass' in result: return url
-			except:
-				source_utils.scraper_error('KICKASS2')
-		return fallback

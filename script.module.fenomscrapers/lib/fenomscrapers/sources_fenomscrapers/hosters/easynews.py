@@ -39,7 +39,7 @@ class source:
 			year = data['year']
 			aliases = data['aliases']
 			if content_type == 'tvshow':
-				title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+				title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 				episode_title = None
 				years = None
 				season = int(data.get('season'))

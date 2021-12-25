@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-15-2021)
+# (updated 12-16-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -32,7 +32,7 @@ class source:
 			headers = {"x-rapidapi-host": "filepursuit.p.rapidapi.com", "x-rapidapi-key": api_key}
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -43,7 +43,7 @@ class source:
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url)
 
-			r = client.request(url, headers=headers, timeout='5')
+			r = client.request(url, headers=headers, timeout=5)
 			if not r: return sources
 			r = jsloads(r)
 			if 'not_found' in r['status']: return sources
@@ -68,7 +68,7 @@ class source:
 				if source_utils.remove_lang(name_info, check_foreign_audio): continue
 				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
-				# link_header = client.request(url, output='headers', timeout='5') # to slow to check validity of links
+				# link_header = client.request(url, output='headers', timeout=5) # to slow to check validity of links
 				# if not any(value in str(link_header) for value in ('stream', 'video/mkv')): continue
 
 				quality, info = source_utils.get_release_quality(name_info, url)

@@ -309,17 +309,18 @@ def replaceHTMLCodes(txt):
 def _replaceHTMLCodes(txt):
 	try:
 		if not txt: return ''
-		txt = re.sub(r"(&#[0-9]+)([^;^0-9]+)", "\\1;\\2", txt)
+		txt = re.sub(r"(&#[0-9]+)([^;^0-9]+)", "\\1;\\2", txt) # fix html codes with missing semicolon
 		txt = unescape(txt)
 		txt = txt.replace("&quot;", "\"")
 		txt = txt.replace("&amp;", "&")
 		txt = txt.replace("&lt;", "<")
 		txt = txt.replace("&gt;", ">")
-		txt = txt.replace("&#38;", "&")
+		txt = txt.replace("&apos;", "'")
 		txt = txt.replace("&nbsp;", "")
-		txt = txt.replace('&#8230;', '...')
-		txt = txt.replace('&#8217;', '\'')
-		txt = txt.replace('&#8211;', '-')
+		txt = txt.replace("&#38;", "&")
+		txt = txt.replace("&#8230;", "...")
+		txt = txt.replace("&#8217;", "'")
+		txt = txt.replace("&#8211;", "-")
 		txt = txt.strip()
 		return txt
 	except:

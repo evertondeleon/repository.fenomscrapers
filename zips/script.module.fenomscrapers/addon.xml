@@ -1,4 +1,4 @@
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.0.9" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.1.0" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -25,11 +25,12 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.0.9 - Dec. 16, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Fixed torrentz2 query change, again.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed performance issue with torrentdownloads index.[/I]
-[COLOR yellow]--[/COLOR][I] Added, updated, missing .po strings.[/I]
-[COLOR yellow]--[/COLOR][I] Moved "foreign_audio" settings check outside "for" loop in all scrapers.[/I]
+[B][COLOR red]Update - v2.1.0 - Dec. 25, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] A number of regex optimizations, and usage reduction, to scrapers.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed title check issue when meta title contains the character [B]"/"[/B], ex. [B]"Mother/Android"[/B].[/I]
+[COLOR yellow]--[/COLOR][I] Fixed yourbittorrent scraper domain change.[/I]
+[COLOR yellow]--[/COLOR][I] Improvements to torrentio scraper for foreign audio only track sources being returned.[/I]
+[COLOR yellow]--[/COLOR][I] Added missing Dutch language translation strings.[/I]
 		</news>
 	</extension>
 </addon>

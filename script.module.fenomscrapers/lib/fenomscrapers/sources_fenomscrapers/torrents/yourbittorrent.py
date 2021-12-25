@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-15-2021)
+# created by Venom for Fenomscrapers (updated 12-20-2021)
 """
 	Fenomscrapers Project
 """
@@ -18,9 +18,9 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://yourbittorrent2.com'
+		self.base_link = "https://yourbittorrent.com"
 		# self.search_link = '?q=%s&page=1&v=&c=&sort=size&o=desc'
-		self.search_link = '?q=%s'
+		self.search_link = '?q=%s&sort=size'
 		self.min_seeders = 0  # to many items with no value but cached links
 
 	def sources(self, data, hostDict):
@@ -29,7 +29,7 @@ class source:
 		self.sources_append = self.sources.append
 		try:
 			self.title = data['tvshowtitle'].lower() if 'tvshowtitle' in data else data['title'].lower()
-			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.year = data['year']
 			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
@@ -41,9 +41,9 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = ('%s%s' % (self.base_link, self.search_link % quote_plus(query))).replace('+', '-')
 
-			r = client.request(url, timeout='5')
-			if not r: return self.sources
-			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
+			results = client.request(url, timeout=5)
+			if not results: return self.sources
+			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', results, re.DOTALL | re.I)
 			threads = []
 			append = threads.append
 			for link in links:
@@ -58,13 +58,13 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = '%s%s' % (self.base_link, link)
-			result = client.request(url, timeout='5')
+			result = client.request(url, timeout=5)
 			if result is None: return
 			if '<kbd>' not in result: return
 			hash = re.search(r'<kbd>(.+?)<', result, re.I).group(1)
-
 			name = re.search(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.I).group(1).replace('Original Name: ', '')
 			name = source_utils.clean_name(unquote_plus(name))
+
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 			if source_utils.remove_lang(name_info, self.check_foreign_audio): return
@@ -72,7 +72,8 @@ class source:
 
 			if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-				if any(re.search(item, name.lower()) for item in ep_strings): return
+				name_lower = name.lower()
+				if any(re.search(item, name_lower) for item in ep_strings): return
 
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			try:
@@ -105,7 +106,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -143,9 +144,9 @@ class source:
 
 	def get_pack_items(self, url):
 		try:
-			r = client.request(url, timeout='5')
-			if not r: return
-			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
+			results = client.request(url, timeout=5)
+			if not results: return
+			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', results, re.DOTALL | re.I)
 			for link in links:
 				url = '%s%s' % (self.base_link, link)
 				self.items_append((url))
@@ -156,13 +157,13 @@ class source:
 	def get_pack_sources(self, url):
 		try:
 			# log_utils.log('url = %s' % str(url))
-			result = client.request(url, timeout='5')
+			result = client.request(url, timeout=5)
 			if not result: return
 			if '<kbd>' not in result: return
 			hash = re.search(r'<kbd>(.+?)<', result, re.I).group(1)
-
 			name = re.search(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.I).group(1).replace('Original Name: ', '')
 			name = source_utils.clean_name(unquote_plus(name))
+
 			if not self.search_series:
 				if not self.bypass_filter:
 					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): return

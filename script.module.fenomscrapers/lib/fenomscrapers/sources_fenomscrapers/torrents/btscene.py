@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-15-2021)
+# modified by Venom for Fenomscrapers (updated 12-20-2021)
 """
 	Fenomscrapers Project
 """
@@ -18,8 +18,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'http://btscene.nl/' # 7torr.com is a mirror of btscene, do not use
-		self.search_link = 'search?q=%s'
+		self.base_link = "http://btscene.nl" # 7torr.com is a mirror of btscene, do not use
+		self.search_link = '/search?q=%s'
 		self.min_seeders = 1
 
 	def sources(self, data, hostDict):
@@ -28,7 +28,7 @@ class source:
 		self.sources_append = self.sources.append
 		try:
 			self.title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 			self.year = data['year']
@@ -56,18 +56,19 @@ class source:
 
 	def get_sources(self, url):
 		try:
-			r = client.request(url, timeout='5')
-			if not r or '<table' not in r: return
-			table = client.parseDOM(r, 'table', attrs={'class': 'rtable'})
-			rows = client.parseDOM(table, 'tr')
+			result = client.request(url, timeout=5)
+			if not result or '<table' not in result: return
+			rows = client.parseDOM(result, 'tr', attrs={'class': 'row'})
 		except:
 			source_utils.scraper_error('BTSCENE')
 		for row in rows:
 			try:
 				if 'magnet:' not in row: continue
-				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
-				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				url = source_utils.strip_non_ascii_and_unprintable(url)
+				columns = re.findall(r'<td.*?>(.+?)</td', row, re.DOTALL) # site has improper closing tags
+
+				url = unquote_plus(columns[5]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
+				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1])
 
@@ -78,16 +79,17 @@ class source:
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					if any(re.search(item, name.lower()) for item in ep_strings): continue
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
+
 				try:
-					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'seeds is-hidden-sm-mobile'})[0].replace(',', ''))
+					seeders = int(columns[3].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[1])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
@@ -106,7 +108,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -137,19 +139,20 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			r = client.request(link, timeout='5')
-			if not r or '<table' not in r: return
-			table = client.parseDOM(r, 'table', attrs={'class': 'rtable'})
-			rows = client.parseDOM(table, 'tr')
+			result = client.request(link, timeout=5)
+			if not result or '<table' not in result: return
+			rows = client.parseDOM(result, 'tr', attrs={'class': 'row'})
 		except:
 			source_utils.scraper_error('BTSCENE')
 			return
 		for row in rows:
 			try:
 				if 'magnet:' not in row: continue
-				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
-				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				url = source_utils.strip_non_ascii_and_unprintable(url)
+				columns = re.findall(r'<td.*?>(.+?)</td', row, re.DOTALL) # site has improper closing tags
+
+				url = unquote_plus(columns[5]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
+				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1])
 
@@ -169,14 +172,13 @@ class source:
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 				try:
-					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'seeds is-hidden-sm-mobile'})[0].replace(',', ''))
+					seeders = int(columns[3].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[1])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)

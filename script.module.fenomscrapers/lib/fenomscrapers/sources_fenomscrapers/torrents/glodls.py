@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-15-2021)
+# modified by Venom for Fenomscrapers (updated 12-16-2021)
 """
 	Fenomscrapers Project
 """
@@ -9,7 +9,7 @@ from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
-_EPSTRINGS = re.compile(r'[.-]s\d{2}e\d{2}([.-]?)|[.-]s\d{2}([.-]?)|[.-]season[.-]?\d{1,2}[.-]?', re.I)
+
 
 class source:
 	priority = 3
@@ -18,10 +18,11 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://glodls.to/'
-		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
-		self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
-		self.tvsearch_pack = 'search_results.php?search={0}&cat=41,72&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc' # cat=72 timeout
+		self.domains = ['glodls.to', 'gtdb.to']
+		self.base_link = "https://www.gtdb.to"
+		self.moviesearch = '/search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
+		self.tvsearch = '/search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
+		self.tvsearch_pack = '/search_results.php?search={0}&cat=41,72&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc' # cat=72 timeout
 		# cat=1 is (Movies:all) ; cat=41 is (TV:all) ; cat=71 is (Videos:all) ; cat=72 is (Packs:all)
 		self.min_seeders = 0 # to many items with no value but cached links
 
@@ -31,13 +32,11 @@ class source:
 		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
-			undesirables = source_utils.get_undesirables()
-			check_foreign_audio = source_utils.check_foreign_audio()
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -45,42 +44,44 @@ class source:
 			else: url = self.moviesearch.format(quote_plus(query))
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			result = client.request(url, timeout='5')
+			result = client.request(url, timeout=5)
 			if not result: return sources
 			rows = client.parseDOM(result, 'tr', attrs={'class': 't-row'})
 			if not rows: return sources
 			rows = [i for i in rows if 'racker:' not in i]
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('GLODLS')
 			return sources
+
 		for row in rows:
 			try:
-				ref = client.parseDOM(row, 'a', ret='href')
-				url = [i for i in ref if 'magnet:' in i][0]
-				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.search(r'btih:(.*?)&', url, re.I).group(1).lower()
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
 
-				name = unquote_plus(client.parseDOM(row, 'a', ret='title')[0])
-				name = source_utils.clean_name(name)
+				url = unquote_plus(columns[3]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+				name = source_utils.clean_name(url.split('&dn=')[1].replace('.torrent', ''))
+
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info, check_foreign_audio): continue
 				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
-				# if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					# # ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					# # if any(re.search(item, name.lower()) for item in ep_strings): continue
-					# if _EPSTRINGS.search(name): continue
+				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
+					name_lower = name.lower()
+					if any(re.search(item, name_lower) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.search(r'<td.*?<font\s*color\s*=\s*["\'].+?["\']><b>([0-9]+|[0-9]+,[0-9]+)</b>', row).group(1).replace(',', ''))
+					seeders = int(re.search(r'>(\d+|\d+\,\d+)<', columns[5]).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[4])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
@@ -100,7 +101,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -132,7 +133,7 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			result = client.request(link, timeout='5')
+			result = client.request(link, timeout=5)
 			if not result: return
 			rows = client.parseDOM(result, 'tr', attrs={'class': 't-row'})
 			if not rows: return
@@ -143,13 +144,13 @@ class source:
 
 		for row in rows:
 			try:
-				ref = client.parseDOM(row, 'a', ret='href')
-				url = [i for i in ref if 'magnet:' in i][0]
-				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.search(r'btih:(.*?)&', url, re.I).group(1).lower()
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
 
-				name = unquote_plus(client.parseDOM(row, 'a', ret='title')[0])
-				name = source_utils.clean_name(name)
+				url = unquote_plus(columns[3]).replace('&amp;', '&')
+				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
+				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
+				name = source_utils.clean_name(url.split('&dn=')[1].replace('.torrent', ''))
+
 				if not self.search_series:
 					if not self.bypass_filter:
 						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
@@ -166,14 +167,13 @@ class source:
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 				try:
-					seeders = int(re.search(r'<td.*?<font\s*color\s*=\s*["\'].+?["\']><b>([0-9]+|[0-9]+,[0-9]+)</b>', row).group(1).replace(',', ''))
+					seeders = int(re.search(r'>(\d+|\d+\,\d+)<', columns[5]).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0)
-					dsize, isize = source_utils._size(size)
+					dsize, isize = source_utils._size(columns[4])
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)

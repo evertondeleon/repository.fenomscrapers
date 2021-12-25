@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-15-2021)
+# created by Venom for Fenomscrapers (updated 12-20-2021)
 """
 	Fenomscrapers Project
 """
@@ -17,7 +17,7 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'http://topnow.se'
+		self.base_link = "http://topnow.se"
 		self.search_link = '/index.php?search=%s'
 		self.show_link = '/index.php?show=%s'
 
@@ -27,7 +27,7 @@ class source:
 		append = sources.append
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
@@ -39,29 +39,29 @@ class source:
 			else: url = self.search_link % quote_plus(query)
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			r = client.request(url, timeout='5')
-			if not r: return sources
-			r = r.replace('\r', '').replace('\n', '').replace('\t', '')
-			r = client.parseDOM(r, 'div', attrs={'class': 'card'})
-			if not r: return sources
+			results = client.request(url, timeout=5)
+			if not results: return sources
+			results = re.sub('[\r\n\t]', '', results)
+			items = client.parseDOM(results, 'div', attrs={'class': 'card'})
+			if not items: return sources
+			undesirables = source_utils.get_undesirables()
+			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
 			source_utils.scraper_error('TOPNOW')
 			return sources
 
-		undesirables = source_utils.get_undesirables()
-		check_foreign_audio = source_utils.check_foreign_audio()
-		for i in r:
+		for item in items:
 			try:
-				if 'magnet:' not in i: continue
-				name = client.parseDOM(i, 'img', attrs={'class': 'thumbnails'}, ret='alt')[0].replace(u'\xa0', u' ')
+				if 'magnet:' not in item: continue
+				name = client.parseDOM(item, 'img', attrs={'class': 'thumbnails'}, ret='alt')[0].replace(u'\xa0', u' ')
 				if not source_utils.check_title(title, aliases, name, hdlr.replace('(', '').replace(')', ''), year): continue
 
-				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', i, re.DOTALL | re.I).group(1)
+				url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', item, re.DOTALL | re.I).group(1)
 				try: url = unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
 				except: url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on topnow &tr= before &dn=
 				url = url.split('&tr=')[0].replace(' ', '.')
-				url = source_utils.strip_non_ascii_and_unprintable(url)
+				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				release_name = source_utils.clean_name(url.split('&dn=')[1])
 				name_info = source_utils.info_from_name(release_name, title, year, hdlr, episode_title)
@@ -71,7 +71,7 @@ class source:
 				seeders = 0 # seeders not available on topnow
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', i).group(0) # file size is no longer available on topnow's new site
+					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', item).group(0) # file size is no longer available on topnow's new site
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

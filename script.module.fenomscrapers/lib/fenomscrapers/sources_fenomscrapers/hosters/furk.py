@@ -51,7 +51,7 @@ class source:
 		if not api_key: return sources
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
-			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
 			aliases = data['aliases'] # not used atm
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
