@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-15-2021)
+# modified by Venom for Fenomscrapers (updated 01-02-2022)
 '''
 	Fenomscrapers Project
 '''
@@ -18,9 +18,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['scene-rls.com', 'scene-rls.net']
-		self.base_link = 'http://scene-rls.net'
-		self.search_link = '/?s=%s'
+		self.base_link = "http://scene-rls.net"
+		self.search_link = "/?s=%s"
 
 	def sources(self, data, hostDict):
 		sources = []

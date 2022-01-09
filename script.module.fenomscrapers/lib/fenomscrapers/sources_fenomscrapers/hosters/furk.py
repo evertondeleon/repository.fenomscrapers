@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-15-2021) increased timeout=20
+# (updated 01-02-2022) increased timeout=20
 '''
 	Fenomscrapers Project
 '''
@@ -18,8 +18,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.domain = 'furk.net/'
-		self.base_link = 'https://www.furk.net'
+		self.domain = "furk.net"
+		self.base_link = "https://www.furk.net"
 		self.search_link = "/api/plugins/metasearch?api_key=%s&q=%s&cached=yes" \
 								"&match=%s&moderated=%s%s&sort=relevance&type=video&offset=0&limit=200"
 		self.tfile_link = "/api/file/get?api_key=%s&t_files=1&id=%s"

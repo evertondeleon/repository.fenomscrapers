@@ -56,7 +56,7 @@ class source:
 				name = unquote(link.rsplit("/")[-1])
 				if self.title_chk:
 					if not source_utils.check_title(title, aliases, name, hdlr, year): continue
-				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title) # needs a decent rewrite to get this
+				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 
 				quality, info = source_utils.get_release_quality(name_info, link)
 				try:

@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-15-2021)
+# (updated 01-02-2022)
 '''
 	Fenomscrapers Project
 '''
@@ -23,9 +23,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.domain = ['easynews.com']
-		self.base_link = 'https://members.easynews.com'
-		self.search_link = '/2.0/search/solr-search/advanced'
+		self.base_link = "https://members.easynews.com"
+		self.search_link = "/2.0/search/solr-search/advanced"
 
 	def sources(self, data, hostDict):
 		sources = []
@@ -45,13 +44,13 @@ class source:
 				season = int(data.get('season'))
 				episode = int(data.get('episode'))
 				hdlr = 'S%02dE%02d' % (season, episode)
-				query = '%s %s' % (title, hdlr)
+				query = '%s %s' % (re.sub(r'[^A-Za-z0-9\s\.-]+', '', title), hdlr)
 			else:
-				title = data['title'].replace('&', 'and')
+				title = data['title'].replace('&', 'and').replace('/', ' ')
 				episode_title = data['title']
 				years = [str(int(year)-1), str(year), str(int(year)+1)]
 				hdlr = year
-				query = '"%s" %s' % (title, ','.join(years))
+				query = '"%s" %s' % (re.sub(r'[^A-Za-z0-9\s\.-]+', '', title), ','.join(years))
 			# log_utils.log('query = %s' % query)
 
 			url, params = self._translate_search(query)

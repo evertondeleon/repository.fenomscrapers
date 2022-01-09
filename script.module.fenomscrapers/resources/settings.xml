@@ -11,8 +11,6 @@
 		<setting label="32009" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowChangelog)" />
 		<setting id="checkAddonUpdates" type="bool" label="32010" default="false" />
 		<setting label="32001" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=updates)" />
-		<!-- Hidden -->
-        <!-- <setting id="folder5.tv_shows_directory" type="text" default="None" visible="false" /> -->
 	</category>
 
 	<!-- Debrid Sources-1 -->
@@ -63,10 +61,11 @@
 		<setting id="provider.bitcq" type="bool" label="32137" default="false" />
 		<setting id="provider.bitlord" type="bool" label="32103" default="true" />
 		<setting id="provider.bitsearch" type="bool" label="32138" default="false" />
-		<setting id="provider.bt4g" type="bool" label="32132" default="false" />
+		<!-- <setting id="provider.bt4g" type="bool" label="32132" default="false" /> -->
 		<setting id="provider.btscene" type="bool" label="32104" default="false" />
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
 		<setting id="provider.eztv" type="bool" label="32107" default="true" />
+		<setting id="provider.ext" type="bool" label="32131" default="true" />
 		<setting id="provider.glodls" type="bool" label="32108" default="true" />
 		<setting id="provider.idope" type="bool" label="32109" default="false" />
 		<setting id="provider.isohunt2" type="bool" label="32110" default="false" />

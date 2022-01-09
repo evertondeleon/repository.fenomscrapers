@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-16-2021) increased timeout=7
+# created by Venom for Fenomscrapers (updated 1-08-2022)
 """
 	Fenomscrapers Project
 """
 
 import re
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -18,8 +18,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = "https://bt4g.org"
-		self.search_link = '/movie/search/%s/byseeders/1' # site option "video" adds "/movie/" to url
+		self.base_link = "https://ext.torrentbay.to" # "ext.to" V2 challenge as of 2-9-21
+		self.search_link = "/search/?order=size&sort=desc&q=%s"
 		self.min_seeders = 0
 
 	def sources(self, data, hostDict):
@@ -39,21 +39,28 @@ class source:
 			url = self.search_link % quote_plus(query)
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			results = client.request(url, timeout=7)
-			if not results or 'did not match any documents' in results: return sources
-			results = results.replace('&nbsp;', ' ')
-			results = client.parseDOM(results, 'div', attrs={'class': 'col s12'})
-			rows = client.parseDOM(results, 'div')[1:]
-			rows = [i for i in rows if 'magnet/' in i]
+
+			html = client.request(url, timeout='5')
+			if not html or '<tbody' not in html: return sources
+			table = client.parseDOM(html, 'tbody')
+			rows = client.parseDOM(table, 'tr')
 			undesirables = source_utils.get_undesirables()
 			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
-			source_utils.scraper_error('BT4G')
+			source_utils.scraper_error('EXT.TO')
 			return sources
 
 		for row in rows:
 			try:
-				name = re.search(r'title\s*?=\s*?["\'](.+?)["\']', row, re.I).group(1)
+				if 'dwn-btn torrent-dwn' not in row: continue
+				row = re.sub('[\r\n\t]', '', row)
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
+
+				link = client.parseDOM(columns[0], 'a', attrs={'class': 'dwn-btn torrent-dwn'}, ret='href')[0]
+				hash = re.search(r'btih:(.*?)$', link, re.I).group(1)
+
+				name = client.parseDOM(columns[0], 'a', ret='href')[0].lstrip('/').rstrip('/')
+				name = name.rsplit('-', 1)[0]
 				name = source_utils.clean_name(name)
 
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
@@ -61,32 +68,29 @@ class source:
 				if source_utils.remove_lang(name_info, check_foreign_audio): continue
 				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
-				hash = re.search(r'href\s*?=\s*?["\']/magnet/(.+?)["\']', row, re.I).group(1)
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
-					name_lower = name.lower()
-					if any(re.search(item, name_lower) for item in ep_strings): continue
+					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.search(r'["\']seeders["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.I).group(1).replace(',', ''))
-					if self.min_seeders > seeders: return
+					seeders = int(re.search(r'text-success["\']>([0-9]+)</', columns[4], re.I).group(1))
+					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row).group(0) #lot of combo S01E01-E08 so parse episode item for size instead, it's closer
+					size = re.search(r'<span>(.+?)</span', columns[1], re.I).group(1)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				append({'provider': 'bt4g', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
-							'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				append({'provider': 'ext', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
-				source_utils.scraper_error('BT4G')
-				return sources
+				source_utils.scraper_error('EXT.TO')
 		return sources
 
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -98,7 +102,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
+			self.title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			self.aliases = data['aliases']
 			self.imdb = data['imdb']
 			self.year = data['year']
@@ -110,69 +114,85 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
-						self.search_link % quote_plus(query + ' Season %s' % self.season_x)]
-			if search_series:
+						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
+							]
+			if self.search_series:
 				queries = [
 						self.search_link % quote_plus(query + ' Season'),
-						self.search_link % quote_plus(query + ' Complete')]
+						self.search_link % quote_plus(query + ' Complete')
+								]
 
 			threads = []
-			append = threads.append
 			for url in queries:
 				link = '%s%s' % (self.base_link, url)
-				append(workers.Thread(self.get_sources_packs, link))
+				threads.append(workers.Thread(self.get_sources_packs, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
 		except:
-			source_utils.scraper_error('BTDB')
+			source_utils.scraper_error('EXT.TO')
 			return self.sources
 
 	def get_sources_packs(self, link):
-		results = client.request(link, timeout=7)
-		if not results or 'did not match any documents' in results: return
-		results = results.replace('&nbsp;', ' ')
-		results = client.parseDOM(results, 'div', attrs={'class': 'col s12'})
-		rows = client.parseDOM(results, 'div')[1:]
-		rows = [i for i in rows if 'magnet/' in i]
+		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
+		try:
+			html = client.request(link, timeout='5')
+			if not html or '<tbody' not in html: return self.sources
+			table = client.parseDOM(html, 'tbody')
+			rows = client.parseDOM(table, 'tr')
+		except:
+			source_utils.scraper_error('EXT.TO')
+			return self.sources
+
 		for row in rows:
 			try:
-				name = re.search(r'title\s*?=\s*?["\'](.+?)["\']', row, re.I).group(1)
+				if 'dwn-btn torrent-dwn' not in row: continue
+				row = re.sub('[\r\n\t]', '', row)
+				columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
+
+				link = client.parseDOM(columns[0], 'a', attrs={'class': 'dwn-btn torrent-dwn'}, ret='href')[0]
+				hash = re.search(r'btih:(.*?)$', link, re.I).group(1)
+
+				name = client.parseDOM(columns[0], 'a', ret='href')[0].lstrip('/').rstrip('/')
+				name = name.rsplit('-', 1)[0]
 				name = source_utils.clean_name(name)
+
 				if not self.search_series:
 					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
+						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
+							continue
 					package = 'season'
 
 				elif self.search_series:
 					if not self.bypass_filter:
 						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
 						if not valid: continue
-					else: last_season = self.total_seasons
+					else:
+						last_season = self.total_seasons
 					package = 'show'
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
 				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 
-				hash = re.search(r'href\s*?=\s*?["\']/magnet/(.+?)["\']', row, re.I).group(1)
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
+
 				try:
-					seeders = int(re.search(r'["\']seeders["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.I).group(1).replace(',', ''))
-					if self.min_seeders > seeders: return
+					seeders = int(re.search(r'text-success["\']>([0-9]+)</', columns[4], re.I).group(1))
+					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.search(r'<b\s*class\s*=\s*["\']cpill.+?-pill["\']>(.+?)</b>', row, re.I).group(1)
+					size = re.search(r'<span>(.+?)</span', columns[1], re.I).group(1)
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				item = {'provider': 'bt4g', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+				item = {'provider': 'ext', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
 				self.sources_append(item)
 			except:
-				source_utils.scraper_error('BT4G')
+				source_utils.scraper_error('EXT.TO')

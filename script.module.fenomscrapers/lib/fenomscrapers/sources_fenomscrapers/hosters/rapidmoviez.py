@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers  (updated 12-15-2021)
+# modified by Venom for Fenomscrapers  (updated 01-02-2022)
 '''
 	Fenomscrapers Project
 '''
@@ -22,10 +22,9 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['rmz.cr', 'rapidmoviez.site']
-		self.base_link = 'http://rmz.cr/'
-		self.search_link = 'search/%s'
 		# self.base_link = 'http://rapidmoviez.cr/' # cloudflare IUAM challenge failure
+		self.base_link = "http://rmz.cr"
+		self.search_link = "/search/%s"
 		self.scraper = cfscrape.create_scraper()
 
 	def search(self, title, year):

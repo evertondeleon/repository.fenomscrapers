@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-16-2021)
+# (updated 01-02-2022)
 '''
 	Fenomscrapers Project
 '''
@@ -19,8 +19,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://filepursuit.p.rapidapi.com' # 'https://rapidapi.com/azharxes/api/filepursuit' to obtain key
-		self.search_link = '/?type=video&q=%s'
+		self.base_link = "https://filepursuit.p.rapidapi.com" # 'https://rapidapi.com/azharxes/api/filepursuit' to obtain key
+		self.search_link = "/?type=video&q=%s"
 
 	def sources(self, data, hostDict):
 		sources = []

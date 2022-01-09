@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-20-2021)
+# created by Venom for Fenomscrapers (updated 01-03-2022)
 """
 	Fenomscrapers Project
 """
@@ -19,7 +19,7 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = "https://torrentzeu.org"
+		self.base_link = "https://torrentz2.org.in"
 		self.search_link = '/kick.php?q=%s'
 		self.min_seeders = 0
 

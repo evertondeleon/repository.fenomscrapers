@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-14-2021)
+# (updated 01-02-2022)
 '''
 	Fenomscrapers Project
 '''
@@ -20,13 +20,12 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['ororo.tv']
-		self.base_link = 'https://ororo.tv'
-		self.moviesearch_link = '/api/v2/movies'
-		self.tvsearch_link = '/api/v2/shows'
-		self.movie_link = '/api/v2/movies/%s'
-		self.show_link = '/api/v2/shows/%s'
-		self.episode_link = '/api/v2/episodes/%s'
+		self.base_link = "https://ororo.tv"
+		self.moviesearch_link = "/api/v2/movies"
+		self.tvsearch_link = "/api/v2/shows"
+		self.movie_link = "/api/v2/movies/%s"
+		self.show_link = "/api/v2/shows/%s"
+		self.episode_link = "/api/v2/episodes/%s"
 		self.user = getSetting('ororo.user')
 		self.password = getSetting('ororo.pass')
 		self.headers = {

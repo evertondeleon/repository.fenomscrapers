@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-15-2021)
+# modified by Venom for Fenomscrapers (updated 01-02-2022)
 '''
 	Fenomscrapers Project
 '''
@@ -17,10 +17,9 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['proxybb.com', 'rlsbb.ru', 'rlsbb.to']
-		self.base_new = 'http://proxybb.com/'
-		self.base_old = 'http://old3.proxybb.com/'
-		self.search_link = 'http://search.proxybb.com/?s=%s' #may use in future but adds a request to do so.
+		self.base_new = "http://proxybb.com/"
+		self.base_old = "http://old3.proxybb.com/"
+		self.search_link = "http://search.proxybb.com/?s=%s" #may use in future but adds a request to do so.
 
 	def sources(self, data, hostDict):
 		sources = []
@@ -41,7 +40,8 @@ class source:
 			query = re.sub(r'\s', '-', query)
 
 			if int(year) >= 2021: self.base_link = self.base_new
-			else: self.base_link = self.base_old
+			# else: self.base_link = self.base_old
+			else: return sources # "old3.proxybb.com" does not seem operational anymore
 
 			url = '%s%s' % (self.base_link, query)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)

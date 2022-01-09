@@ -10,7 +10,7 @@ from fenomscrapers.modules.undesirables import Undesirables
 from fenomscrapers.modules.control import homeWindow, setting as getSetting, setSetting
 
 
-RES_4K = ('2160', '.4k', 'ultrahd', 'ultra.hd', '216o', '.uhd.')
+RES_4K = ('2160', '216o', '.4k', 'ultrahd', 'ultra.hd', '.uhd.')
 RES_1080 = ('1080', '1o8o', '108o', '1o80', '.fhd.')
 RES_720 = ('720', '72o')
 SCR = ('dvdscr', 'screener', '.scr.', '.r5', '.r6')

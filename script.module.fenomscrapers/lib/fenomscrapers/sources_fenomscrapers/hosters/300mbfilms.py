@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-16-2021)
+# modified by Venom for Fenomscrapers (updated 01-02-2022)
 '''
 	Fenomscrapers Project
 '''
@@ -17,9 +17,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.domains = ['300mbfilms.io', '300mbfilms.co']
-		self.base_link = 'https://www.300mbfilms.io'
-		self.search_link = '/?s=%s'
+		self.base_link = "https://www.300mbfilms.cx"
+		self.search_link = "/?s=%s"
 
 	def sources(self, data, hostDict):
 		sources = []
