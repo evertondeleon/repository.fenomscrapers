@@ -1,4 +1,4 @@
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.1.1" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.1.2" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -25,11 +25,8 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.1.1 - Jan. 08, 2022[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] rlsbb's "old3.proxybb.com" appears to no longer be functional so this has been disabled.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed EasyNews title check issue when meta title contains the character [B]"/"[/B], ex. [B]"Mother/Android"[/B].  This was missed in previous update[/I]
-[COLOR yellow]--[/COLOR][I] BT4G scraper has been removed.  Site is now behind Cloudflare V2 challenge and no solve available.[/I]
-[COLOR yellow]--[/COLOR][I] EXT.TO scraper has returned with a new proxy in use.[/I]
+[B][COLOR red]Update - v2.1.2 - Jan. 10, 2022[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] TORRENTPARADISE site is back up so the scraper has returned.[/I]
 		</news>
 	</extension>
 </addon>

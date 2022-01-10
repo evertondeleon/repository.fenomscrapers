@@ -59,9 +59,8 @@
 		<setting id="provider.1337x" type="bool" label="32101" default="false" />
 		<setting id="provider.7torrents" type="bool" label="32102" default="false" />
 		<setting id="provider.bitcq" type="bool" label="32137" default="false" />
-		<setting id="provider.bitlord" type="bool" label="32103" default="true" />
+		<setting id="provider.bitlord" type="bool" label="32103" default="false" />
 		<setting id="provider.bitsearch" type="bool" label="32138" default="false" />
-		<!-- <setting id="provider.bt4g" type="bool" label="32132" default="false" /> -->
 		<setting id="provider.btscene" type="bool" label="32104" default="false" />
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
 		<setting id="provider.eztv" type="bool" label="32107" default="true" />
@@ -81,6 +80,7 @@
 		<setting id="provider.torrentfunk" type="bool" label="32124" default="false" />
 		<setting id="provider.torrentgalaxy" type="bool" label="32125" default="false" />
 		<setting id="provider.torrentio" type="bool" label="32139" default="true" />
+		<setting id="provider.torrentparadise" type="bool" label="32135" default="true" />
 		<setting id="provider.torrentproject2" type="bool" label="32136" default="false" />
 		<setting id="provider.torrentz2" type="bool" label="32130" default="false" />
 		<setting id="provider.yourbittorrent" type="bool" label="32126" default="false" />

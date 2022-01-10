@@ -1,4 +1,8 @@
 
+[B][COLOR red]Update - v2.1.2 - Jan. 10, 2022[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] TORRENTPARADISE site is back up so the scraper has returned.[/I]
+
+
 [B][COLOR red]Update - v2.1.1 - Jan. 08, 2022[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] rlsbb's "old3.proxybb.com" appears to no longer be functional so this has been disabled.[/I]
 [COLOR yellow]--[/COLOR][I] Fixed EasyNews title check issue when meta title contains the character [B]"/"[/B], ex. [B]"Mother/Android"[/B].  This was missed in previous update[/I]
