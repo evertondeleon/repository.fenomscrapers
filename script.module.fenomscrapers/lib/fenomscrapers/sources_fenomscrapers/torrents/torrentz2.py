@@ -19,7 +19,8 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = "https://torrentz2.org.in"
+		# self.base_link = "https://torrentz2.org.in"
+		self.base_link = "https://torrentz2.club"
 		self.search_link = '/kick.php?q=%s'
 		self.min_seeders = 0
 
@@ -40,7 +41,7 @@ class source:
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
 			# log_utils.log('url = %s' % url)
 
-			results = client.request(url, timeout=7)
+			results = client.request(url, timeout=10)
 			if not results or any(value in results for value in SERVER_ERROR): return sources
 			rows = client.parseDOM(results, 'tr')
 			undesirables = source_utils.get_undesirables()
@@ -127,7 +128,7 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			results = client.request(link, timeout=7)
+			results = client.request(link, timeout=10)
 			if not results or any(value in results for value in SERVER_ERROR): return
 			rows = client.parseDOM(results, 'tr')
 		except:

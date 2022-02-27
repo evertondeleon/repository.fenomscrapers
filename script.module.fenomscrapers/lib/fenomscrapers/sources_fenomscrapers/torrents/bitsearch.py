@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (12-20-2021) increased timeout=7
+# created by Venom for Fenomscrapers (02-26-2022)
 """
 	Fenomscrapers Project
 """
@@ -60,7 +60,7 @@ class source:
 		try:
 			results = client.request(url, timeout=7)
 			if not results or 'search-result view-box' not in results: return
-			rows = client.parseDOM(results, 'div', attrs={'class': 'search-result view-box'})
+			rows = client.parseDOM(results, 'li', attrs={'class': 'search-result view-box'})
 		except:
 			source_utils.scraper_error('BITSEARCH')
 		for row in rows:
@@ -147,7 +147,7 @@ class source:
 		try:
 			results = client.request(link, timeout=7)
 			if not results or 'search-result view-box' not in results: return
-			rows = client.parseDOM(results, 'div', attrs={'class': 'search-result view-box'})
+			rows = client.parseDOM(results, 'li', attrs={'class': 'search-result view-box'})
 		except:
 			source_utils.scraper_error('BITSEARCH')
 		for row in rows:
