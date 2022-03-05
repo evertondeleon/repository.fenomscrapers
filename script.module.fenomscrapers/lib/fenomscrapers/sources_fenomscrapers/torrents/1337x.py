@@ -116,7 +116,6 @@ class source:
 			data = client.request(item[2], timeout=7)
 			url = re.search(r'href\s*=\s*["\'](magnet:.+?)["\']', data, re.I).group(1)
 			url = unquote_plus(url).replace('&amp;', '&').split('&tr')[0].replace(' ', '.')
-			# url = source_utils.strip_non_ascii_and_unprintable(url)
 			hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 			self.sources_append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1],
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})

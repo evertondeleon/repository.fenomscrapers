@@ -432,8 +432,8 @@ msgid "EXTRATORRENT (Pack capable)"
 msgstr "EXTRATORRENT (Pack geschikt)"
 
 msgctxt "#32107"
-msgid "EZTV (shows only)"
-msgstr "EZTV (alleen series)"
+msgid "EZTV (shows only-Pack capable)"
+msgstr "EZTV (alleen series-Pack geschikt)"
 
 msgctxt "#32108"
 msgid "GLODLS (Pack capable)"

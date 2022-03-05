@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-16-2021)
+# created by Venom for Fenomscrapers (updated 3-02-2022)
 """
 	Fenomscrapers Project
 """
@@ -115,13 +115,14 @@ class source:
 			self.check_foreign_audio = source_utils.check_foreign_audio()
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
-			queries = [
-						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
-						self.search_link % quote_plus(query + ' Season %s' % self.season_x)]
 			if search_series:
 				queries = [
 						self.search_link % quote_plus(query + ' Season'),
 						self.search_link % quote_plus(query + ' Complete')]
+			else:
+				queries = [
+						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
+						self.search_link % quote_plus(query + ' Season %s' % self.season_x)]
 			threads = []
 			append = threads.append
 			for url in queries:
@@ -161,9 +162,11 @@ class source:
 			name = re.search(r'<title>(.+?)</title>', result, re.I).group(1)
 			name = source_utils.clean_name(unquote_plus(name))
 
+			episode_start, episode_end = 0, 0
 			if not self.search_series:
 				if not self.bypass_filter:
-					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): return
+					valid, episode_start, episode_end = source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name)
+					if not valid: return
 				package = 'season'
 
 			elif self.search_series:
@@ -194,6 +197,7 @@ class source:
 			item = {'provider': 'torrentproject2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 						'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 			if self.search_series: item.update({'last_season': last_season})
+			elif episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
 			self.sources_append(item)
 		except:
 			source_utils.scraper_error('TORRENTPROJECT2')

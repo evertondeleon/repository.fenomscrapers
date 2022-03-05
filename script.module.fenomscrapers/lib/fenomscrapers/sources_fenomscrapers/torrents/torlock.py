@@ -66,7 +66,6 @@ class source:
 
 			url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', result, re.I).group(1)
 			url = unquote_plus(url).replace('&amp;', '&').split('&tr')[0].replace(' ', '.')
-			# url = source_utils.strip_non_ascii_and_unprintable(url)
 			hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 			name = source_utils.clean_name(url.split('&dn=')[1])
 

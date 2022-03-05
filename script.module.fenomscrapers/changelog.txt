@@ -1,4 +1,12 @@
 
+[B][COLOR red]Update - v2.1.4 - March 05, 2022[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Updated regex filtering to better identify some season packs that were previously passed back to addons as a single episode.[/I]
+[COLOR yellow]--[/COLOR][I] Improved multi audio track detection.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed TORRENTZ2 domain and query change...again.[/I]
+[COLOR yellow]--[/COLOR][I] EZTV scraper now supports season packs.  The scraper has also been mofified to convert any base32 hashes returned to hex40.  Addons no longer need to convert these for Real-Debrid support, which does not support base32 hashes.  AllDebrid and Premiumize.me currently supports handling the conversion server sided so this is of no concern for those users.[/I]
+[COLOR yellow]--[/COLOR][I] All pack capable scrapers now return season pack "range of episodes" cases as a pack file with the start and end episode the range covers, ex. "S01E01-E05" is no longer identified as a single episode.[/I]
+
+
 [B][COLOR red]Update - v2.1.3 - Feb. 27, 2022[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] TORRENTZ2 has new domain.[/I]
 [COLOR yellow]--[/COLOR][I] fixed BITSEARCH html tag change, scraper is working again.[/I]

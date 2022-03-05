@@ -25,7 +25,7 @@ ABV_LANG = ('.ara.', '.ces.', '.chi.', '.chs.', '.cze.', '.dan.', '.de.', '.deu.
 DUBBED = ('bengali.dub', 'dublado', 'dubbed', 'pldub')
 SUBS = ('subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs')
 
-ENG_CHECK = ('.eng.', '.en.', 'english')
+ENG_CHECK = ('.eng.', '.en.', 'english', 'multi')
 SRT_CHECK = ('with.srt', '.avi', '.mkv', '.mp4')
 
 UNDESIRABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'amedia', 'audiobook', 'baibako', 'bigsinema', 'bonus.disc', 'casstudio.tv', 'courage.bambey',
@@ -127,7 +127,11 @@ def aliases_to_array(aliases, filter=None):
 		log_utils.error()
 		return []
 
-def check_title(title, aliases, release_title, hdlr, year, years=None):
+def check_title(title, aliases, release_title, hdlr, year, years=None): # non pack file title check, single eps and movies
+	if years: # for movies only, scraper to pass None for episodes
+		if not any(value in release_title for value in years): return False
+	else: 
+		if not re.search(r'%s' % hdlr, release_title, re.I): return False
 	aliases = aliases_to_array(aliases)
 	title_list = []
 	title_list_append = title_list.append
@@ -143,22 +147,27 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 				from fenomscrapers.modules import log_utils
 				log_utils.error()
 	try:
-		match = True
 		title = title.replace('&', 'and')
 		if title not in title_list: title_list_append(title)
 
 		release_title = re.sub(r'([(])(?=((19|20)[0-9]{2})).*?([)])', '\\2', release_title) #remove parenthesis only if surrounding a 4 digit date
 		t = re.split(r'%s' % hdlr, release_title, 1, re.I)[0].replace(year, '').replace('&', 'and')
-
 		if years:
 			for i in years: t = t.split(i)[0]
 		t = re.split(r'2160p|216op|4k|1080p|1o8op|108op|1o80p|720p|72op|480p|48op', t, 1, re.I)[0]
-		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list): match = False
-		if years: # for movies only, scraper to pass None for episodes
-			if not any(value in release_title for value in years): match = False
-		else: 
-			if not re.search(r'%s' % hdlr, release_title, re.I): match = False
-		return match
+		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list): return False
+
+# filter to remove episode ranges that should be picked up in "filter_season_pack()" ex. "s01e01-08"
+		if hdlr != year: # equal for movies but not for shows
+			range_regex = (
+					r's\d{1,3}e\d{1,3}[-.]e\d{1,3}',
+					r's\d{1,3}e\d{1,3}[-.]\d{1,3}(?!p|bit|gb)(?!\d{1,3})',
+					r's\d{1,3}[-.]e\d{1,3}[-.]e\d{1,3}',
+					r'season[.-]?\d{1,3}[.-]?ep[.-]?\d{1,3}[-.]ep[.-]?\d{1,3}',
+					r'season[.-]?\d{1,3}[.-]?episode[.-]?\d{1,3}[-.]episode[.-]?\d{1,3}') # may need to add "to", "thru"
+			for regex in range_regex:
+				if bool(re.search(regex, release_title, re.I)): return False
+		return True
 	except:
 		from fenomscrapers.modules import log_utils
 		log_utils.error()
@@ -202,31 +211,42 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 		season_fill = season.zfill(2)
 		season_check = '.s%s.' % season
 		season_fill_check = '.s%s.' % season_fill
+		season_fill_checke = '.s%se' % season_fill # added 3/2/22 to pick up episode range packs ex "Reacher.s01e01-08"
 		season_full_check = '.season.%s.' % season
 		season_full_check_ns = '.season%s.' % season
 		season_full_fill_check = '.season.%s.' % season_fill
 		season_full_fill_check_ns = '.season%s.' % season_fill
-
-		split_list = (season_check, season_fill_check, '.' + season + '.season', 'total.season', 'season', 'the.complete', 'complete', year)
-		string_list = (season_check, season_fill_check, season_full_check, season_full_check_ns, season_full_fill_check, season_full_fill_check_ns)
+		split_list = (season_check, season_fill_check, season_fill_checke, '.' + season + '.season', 'total.season', 'season', 'the.complete', 'complete', year)
+		string_list = (season_check, season_fill_check, season_fill_checke, season_full_check, season_full_check_ns, season_full_fill_check, season_full_fill_check_ns)
 
 		release_title = release_title_format(release_title)
 		t = release_title.replace('-', '.')
-		for i in split_list:
-			t = t.split(i)[0]
-		if all(cleantitle.get(x) != cleantitle.get(t) for x in title_list):
-			return False
+		for i in split_list: t = t.split(i)[0]
+		if all(cleantitle.get(x) != cleantitle.get(t) for x in title_list): return False, 0, 0
 
-# remove single episodes(returned in single ep scrape)
+# remove single episodes ONLY (returned in single ep scrape), keep episode ranges as season packs
 		episode_regex = (
-				r's\d{1,3}e\d{1,3}',
-				r's[0-3]{1}[0-9]{1}[.-]e\d{1,2}',
-				r's\d{1,3}[.-]\d{1,3}e\d{1,3}',
-				r'season[.-]?\d{1,3}[.-]?ep[.-]?\d{1,3}',
-				r'season[.-]?\d{1,3}[.-]?episode[.-]?\d{1,3}')
+				r's\d{1,3}e\d{1,3}[-.](?!\d{2,3}[-.])(?!e\d{1,3})(?!\d{2}gb)',
+				r'season[.-]?\d{1,3}[.-]?ep[.-]?\d{1,3}[-.](?!\d{2,3}[-.])(?!e\d{1,3})(?!\d{2}gb)',
+				r'season[.-]?\d{1,3}[.-]?episode[.-]?\d{1,3}[-.](?!\d{2,3}[-.])(?!e\d{1,3})(?!\d{2}gb)')
 		for item in episode_regex:
-			if bool(re.search(item, release_title)):
-				return False
+			if bool(re.search(item, release_title)): return False, 0, 0
+
+# return and identify episode ranges
+		range_regex = (
+				r's\d{1,3}e(\d{1,3})[-.]e(\d{1,3})',
+				r's\d{1,3}e(\d{1,3})[-.](\d{1,3})(?!p|bit|gb)(?!\d{1,3})',
+				r's\d{1,3}[-.]e(\d{1,3})[-.]e(\d{1,3})',
+				r'season[.-]?\d{1,3}[.-]?ep[.-]?(\d{1,3})[-.]ep[.-]?(\d{1,3})',
+				r'season[.-]?\d{1,3}[.-]?episode[.-]?(\d{1,3})[-.]episode[.-]?(\d{1,3})') # may need to add "to", "thru"
+		for regex in range_regex:
+			match = re.search(regex, release_title)
+			if match:
+				# from fenomscrapers.modules import log_utils
+				# log_utils.log('pack episode range found -- > release_title=%s' % release_title)
+				episode_start = int(match.group(1))
+				episode_end = int(match.group(2))
+				return True, episode_start, episode_end
 
 # remove season ranges - returned in showPack scrape, plus non conforming season and specific crap
 		rt = release_title.replace('-', '.')
@@ -239,14 +259,14 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 				season_full_check.rstrip('.') + r'[.-]to[.-]([2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]|$)', # ".season.1.to.9.", ".season.1.to.39"
 				season_full_check.rstrip('.') + r'[.-]season[.-]([2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]|$)', # ".season.1.season.9.", ".season.1.season.39"
 				season_full_check.rstrip('.') + r'[.-]([2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]|$)', # "season.1.9.", "season.1.39.
-				season_full_check.rstrip('.') + r'[.-]\d{1}[.-]\d{1,2}(?:[.-]|$)', #  "season.1.9.09."
-				season_full_check.rstrip('.') + r'[.-]\d{3}[.-](?:19|20)[0-9]{2}(?:[.-]|$)',# single season followed by 3 digit followed by 4 digit year ex."season.1.004.1971"
-				season_full_fill_check.rstrip('.') + r'[.-]\d{3}[.-]\d{3}(?:[.-]|$)',# 2 digit season followed by 3 digit dash range ex."season.10.001-025."
+				season_full_check.rstrip('.') + r'[.-]\d{1}[.-]\d{1,2}(?:[.-]|$)', # "season.1.9.09."
+				season_full_check.rstrip('.') + r'[.-]\d{3}[.-](?:19|20)[0-9]{2}(?:[.-]|$)', # single season followed by 3 digit followed by 4 digit year ex."season.1.004.1971"
+				season_full_fill_check.rstrip('.') + r'[.-]\d{3}[.-]\d{3}(?:[.-]|$)', # 2 digit season followed by 3 digit dash range ex."season.10.001-025."
 				season_full_fill_check.rstrip('.') + r'[.-]season[.-]\d{2}(?:[.-]|$)' # 2 digit season followed by 2 digit season range ex."season.01-season.09."
 					):
-				if bool(re.search(item, release_title)): return False
-			return True
-		return False
+				if bool(re.search(item, release_title)): return False, 0, 0
+			return True, 0, 0
+		return False, 0, 0
 	except:
 		from fenomscrapers.modules import log_utils
 		log_utils.error()
@@ -273,10 +293,8 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 		release_title = release_title_format(release_title)
 		t = release_title.replace('-', '.')
 
-		for i in split_list:
-			t = t.split(i)[0]
-		if all(cleantitle.get(x) != cleantitle.get(t) for x in title_list):
-			return False, 0
+		for i in split_list: t = t.split(i)[0]
+		if all(cleantitle.get(x) != cleantitle.get(t) for x in title_list): return False, 0
 
 # remove single episodes(returned in single ep scrape)
 		episode_regex = (
@@ -590,6 +608,13 @@ def convert_size(size_bytes, to='GB'):
 		from fenomscrapers.modules import log_utils
 		log_utils.error()
 		return 0, ''
+
+def base32_to_hex(hash, caller):
+	from base64 import b32decode
+	from fenomscrapers.modules import log_utils
+	hex = b32decode(hash).hex()
+	log_utils.log('%s: base32 hash  "%s"  converted to hex 40  "%s" ' % (caller, hash, hex), __name__, log_utils.LOGDEBUG)
+	return hex
 
 def scraper_error(provider):
 	import traceback

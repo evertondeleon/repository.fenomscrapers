@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-20-2021)
+# created by Venom for Fenomscrapers (updated 3-02-2022)
 """
 	Fenomscrapers Project
 """
@@ -76,7 +76,6 @@ class source:
 				url = unquote_plus(file.get('magnet')).replace('&amp;', '&').replace(' ', '.')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
-				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
@@ -124,13 +123,14 @@ class source:
 			self.headers = cache.get(self._get_token_and_cookies, 1)
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
-			queries = [
-						quote_plus(query + ' S%s' % self.season_xx),
-						quote_plus(query + ' Season %s' % self.season_x)]
 			if search_series:
 				queries = [
 						quote_plus(query + ' Season'),
 						quote_plus(query + ' Complete')]
+			else:
+				queries = [
+						quote_plus(query + ' S%s' % self.season_xx),
+						quote_plus(query + ' Season %s' % self.season_x)]
 			threads = []
 			append = threads.append
 			for url in queries:
@@ -171,12 +171,13 @@ class source:
 				url = unquote_plus(file.get('magnet')).replace('&amp;', '&').replace(' ', '.')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
-				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 
+				episode_start, episode_end = 0, 0
 				if not self.search_series:
 					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
+						valid, episode_start, episode_end = source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name)
+						if not valid: continue
 					package = 'season'
 
 				elif self.search_series:
@@ -207,6 +208,7 @@ class source:
 				item = {'provider': 'bitlord', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
+				elif episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
 				self.sources_append(item)
 			except:
 				source_utils.scraper_error('BITLORD')

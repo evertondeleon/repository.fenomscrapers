@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-16-2021)
+# modified by Venom for Fenomscrapers (updated 3-02-2022)
 """
 	Fenomscrapers Project
 """
@@ -43,7 +43,7 @@ class source:
 			else: url = self.moviesearch.format(quote_plus(query))
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			result = client.request(url, timeout=5)
+			result = client.request(url, timeout=7)
 			if not result: return sources
 			rows = client.parseDOM(result, 'tr', attrs={'class': 't-row'})
 			if not rows: return sources
@@ -110,14 +110,14 @@ class source:
 			self.check_foreign_audio = source_utils.check_foreign_audio()
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
-			queries = [
-						self.tvsearch_pack.format(quote_plus(query + ' S%s' % self.season_xx)),
-						self.tvsearch_pack.format(quote_plus(query + ' Season %s' % self.season_x))]
 			if search_series:
 				queries = [
 						self.tvsearch_pack.format(quote_plus(query + ' Season')),
 						self.tvsearch_pack.format(quote_plus(query + ' Complete'))]
-
+			else:
+				queries = [
+						self.tvsearch_pack.format(quote_plus(query + ' S%s' % self.season_xx)),
+						self.tvsearch_pack.format(quote_plus(query + ' Season %s' % self.season_x))]
 			threads = []
 			append = threads.append
 			for url in queries:
@@ -132,7 +132,7 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			result = client.request(link, timeout=5)
+			result = client.request(link, timeout=7)
 			if not result: return
 			rows = client.parseDOM(result, 'tr', attrs={'class': 't-row'})
 			if not rows: return
@@ -150,9 +150,11 @@ class source:
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1].replace('.torrent', ''))
 
+				episode_start, episode_end = 0, 0
 				if not self.search_series:
 					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
+						valid, episode_start, episode_end = source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name)
+						if not valid: continue
 					package = 'season'
 
 				elif self.search_series:
@@ -180,6 +182,7 @@ class source:
 				item = {'provider': 'glodls', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
+				elif episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
 				self.sources_append(item)
 			except:
 				source_utils.scraper_error('GLODLS')

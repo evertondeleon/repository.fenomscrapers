@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-20-2021)
+# modified by Venom for Fenomscrapers (updated 3-02-2022)
 """
 	Fenomscrapers Project
 """
@@ -76,7 +76,6 @@ class source:
 					if 'magnet:' not in row: continue
 					url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
 					url = unquote_plus(url).replace('&amp;', '&').split('&tr')[0].replace(' ', '.')
-					# url = source_utils.strip_non_ascii_and_unprintable(url)
 				except: continue
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				try:
@@ -139,13 +138,14 @@ class source:
 
 			# query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', self.title)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
-			queries = [
-						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
-						self.search_link % quote_plus(query + ' Season %s' % self.season_x)]
-			if self.search_series:
+			if search_series:
 				queries = [
 						self.search_link % quote_plus(query + ' Season'),
 						self.search_link % quote_plus(query + ' Complete')]
+			else:
+				queries = [
+						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
+						self.search_link % quote_plus(query + ' Season %s' % self.season_x)]
 			threads = []
 			append = threads.append
 			for url in queries:
@@ -178,7 +178,6 @@ class source:
 					if 'magnet:' not in row: continue
 					url = re.search(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.I).group(1)
 					url = unquote_plus(url).replace('&amp;', '&').split('&tr')[0].replace(' ', '.')
-					# url = source_utils.strip_non_ascii_and_unprintable(url)
 				except: continue
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				try:
@@ -192,9 +191,11 @@ class source:
 					try: name = re.sub(r'(.*?)\W{2,10}', '', name)
 					except: name = name.split('-.', 1)[1].lstrip()
 
+				episode_start, episode_end = 0, 0
 				if not self.search_series:
 					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
+						valid, episode_start, episode_end = source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name)
+						if not valid: continue
 					package = 'season'
 
 				elif self.search_series:
@@ -223,6 +224,7 @@ class source:
 				item = {'provider': 'zooqle', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
+				elif episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
 				self.sources_append(item)
 			except:
 				source_utils.scraper_error('ZOOQLE')

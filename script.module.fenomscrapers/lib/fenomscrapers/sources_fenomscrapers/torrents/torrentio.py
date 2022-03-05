@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-19-2021)
+# created by Venom for Fenomscrapers (updated 3-02-2022)
 '''
 	Fenomscrapers Project
 '''
@@ -9,6 +9,7 @@ import re
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 SERVER_ERROR = ('521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance', 'null')
+
 
 class source:
 	priority = 1
@@ -25,7 +26,6 @@ class source:
 		self.min_seeders = 0
 # Currently supports YTS(+), EZTV(+), RARBG(+), 1337x(+), ThePirateBay(+), KickassTorrents(+), TorrentGalaxy(+), HorribleSubs(+), NyaaSi(+), NyaaPantsu(+), Rutor(+), Comando(+), ComoEuBaixo(+), Lapumia(+), OndeBaixa(+), Torrent9(+).
 
-
 	def sources(self, data, hostDict):
 		sources = []
 		if not data: return sources
@@ -36,11 +36,15 @@ class source:
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 			imdb = data['imdb']
-
-			if 'tvshowtitle' in data: url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, data['season'], data['episode']))
-			else: url = '%s%s' % (self.base_link, self.movieSearch_link % imdb)
+			if 'tvshowtitle' in data:
+				season = data['season']
+				episode = data['episode']
+				hdlr = 'S%02dE%02d' % (int(season), int(episode))
+				url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, season, episode))
+			else:
+				url = '%s%s' % (self.base_link, self.movieSearch_link % imdb)
+				hdlr = year
 			# log_utils.log('url = %s' % url)
 			results = client.request(url, timeout=5)
 			if not results or any(value in results for value in SERVER_ERROR): return sources
@@ -66,16 +70,16 @@ class source:
 
 				name = source_utils.clean_name(file_title[0])
 
-				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
+				if not source_utils.check_title(title, aliases, name.replace('.(Archie.Bunker', ''), hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info, check_foreign_audio): continue
 				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name) 
-				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-					name_lower = name.lower()
-					if any(re.search(item, name_lower) for item in ep_strings): continue
+				# if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					# ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					# name_lower = name.lower()
+					# if any(re.search(item, name_lower) for item in ep_strings): continue
 
 				try:
 					seeders = int(re.search(r'(\d+)', file_info).group(1))
@@ -106,7 +110,7 @@ class source:
 			imdb = data['imdb']
 			year = data['year']
 			season = data['season']
-			url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, data['season'], data['episode']))
+			url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, season, data['episode']))
 			results = client.request(url, timeout=5)
 			if not results or any(value in results for value in SERVER_ERROR): return sources
 			files = jsloads(results)['streams']
@@ -131,14 +135,16 @@ class source:
 
 				name = source_utils.clean_name(file_title[0])
 
+				episode_start, episode_end = 0, 0
 				if not search_series:
 					if not bypass_filter:
-						if not source_utils.filter_season_pack(title, aliases, year, season, name): continue
+						valid, episode_start, episode_end = source_utils.filter_season_pack(title, aliases, year, season, name.replace('.(Archie.Bunker', ''))
+						if not valid: continue
 					package = 'season'
 
 				elif search_series:
 					if not bypass_filter:
-						valid, last_season = source_utils.filter_show_pack(title, aliases, imdb, year, season, name, total_seasons)
+						valid, last_season = source_utils.filter_show_pack(title, aliases, imdb, year, season, name.replace('.(Archie.Bunker', ''), total_seasons)
 						if not valid: continue
 					else: last_season = total_seasons
 					package = 'show'
@@ -164,6 +170,7 @@ class source:
 				item = {'provider': 'torrentio', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if search_series: item.update({'last_season': last_season})
+				elif episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
 				sources_append(item)
 			except:
 				source_utils.scraper_error('TORRENTIO')

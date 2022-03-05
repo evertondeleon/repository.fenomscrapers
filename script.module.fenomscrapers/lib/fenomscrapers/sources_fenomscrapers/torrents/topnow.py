@@ -61,7 +61,6 @@ class source:
 				except: url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on topnow &tr= before &dn=
 				url = url.split('&tr=')[0].replace(' ', '.')
-				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				release_name = source_utils.clean_name(url.split('&dn=')[1])
 				name_info = source_utils.info_from_name(release_name, title, year, hdlr, episode_title)

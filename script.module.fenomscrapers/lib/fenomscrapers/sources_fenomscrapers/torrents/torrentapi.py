@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-16-2021)
+# modified by Venom for Fenomscrapers (updated 3-02-2022)
 """
 	Fenomscrapers Project
 """
@@ -104,10 +104,9 @@ class source:
 
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		sources = []
+		if search_series: return sources # torrentapi does not have showPacks
 		if not data: return sources
-		append = sources.append
-		if search_series: # torrentapi does not have showPacks
-			return sources
+		sources_append = sources.append
 		try:
 			self.scraper = cfscrape.create_scraper()
 			key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
@@ -136,8 +135,10 @@ class source:
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(unquote_plus(file["title"]))
 
+				episode_start, episode_end = 0, 0
 				if not bypass_filter:
-					if not source_utils.filter_season_pack(title, aliases, year, season, name): continue
+					valid, episode_start, episode_end = source_utils.filter_season_pack(title, aliases, year, season, name)
+					if not valid: continue
 				package = 'season'
 
 				name_info = source_utils.info_from_name(name, title, year, season=season, pack=package)
@@ -155,8 +156,10 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-								'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package})
+				item = {'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+								'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
+				if episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
+				sources_append(item)
 			except:
 				source_utils.scraper_error('TORRENTAPI')
 		return sources
