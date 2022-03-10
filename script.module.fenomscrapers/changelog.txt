@@ -1,4 +1,9 @@
 
+[B][COLOR red]Update - v2.1.5 - March 10, 2022[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] BITCQ site is back up so scraper has returned.[/I]
+[COLOR yellow]--[/COLOR][I] Added a windows property check(fs_filterless_search) so that addons can bypass FenomScrapers filtering on the fly.[/I]
+
+
 [B][COLOR red]Update - v2.1.4 - March 05, 2022[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Updated regex filtering to better identify some season packs that were previously passed back to addons as a single episode.[/I]
 [COLOR yellow]--[/COLOR][I] Improved multi audio track detection.[/I]
