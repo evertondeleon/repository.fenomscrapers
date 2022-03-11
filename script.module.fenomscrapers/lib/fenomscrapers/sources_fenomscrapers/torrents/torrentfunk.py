@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 3-02-2022)
+# created by Venom for Fenomscrapers (updated 3-11-2022)
 """
 	Fenomscrapers Project
 """
@@ -172,10 +172,10 @@ class source:
 				if '<span' in name: name = name.split('<span')[0].rstrip(' [')
 				name = source_utils.clean_name(name)
 
-				episode_start, episode_end = 0, 0
+				self.episode_start, self.episode_end = 0, 0
 				if not self.search_series:
 					if not self.bypass_filter:
-						valid, episode_start, episode_end = source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name)
+						valid, self.episode_start, self.episode_end = source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name)
 						if not valid: continue
 					package = 'season'
 
@@ -219,7 +219,7 @@ class source:
 			item = {'provider': 'torrentfunk', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': items[0], 'name_info': items[1], 'quality': quality,
 						'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': items[3]}
 			if self.search_series: item.update({'last_season': items[4]})
-			elif episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
+			elif self.episode_start: item.update({'episode_start': self.episode_start, 'episode_end': self.episode_end}) # for partial season packs
 			self.sources_append(item)
 		except:
 			source_utils.scraper_error('TORRENTFUNK')

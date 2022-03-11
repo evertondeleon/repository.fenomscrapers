@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.1.5" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.1.6" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -27,9 +27,9 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.1.5 - March 10, 2022[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] BITCQ site is back up so scraper has returned.[/I]
-[COLOR yellow]--[/COLOR][I] Added a windows property check(fs_filterless_search) so that addons can bypass FenomScrapers filtering on the fly.[/I]
+[B][COLOR red]Update - v2.1.6 - March 11, 2022[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed TORRENTFUNK "episode_start" range error breaking pack file scrape.[/I]
+[COLOR yellow]--[/COLOR][I] Switched GLOTORRENTS(glodls, gtdb.to) to use html "title" tag.  GLOTORRENTS conveniently fixes incomplete pack files to list the episode range the pack covers but does so in the html "title" tag while the magnet title still falsely indicates a full season pack.[/I]
 		</news>
 	</extension>
 </addon>
