@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 3-02-2022)
+# modified by Venom for Fenomscrapers (updated 3-30-2022)
 """
 	Fenomscrapers Project
 """
 
 import re
-from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils

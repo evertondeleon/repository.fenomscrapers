@@ -41,7 +41,7 @@ from .user_agent import User_Agent
 
 # ------------------------------------------------------------------------------- #
 
-__version__ = '1.2.59'
+__version__ = '1.2.60'
 
 # ------------------------------------------------------------------------------- #
 
@@ -343,7 +343,7 @@ class CloudScraper(Session):
                     'doubleDown',
                     'captcha',
                     'interpreter',
-                    'source_address'
+                    'source_address',
                     'requestPreHook',
                     'requestPostHook'
                 ] if field in kwargs

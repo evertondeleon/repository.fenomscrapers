@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 3-02-2022)
+# modified by Venom for Fenomscrapers (updated 3-30-2022)
 """
 	Fenomscrapers Project
 """
@@ -7,7 +7,6 @@
 from json import loads as jsloads
 import re
 from urllib.parse import quote
-from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers

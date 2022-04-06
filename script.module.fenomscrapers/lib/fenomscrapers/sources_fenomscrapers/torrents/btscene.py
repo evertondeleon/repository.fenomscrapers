@@ -56,7 +56,7 @@ class source:
 
 	def get_sources(self, url):
 		try:
-			result = client.request(url, timeout=5)
+			result = client.request(url, timeout=7)
 			if not result or '<table' not in result: return
 			rows = client.parseDOM(result, 'tr', attrs={'class': 'row'})
 		except:
@@ -139,7 +139,7 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			result = client.request(link, timeout=5)
+			result = client.request(link, timeout=7)
 			if not result or '<table' not in result: return
 			rows = client.parseDOM(result, 'tr', attrs={'class': 'row'})
 		except:

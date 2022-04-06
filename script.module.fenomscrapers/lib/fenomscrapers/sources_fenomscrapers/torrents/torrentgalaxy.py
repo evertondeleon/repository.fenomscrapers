@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 3-02-2022)
+# created by Venom for Fenomscrapers (updated 4-05-2022)
 """
 	Fenomscrapers Project
 """
@@ -19,7 +19,9 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = "https://torrentgalaxy.to"
+# capcha ["torrentgalaxy.to", "torrentgalaxy.mx"
+# working ["torrentgalaxy.su", "https://tgx.rs"]
+		self.base_link = "https://torrentgalaxy.su"
 		self.search_link = '/torrents.php?search=%s&sort=seeders&order=desc'
 		self.min_seeders = 0
 

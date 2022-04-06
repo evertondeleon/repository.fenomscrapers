@@ -71,8 +71,7 @@ class source:
 
 				link = re.search(r'href\s*=\s*["\']/(.+?)["\']>', columns[0], re.I).group(1).split('/')
 				hash = link[0]
-				name = unquote_plus(link[1]).replace('&amp;', '&')
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(unquote_plus(link[1]).replace('&amp;', '&'))
 
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
@@ -157,8 +156,7 @@ class source:
 
 				link = re.search(r'href\s*=\s*["\']/(.+?)["\']>', columns[0], re.I).group(1).split('/')
 				hash = link[0]
-				name = unquote_plus(link[1]).replace('&amp;', '&')
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(unquote_plus(link[1]).replace('&amp;', '&'))
 
 				episode_start, episode_end = 0, 0
 				if not self.search_series:

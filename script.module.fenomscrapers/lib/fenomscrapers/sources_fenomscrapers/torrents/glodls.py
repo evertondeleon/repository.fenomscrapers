@@ -43,7 +43,7 @@ class source:
 			else: url = self.moviesearch.format(quote_plus(query))
 			url = '%s%s' % (self.base_link, url)
 			# log_utils.log('url = %s' % url)
-			result = client.request(url, timeout=7)
+			result = client.request(url, timeout=10)
 			if not result: return sources
 			rows = client.parseDOM(result, 'tr', attrs={'class': 't-row'})
 			if not rows: return sources
@@ -61,13 +61,12 @@ class source:
 				url = unquote_plus(columns[3]).replace('&amp;', '&')
 				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				# name = source_utils.clean_name(url.split('&dn=')[1].replace('.torrent', ''))
 				name = client.parseDOM(columns[1], 'a', ret='title')[0].replace('/', '').replace('  ', ' ')
 
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info, check_foreign_audio): continue
-				# if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
+				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
@@ -133,7 +132,7 @@ class source:
 
 	def get_sources_packs(self, link):
 		try:
-			result = client.request(link, timeout=7)
+			result = client.request(link, timeout=10)
 			if not result: return
 			rows = client.parseDOM(result, 'tr', attrs={'class': 't-row'})
 			if not rows: return
@@ -148,7 +147,6 @@ class source:
 				url = unquote_plus(columns[3]).replace('&amp;', '&')
 				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
-				# name = source_utils.clean_name(url.split('&dn=')[1].replace('.torrent', ''))
 				name = client.parseDOM(columns[1], 'a', ret='title')[0].replace('/', '').replace('  ', ' ') # glotorrents seems to fix incomplete packs as a range in html title tag
 
 				episode_start, episode_end = 0, 0
@@ -167,7 +165,7 @@ class source:
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info, self.check_foreign_audio): continue
-				# if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
+				if self.undesirables and source_utils.remove_undesirables(name_info, self.undesirables): continue
 				try:
 					seeders = int(re.search(r'>(\d+|\d+\,\d+)<', columns[5]).group(1).replace(',', ''))
 					if self.min_seeders > seeders: continue

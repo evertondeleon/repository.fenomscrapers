@@ -172,7 +172,7 @@ def check_title(title, aliases, release_title, hdlr, year, years=None): # non pa
 	except:
 		from fenomscrapers.modules import log_utils
 		log_utils.error()
-		return match
+		return False
 
 def remove_lang(release_info, check_foreign_audio):
 	if not release_info: return False

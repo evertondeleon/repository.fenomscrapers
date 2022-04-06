@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 3-02-2022)
+# created by Venom for Fenomscrapers (updated 4-05-2022)
 """
 	Fenomscrapers Project
 """
@@ -59,8 +59,8 @@ class source:
 	def get_sources(self, url):
 		try:
 			results = client.request(url, timeout=7)
-			if not results or 'search-result view-box' not in results: return
-			rows = client.parseDOM(results, 'li', attrs={'class': 'search-result view-box'})
+			if not results or 'card search-result my-2' not in results: return
+			rows = client.parseDOM(results, 'li', attrs={'class': 'card search-result my-2'})
 		except:
 			source_utils.scraper_error('BITSEARCH')
 		for row in rows:
@@ -146,8 +146,8 @@ class source:
 	def get_sources_packs(self, link):
 		try:
 			results = client.request(link, timeout=7)
-			if not results or 'search-result view-box' not in results: return
-			rows = client.parseDOM(results, 'li', attrs={'class': 'search-result view-box'})
+			if not results or 'card search-result my-2' not in results: return
+			rows = client.parseDOM(results, 'li', attrs={'class': 'card search-result my-2'})
 		except:
 			source_utils.scraper_error('BITSEARCH')
 		for row in rows:

@@ -5,7 +5,7 @@
 """
 
 import re
-from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers

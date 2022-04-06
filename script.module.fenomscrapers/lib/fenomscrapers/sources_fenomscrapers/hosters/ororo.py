@@ -13,6 +13,7 @@ from fenomscrapers.modules import client
 from fenomscrapers.modules.control import setting as getSetting
 from fenomscrapers.modules import source_utils
 
+
 class source:
 	priority = 25
 	pack_capable = False
@@ -44,7 +45,6 @@ class source:
 		append = sources.append
 		try:
 			if (self.user == '' or self.password == ''): return sources
-
 			url = cache.get(self.ororo_tvcache, 120, self.user)
 			if not url: return sources
 			url = [i[0] for i in url if data['imdb'] == i[1]]
@@ -64,7 +64,7 @@ class source:
 			url = client.request(url, headers=self.headers)
 			if not url: return sources
 			url = jsloads(url)['url']
-			# log_utils.log('url = %s' % url)
+			# log_utils.log('url = %s' % url, __name__)
 
 			name = re.sub(r'(.*?)\/video/file/(.*?)/', '', url).split('.smil')[0].split('-')[0]
 			quality, info = source_utils.get_release_quality(name)
