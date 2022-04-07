@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.1.7" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="2.1.8" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -27,11 +27,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v2.1.7 - April 05, 2022[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Fixed BITSEARCH scraper for html tag site changes.[/I]
-[COLOR yellow]--[/COLOR][I] Changed default scrapers to remove EXT and replace with BITSEARCH.  EXT site limits source title length and tends to chop off file info so we favor BITSEARCH results that do not suffer this issue.[/I]
-[COLOR yellow]--[/COLOR][I] Changed TORRENTGALAXY to proxy due to new capcha.[/I]
-[COLOR yellow]--[/COLOR][I] Updated cloudscraper to v1.2.60.[/I]
+[B][COLOR red]Update - v2.1.8 - April 07, 2022[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed BITCQ bug in pack file title checking.[/I]
+[COLOR yellow]--[/COLOR][I] Updated torrentinfo help file.[/I]
+[COLOR yellow]--[/COLOR][I] Small fix for BITSEARCH query results when an item might contain a new liked count mucking with the index.[/I]
 		</news>
 	</extension>
 </addon>

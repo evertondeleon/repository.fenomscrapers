@@ -7,7 +7,7 @@
 import re
 from urllib.parse import quote_plus, unquote_plus
 from fenomscrapers.modules import client
-from fenomscrapers.modules import source_utils
+from fenomscrapers.modules import source_utils, log_utils
 from fenomscrapers.modules import workers
 
 
@@ -67,8 +67,8 @@ class source:
 			try:
 				if 'magnet:' not in row: continue
 				columns = re.findall(r'<div.*?>(.*?)</div>', row, re.DOTALL)
-
-				url = re.search(r'href\s*=\s*["\'](magnet:.+?)["\']', columns[5], re.I).group(1)
+				magnet_index = len(columns)-1 # likes might be added so magnet is in last index
+				url = re.search(r'href\s*=\s*["\'](magnet:.+?)["\']', columns[magnet_index], re.I).group(1)
 				url = unquote_plus(url).replace('&amp;', '&').replace('&#x3D;', '=')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url).replace(' ', '.') # some links on bitsearch &tr= before &dn=
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
@@ -154,8 +154,8 @@ class source:
 			try:
 				if 'magnet:' not in row: continue
 				columns = re.findall(r'<div.*?>(.*?)</div>', row, re.DOTALL)
-
-				url = re.search(r'href\s*=\s*["\'](magnet:.+?)["\']', columns[5], re.I).group(1)
+				magnet_index = len(columns)-1 # likes might be added so magnet is in last index
+				url = re.search(r'href\s*=\s*["\'](magnet:.+?)["\']', columns[magnet_index], re.I).group(1)
 				url = unquote_plus(url).replace('&amp;', '&').replace('&#x3D;', '=')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url).replace(' ', '.') # some links on bitsearch &tr= before &dn=
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)

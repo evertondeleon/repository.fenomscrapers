@@ -19,7 +19,7 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-# capcha ["torrentgalaxy.to", "torrentgalaxy.mx"
+# captcha ["torrentgalaxy.to", "torrentgalaxy.mx"
 # working ["torrentgalaxy.su", "https://tgx.rs"]
 		self.base_link = "https://torrentgalaxy.su"
 		self.search_link = '/torrents.php?search=%s&sort=seeders&order=desc'

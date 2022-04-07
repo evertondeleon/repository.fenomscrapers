@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-20-2021)
+# created by Venom for Fenomscrapers (updated 4-06-2022)
 """
 	Fenomscrapers Project
 """
@@ -53,7 +53,6 @@ class source:
 
 				url = unquote_plus(columns[0]).replace('&amp;', '&')
 				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
-				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1])
 
@@ -137,13 +136,14 @@ class source:
 
 				url = unquote_plus(columns[0]).replace('&amp;', '&')
 				url = re.search(r'(magnet:.+?)&tr=', url, re.I).group(1).replace(' ', '.')
-				# url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1])
 
+				episode_start, episode_end = 0, 0
 				if not self.search_series:
 					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
+						valid, episode_start, episode_end = source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name)
+						if not valid: continue
 					package = 'season'
 
 				elif self.search_series:
@@ -172,6 +172,7 @@ class source:
 				item = {'provider': 'bitcq', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if self.search_series: item.update({'last_season': last_season})
+				elif episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
 				self.sources_append(item)
 			except:
 				source_utils.scraper_error('BITCQ')
