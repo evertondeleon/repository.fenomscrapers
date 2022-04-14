@@ -1,4 +1,8 @@
 
+[B][COLOR red]Update - v2.1.9 - April 14, 2022[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Development ended and closed.[/I]
+
+
 [B][COLOR red]Update - v2.1.8 - April 07, 2022[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed BITCQ bug in pack file title checking.[/I]
 [COLOR yellow]--[/COLOR][I] Updated torrentinfo help file.[/I]
